@@ -553,11 +553,11 @@
         <p>Registre uma Ordem de Serviço para a equipe de manutenção avaliar, executar e encerrar com rastreabilidade.</p>
       </header>
 
-     <form class="form-card">
+     <form class="form-card" onsubmit="return false;">
 
      <label>
         Escolher o andar
-        <select id="andarChamado">
+        <select id="andarChamado" onchange="atualizarLocaisPorAndarManutencao()">
           <option value="">Selecione o andar</option>
           <option value="1º ANDAR">1º ANDAR</option>
           <option value="SL ANDAR">SL ANDAR</option>
@@ -587,7 +587,7 @@
 
      <label>
         Categoria da OS
-        <select id="categoriaChamado">
+        <select id="categoriaChamado" onchange="atualizarSubcategoriasChamado(this.value)">
           <option value="">Selecione</option>
           <option value="Elétrica">Elétrica</option>
           <option value="Hidráulica">Hidráulica</option>
@@ -617,7 +617,9 @@
         Nome do Solicitante
        <input 
        id="setorChamado" 
+       name="solicitanteChamado"
        type="text" 
+       autocomplete="name"
        placeholder="Digite o nome de quem está solicitando a OS"
        />
      </label>

@@ -1,12 +1,16 @@
+/* =====================================================
+   CATEGORIAS, SUBCATEGORIAS E LOCAIS DA OS
+   Fonte única para os selects da abertura de OS.
+===================================================== */
 
-const categoriasManutencao = {
+const categoriasManutencao = Object.freeze({
   "Elétrica": [
     "Iluminação",
     "Tomadas",
     "Interruptores",
     "Torneira elétrica",
     "Disjuntores",
-    "Quadro Elétrico",
+    "Quadro elétrico",
     "Cabeamento",
     "Eletrocalhas",
     "Aterramento / SPDA",
@@ -33,74 +37,29 @@ const categoriasManutencao = {
     "Corrimão / escada"
   ],
   "Pintura": [
-    "Pintura Interna",
-    "Pintura Externa",
+    "Pintura interna",
+    "Pintura externa",
     "Retoque",
     "Sinalização"
   ],
   "Eletrônica": [
     "Projetores",
     "CFTV",
-    "Controle de Acesso",
+    "Controle de acesso",
     "Som",
-    "Painel Eletrônico",
+    "Painel eletrônico",
     "TVs",
     "Alarmes / sensores"
   ],
   "Outros": [
     "Mobiliário",
     "Jardinagem",
-    "Limpeza Técnica",
-    "Serviços Gerais"
+    "Limpeza técnica",
+    "Serviços gerais"
   ]
-};
+});
 
-function atualizarSubcategoriasChamado(categoriaSelecionada, subcategoriaSelecionada = "") {
-  const subcategoria = document.getElementById("subcategoriaChamado");
-  if (!subcategoria) return;
-
-  const valorAtual = subcategoriaSelecionada || subcategoria.value || "";
-  const lista = categoriasManutencao[categoriaSelecionada] || [];
-  subcategoria.innerHTML = lista.length
-    ? '<option value="">Selecione</option>'
-    : '<option value="">Selecione uma categoria primeiro</option>';
-
-  lista.forEach(item => {
-    const option = document.createElement("option");
-    option.value = item;
-    option.textContent = item;
-    subcategoria.appendChild(option);
-  });
-
-  if (valorAtual && lista.includes(valorAtual)) {
-    subcategoria.value = valorAtual;
-  }
-
-  subcategoria.disabled = !lista.length;
-}
-
-function inicializarSubcategoriasChamado() {
-  const categoria = document.getElementById("categoriaChamado");
-  const subcategoria = document.getElementById("subcategoriaChamado");
-
-  if (!categoria || !subcategoria || categoria.dataset.subcategoriasInicializadas === "true") return;
-
-  categoria.dataset.subcategoriasInicializadas = "true";
-  categoria.addEventListener("change", () => {
-    atualizarSubcategoriasChamado(categoria.value, "");
-  });
-
-  atualizarSubcategoriasChamado(categoria.value, subcategoria.value);
-}
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", inicializarSubcategoriasChamado);
-} else {
-  inicializarSubcategoriasChamado();
-}
-
-
-const locaisPorAndarManutencao = {
+const locaisPorAndarManutencao = Object.freeze({
   "1º ANDAR": [
     "banheiro masculino",
     "banheiro feminino",
@@ -160,40 +119,94 @@ const locaisPorAndarManutencao = {
     "Sala de Bombas d'água",
     "Caixa d'água"
   ]
-};
+});
 
-function atualizarLocaisPorAndarManutencao() {
-  const andar = document.getElementById("andarChamado");
-  const local = document.getElementById("localChamado");
+function preencherSelect(select, opcoes, placeholder, valorSelecionado = "") {
+  if (!select) return;
 
-  if (!andar || !local) return;
+  const valorAnterior = valorSelecionado || select.value || "";
+  select.innerHTML = `<option value="">${placeholder}</option>`;
 
-  const locais = locaisPorAndarManutencao[andar.value] || [];
-  local.innerHTML = locais.length
-    ? '<option value="">Selecione o local</option>'
-    : '<option value="">Selecione um andar primeiro</option>';
-
-  locais.forEach(nomeLocal => {
+  opcoes.forEach(opcao => {
     const option = document.createElement("option");
-    option.value = nomeLocal;
-    option.textContent = nomeLocal;
-    local.appendChild(option);
+    option.value = opcao;
+    option.textContent = opcao;
+    select.appendChild(option);
   });
 
-  local.disabled = !locais.length;
+  select.disabled = opcoes.length === 0;
+
+  if (valorAnterior && opcoes.includes(valorAnterior)) {
+    select.value = valorAnterior;
+  } else {
+    select.value = "";
+  }
 }
 
-function inicializarLocaisPorAndarManutencao() {
-  const andar = document.getElementById("andarChamado");
-  if (!andar || andar.dataset.locaisInicializados === "true") return;
+function atualizarSubcategoriasChamado(categoriaSelecionada, subcategoriaSelecionada = "") {
+  const categoria = String(categoriaSelecionada || "").trim();
+  const subcategoriaSelect = document.getElementById("subcategoriaChamado");
+  const lista = categoriasManutencao[categoria] || [];
 
-  andar.dataset.locaisInicializados = "true";
-  andar.addEventListener("change", atualizarLocaisPorAndarManutencao);
-  atualizarLocaisPorAndarManutencao();
+  preencherSelect(
+    subcategoriaSelect,
+    lista,
+    lista.length ? "Selecione a subcategoria" : "Selecione uma categoria primeiro",
+    subcategoriaSelecionada
+  );
+}
+
+function atualizarLocaisPorAndarManutencao(localSelecionado = "") {
+  const andarSelect = document.getElementById("andarChamado");
+  const localSelect = document.getElementById("localChamado");
+  const andar = andarSelect ? String(andarSelect.value || "").trim() : "";
+  const locais = locaisPorAndarManutencao[andar] || [];
+
+  preencherSelect(
+    localSelect,
+    locais,
+    locais.length ? "Selecione o local" : "Selecione um andar primeiro",
+    localSelecionado
+  );
+}
+
+function inicializarFormularioLocalizacaoOS() {
+  const andarSelect = document.getElementById("andarChamado");
+  const localSelect = document.getElementById("localChamado");
+
+  if (!andarSelect || !localSelect) return;
+
+  if (andarSelect.dataset.localizacaoInicializada !== "true") {
+    andarSelect.dataset.localizacaoInicializada = "true";
+    andarSelect.addEventListener("change", () => atualizarLocaisPorAndarManutencao(""));
+  }
+
+  atualizarLocaisPorAndarManutencao(localSelect.value || "");
+}
+
+function inicializarFormularioCategoriaOS() {
+  const categoriaSelect = document.getElementById("categoriaChamado");
+  const subcategoriaSelect = document.getElementById("subcategoriaChamado");
+
+  if (!categoriaSelect || !subcategoriaSelect) return;
+
+  if (categoriaSelect.dataset.categoriaInicializada !== "true") {
+    categoriaSelect.dataset.categoriaInicializada = "true";
+    categoriaSelect.addEventListener("change", () => atualizarSubcategoriasChamado(categoriaSelect.value, ""));
+  }
+
+  atualizarSubcategoriasChamado(categoriaSelect.value, subcategoriaSelect.value || "");
+}
+
+function inicializarFormularioOS() {
+  inicializarFormularioLocalizacaoOS();
+  inicializarFormularioCategoriaOS();
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", inicializarLocaisPorAndarManutencao);
+  document.addEventListener("DOMContentLoaded", inicializarFormularioOS);
 } else {
-  inicializarLocaisPorAndarManutencao();
+  inicializarFormularioOS();
 }
+
+window.addEventListener("load", inicializarFormularioOS);

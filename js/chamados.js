@@ -3,105 +3,60 @@
 ===================================================== */
 
 async function criarChamado() {
-  const localInput = document.getElementById("localChamado");
-  const andarInput = document.getElementById("andarChamado");
-  const setorInput = document.getElementById("setorChamado");
-  const equipamentoInput = document.getElementById("equipamentoChamado");
-  const horarioInput = document.getElementById("horarioChamado");
-  const acompanhamentoInput = document.getElementById("precisaAcompanhamento");
-  const categoriaInput = document.getElementById("categoriaChamado");
-  const prioridadeInput = document.getElementById("prioridadeChamado");
-  const subcategoriaInput = document.getElementById("subcategoriaChamado");
-  const tipoManutencaoInput = document.getElementById("tipoManutencaoChamado");
-  const descricaoInput = document.getElementById("descricaoChamado");
-  const fotoInput = document.getElementById("fotoChamado");
+  if (typeof inicializarFormularioOS === "function") {
+    inicializarFormularioOS();
+  }
 
-  if (!localInput || !andarInput || !setorInput || !horarioInput || !categoriaInput || !prioridadeInput || !descricaoInput) {
-    alert("Erro: alguns campos do formulário não foram encontrados no HTML.");
+  const campos = obterCamposFormularioChamado();
+
+  if (!campos.formularioValido) {
+    alert("Erro: alguns campos do formulário de OS não foram encontrados no HTML. Atualize a página e tente novamente.");
+    console.error("Campos ausentes na OS:", campos.ausentes);
     return;
   }
 
-  const local = localInput.value.trim();
-  const andar = andarInput.value.trim();
-  const solicitanteInformado = setorInput.value.trim();
-  const setorSolicitante = solicitanteInformado;
-  const setor = solicitanteInformado;
-  const equipamentoCodigo = equipamentoInput ? equipamentoInput.value.trim().toUpperCase() : "";
-  const ativoVinculado = equipamentoCodigo && typeof encontrarAtivoPorCodigo === "function" ? encontrarAtivoPorCodigo(equipamentoCodigo) : null;
-  const equipamentoNome = ativoVinculado ? (ativoVinculado.nome || "") : "";
-  const horario = horarioInput.value;
-  const precisaAcompanhamento = acompanhamentoInput ? acompanhamentoInput.value : "Não informado";
-  const categoria = categoriaInput.value;
-  const prioridade = prioridadeInput.value;
-  const subcategoria = obterValorSelectChamado(subcategoriaInput);
-  const tipoManutencao = tipoManutencaoInput ? tipoManutencaoInput.value : "Corretiva";
-  const descricao = descricaoInput.value.trim();
-  const arquivosFotos = obterArquivosFotosChamado(fotoInput);
+  if (typeof atualizarLocaisPorAndarManutencao === "function") {
+    atualizarLocaisPorAndarManutencao(campos.local.value);
+  }
 
-  if (!andar || !local || !solicitanteInformado || !horario || !categoria || !subcategoria || !descricao) {
-    alert("Preencha andar, local do andar, nome do solicitante, melhor horário, categoria, subcategoria e descrição do problema.");
+  if (typeof atualizarSubcategoriasChamado === "function") {
+    atualizarSubcategoriasChamado(campos.categoria.value, campos.subcategoria.value);
+  }
+
+  const valores = lerValoresFormularioChamado(campos);
+  const camposPendentes = validarValoresFormularioChamado(valores);
+
+  marcarCamposObrigatoriosChamado(campos, camposPendentes);
+
+  if (camposPendentes.length > 0) {
+    alert(`Preencha os campos obrigatórios da OS:\n- ${camposPendentes.join("\n- ")}`);
     return;
   }
 
-  if (arquivosFotos.length > LIMITE_FOTOS_CHAMADO) {
+  if (valores.arquivosFotos.length > LIMITE_FOTOS_CHAMADO) {
     alert(`Selecione no máximo ${LIMITE_FOTOS_CHAMADO} imagens por chamado.`);
     return;
   }
 
   const agora = new Date();
   const dataAtual = agora.toLocaleDateString("pt-BR");
-  const resultadoFotos = await converterArquivosFotosChamado(arquivosFotos);
+  const resultadoFotos = await converterArquivosFotosChamado(valores.arquivosFotos);
   const fotosAnexadas = resultadoFotos.fotos;
   const fotoPrincipal = fotosAnexadas[0] || null;
 
   if (resultadoFotos.falhas > 0) {
-    alert("Uma ou mais imagens não puderam ser anexadas. O chamado será criado com as imagens válidas.");
+    alert("Uma ou mais imagens não puderam ser anexadas. A OS será criada com as imagens válidas.");
   }
 
   const numeroOS = gerarNumeroOS(agora);
 
-  const novoChamado = {
+  const novoChamado = montarObjetoChamado({
     numeroOS,
-    tipoRegistro: "OS",
-    etapaFluxo: "Solicitação registrada",
-    responsavelManutencao: "A definir",
-    iniciadoEmISO: "",
-    concluidoEmISO: "",
-    validadoEmISO: "",
-    descricao,
-    local,
-    andar,
-    equipamentoCodigo,
-    equipamentoNome,
-    setor,
-    setorSolicitante,
-    horario,
-    precisaAcompanhamento: precisaAcompanhamento || "Não informado",
-    categoria,
-    subcategoria,
-    tipoManutencao,
-    prioridade,
-    status: "ABERTO",
-    data: dataAtual,
-    foto: fotosAnexadas.map(foto => foto.nome).join(", "),
-    fotoNome: fotoPrincipal ? fotoPrincipal.nome : "",
-    fotoData: fotoPrincipal ? fotoPrincipal.data : "",
-    fotos: fotosAnexadas,
-    solicitanteId: usuarioAtual.id,
-    solicitanteNome: solicitanteInformado,
-    solicitanteEmail: usuarioAtual.email,
-    criadoPorUid: usuarioAtual.id,
-    criadoPorNome: usuarioAtual.nome || solicitanteInformado,
-    criadoPorEmail: usuarioAtual.email,
-    justificativaAguardando: "",
-    historico: [
-      {
-        data: dataAtual,
-        acao: "OS aberta",
-        descricao: `${numeroOS} registrada por ${usuarioAtual.nome || solicitanteInformado}. Solicitante informado: ${solicitanteInformado}${equipamentoCodigo ? ` e vinculada ao ativo ${equipamentoCodigo}` : ""}. Categoria: ${categoria}${subcategoria ? ` / ${subcategoria}` : ""}.`
-      }
-    ]
-  };
+    dataAtual,
+    valores,
+    fotosAnexadas,
+    fotoPrincipal
+  });
 
   try {
     const chamadoId = await criarChamadoFirebase(novoChamado);
@@ -115,9 +70,152 @@ async function criarChamado() {
     prepararAbaChamadosAposEnvio();
     openPage("chamados");
   } catch (erro) {
-    console.error("Erro ao enviar chamado:", erro);
-    alert("Não foi possível enviar o chamado para o Firebase.");
+    console.error("Erro ao enviar OS:", erro);
+    alert("Não foi possível enviar a OS para o Firebase. Verifique conexão, login e permissões.");
   }
+}
+
+function obterCamposFormularioChamado() {
+  const campos = {
+    andar: document.getElementById("andarChamado"),
+    local: document.getElementById("localChamado"),
+    solicitante: document.getElementById("solicitanteChamado") || document.getElementById("setorChamado"),
+    equipamento: document.getElementById("equipamentoChamado"),
+    horario: document.getElementById("horarioChamado"),
+    acompanhamento: document.getElementById("precisaAcompanhamento"),
+    categoria: document.getElementById("categoriaChamado"),
+    subcategoria: document.getElementById("subcategoriaChamado"),
+    tipoManutencao: document.getElementById("tipoManutencaoChamado"),
+    prioridade: document.getElementById("prioridadeChamado"),
+    descricao: document.getElementById("descricaoChamado"),
+    foto: document.getElementById("fotoChamado")
+  };
+
+  const obrigatorios = ["andar", "local", "solicitante", "horario", "categoria", "subcategoria", "prioridade", "descricao"];
+  const ausentes = obrigatorios.filter(nome => !campos[nome]);
+
+  return {
+    ...campos,
+    ausentes,
+    formularioValido: ausentes.length === 0
+  };
+}
+
+function lerValoresFormularioChamado(campos) {
+  const equipamentoCodigo = obterValorCampoChamado(campos.equipamento).toUpperCase();
+  const ativoVinculado = equipamentoCodigo && typeof encontrarAtivoPorCodigo === "function"
+    ? encontrarAtivoPorCodigo(equipamentoCodigo)
+    : null;
+
+  return {
+    andar: obterValorCampoChamado(campos.andar),
+    local: obterValorCampoChamado(campos.local),
+    solicitanteNome: obterValorCampoChamado(campos.solicitante),
+    equipamentoCodigo,
+    equipamentoNome: ativoVinculado ? (ativoVinculado.nome || "") : "",
+    horario: obterValorCampoChamado(campos.horario),
+    precisaAcompanhamento: obterValorCampoChamado(campos.acompanhamento) || "Não informado",
+    categoria: obterValorCampoChamado(campos.categoria),
+    subcategoria: obterValorCampoChamado(campos.subcategoria),
+    tipoManutencao: obterValorCampoChamado(campos.tipoManutencao) || "Corretiva",
+    prioridade: obterValorCampoChamado(campos.prioridade) || "Baixa",
+    descricao: obterValorCampoChamado(campos.descricao),
+    arquivosFotos: obterArquivosFotosChamado(campos.foto)
+  };
+}
+
+function obterValorCampoChamado(campo) {
+  if (!campo) return "";
+  return String(campo.value || "").trim();
+}
+
+function validarValoresFormularioChamado(valores) {
+  const regras = [
+    ["Escolher o andar", valores.andar],
+    ["Local do andar", valores.local],
+    ["Nome do solicitante", valores.solicitanteNome],
+    ["Melhor horário para atendimento", valores.horario],
+    ["Categoria da OS", valores.categoria],
+    ["Subcategoria", valores.subcategoria],
+    ["Prioridade", valores.prioridade],
+    ["Descrição da solicitação", valores.descricao]
+  ];
+
+  return regras
+    .filter(([, valor]) => !valor)
+    .map(([nome]) => nome);
+}
+
+function marcarCamposObrigatoriosChamado(campos, camposPendentes) {
+  const mapa = {
+    "Escolher o andar": campos.andar,
+    "Local do andar": campos.local,
+    "Nome do solicitante": campos.solicitante,
+    "Melhor horário para atendimento": campos.horario,
+    "Categoria da OS": campos.categoria,
+    "Subcategoria": campos.subcategoria,
+    "Prioridade": campos.prioridade,
+    "Descrição da solicitação": campos.descricao
+  };
+
+  Object.values(mapa).forEach(campo => {
+    if (campo) campo.classList.remove("campo-obrigatorio-pendente");
+  });
+
+  camposPendentes.forEach(nome => {
+    const campo = mapa[nome];
+    if (campo) campo.classList.add("campo-obrigatorio-pendente");
+  });
+}
+
+function montarObjetoChamado({ numeroOS, dataAtual, valores, fotosAnexadas, fotoPrincipal }) {
+  const usuario = usuarioAtual || {};
+  const criadoPorNome = usuario.nome || valores.solicitanteNome || "Não informado";
+  const criadoPorId = usuario.id || "colaborador-local";
+  const criadoPorEmail = usuario.email || "";
+
+  return {
+    numeroOS,
+    tipoRegistro: "OS",
+    etapaFluxo: "Solicitação registrada",
+    responsavelManutencao: "A definir",
+    iniciadoEmISO: "",
+    concluidoEmISO: "",
+    validadoEmISO: "",
+    descricao: valores.descricao,
+    andar: valores.andar,
+    local: valores.local,
+    equipamentoCodigo: valores.equipamentoCodigo,
+    equipamentoNome: valores.equipamentoNome,
+    setor: valores.solicitanteNome,
+    setorSolicitante: valores.solicitanteNome,
+    horario: valores.horario,
+    precisaAcompanhamento: valores.precisaAcompanhamento,
+    categoria: valores.categoria,
+    subcategoria: valores.subcategoria,
+    tipoManutencao: valores.tipoManutencao,
+    prioridade: valores.prioridade,
+    status: "ABERTO",
+    data: dataAtual,
+    foto: fotosAnexadas.map(foto => foto.nome).join(", "),
+    fotoNome: fotoPrincipal ? fotoPrincipal.nome : "",
+    fotoData: fotoPrincipal ? fotoPrincipal.data : "",
+    fotos: fotosAnexadas,
+    solicitanteId: criadoPorId,
+    solicitanteNome: valores.solicitanteNome,
+    solicitanteEmail: criadoPorEmail,
+    criadoPorUid: criadoPorId,
+    criadoPorNome,
+    criadoPorEmail,
+    justificativaAguardando: "",
+    historico: [
+      {
+        data: dataAtual,
+        acao: "OS aberta",
+        descricao: `${numeroOS} registrada por ${criadoPorNome}. Solicitante informado: ${valores.solicitanteNome}. Local: ${valores.andar} / ${valores.local}. Categoria: ${valores.categoria} / ${valores.subcategoria}.`
+      }
+    ]
+  };
 }
 
 

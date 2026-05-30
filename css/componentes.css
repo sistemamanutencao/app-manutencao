@@ -358,3 +358,9 @@
   gap: 10px;
   margin-top: 12px;
 }
+
+
+.campo-obrigatorio-pendente {
+  border-color: #d93025 !important;
+  box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.12) !important;
+}
