@@ -88,6 +88,10 @@ function executarRenderizacaoDaPagina(pageId) {
     renderizarAtivos();
   }
 
+  if (pageId === "leitor-qr" && typeof renderizarResultadoLeitorQR === "function") {
+    renderizarResultadoLeitorQR(null);
+  }
+
   if (pageId === "preventivas" && typeof renderizarPlanosPreventivos === "function") {
     renderizarPlanosPreventivos();
   }

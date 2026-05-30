@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-etapa6-ativos-excluir-v2";
+const CACHE_NAME = "app-manutencao-etapa7-leitor-qr-v1";
 
 const FILES_TO_CACHE = [
   "./",
@@ -28,6 +28,7 @@ const FILES_TO_CACHE = [
   "./js/perfil.js",
   "./js/comunicados.js",
   "./js/ativos.js",
+  "./js/leitor-qr.js",
   "./js/preventivas.js",
   "./js/app.js",
   "./img/senac-predio.png",

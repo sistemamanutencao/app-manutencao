@@ -62,6 +62,17 @@
             <p>Abrir Ordem de Serviço</p>
           </div>
 
+          <div class="quick-card" onclick="abrirLeitorQRCode()">
+            <div class="quick-icon green-bg">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 4h6v6H4V4ZM14 4h6v6h-6V4ZM4 14h6v6H4v-6Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="M14 14h2M18 14h2M14 18h6M18 16v4" stroke="currentColor" stroke-linecap="round" />
+              </svg>
+            </div>
+            <h3>Ler QR Code</h3>
+            <p>Consultar histórico ou abrir OS</p>
+          </div>
+
           <div class="quick-card" onclick="openPage('chamados')">
             <div class="quick-icon green-bg">
               <svg viewBox="0 0 24 24" fill="none">
@@ -320,6 +331,45 @@
 
       <div class="asset-list" id="listaAtivos">
         <!-- Ativos carregados pelo JavaScript -->
+      </div>
+    </section>
+
+    <!-- ABA LEITOR QR CODE -->
+    <section class="page" id="leitor-qr">
+      <header class="page-header">
+        <h1>Leitor de QR Code</h1>
+        <p>Leia o QR Code de um ambiente, equipamento ou patrimônio para consultar histórico de manutenção ou abrir uma nova OS vinculada.</p>
+      </header>
+
+      <div class="form-card qr-reader-card">
+        <video id="videoLeitorQR" class="qr-reader-video" playsinline muted></video>
+        <p id="statusLeitorQR" class="form-help">Clique em iniciar leitura e permita o acesso à câmera.</p>
+
+        <div class="form-row">
+          <button type="button" class="primary-button" onclick="iniciarLeituraQRCode()">
+            Iniciar leitura
+          </button>
+          <button type="button" class="secondary-button" onclick="pararLeituraQRCode()">
+            Parar câmera
+          </button>
+        </div>
+
+        <label>
+          Código do QR
+          <input id="codigoQRManual" type="text" placeholder="Digite ou cole o código do QR" />
+        </label>
+
+        <button type="button" class="secondary-button" onclick="processarQRCodeManual()">
+          Consultar código
+        </button>
+      </div>
+
+      <div class="section-header spacing">
+        <h2>Resultado da leitura</h2>
+      </div>
+
+      <div id="resultadoLeitorQR" class="asset-list">
+        <!-- Resultado carregado pelo JavaScript -->
       </div>
     </section>
 
@@ -999,6 +1049,7 @@
   <script src="js/perfil.js"></script>
   <script src="js/comunicados.js"></script>
   <script src="js/ativos.js"></script>
+  <script src="js/leitor-qr.js"></script>
   <script src="js/preventivas.js"></script>
   <script src="js/app.js"></script>
 
