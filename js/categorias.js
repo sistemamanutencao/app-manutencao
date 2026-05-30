@@ -55,26 +55,49 @@ const categoriasManutencao = {
   ]
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+function atualizarSubcategoriasChamado(categoriaSelecionada, subcategoriaSelecionada = "") {
+  const subcategoria = document.getElementById("subcategoriaChamado");
+  if (!subcategoria) return;
+
+  const valorAtual = subcategoriaSelecionada || subcategoria.value || "";
+  const lista = categoriasManutencao[categoriaSelecionada] || [];
+  subcategoria.innerHTML = lista.length
+    ? '<option value="">Selecione</option>'
+    : '<option value="">Selecione uma categoria primeiro</option>';
+
+  lista.forEach(item => {
+    const option = document.createElement("option");
+    option.value = item;
+    option.textContent = item;
+    subcategoria.appendChild(option);
+  });
+
+  if (valorAtual && lista.includes(valorAtual)) {
+    subcategoria.value = valorAtual;
+  }
+
+  subcategoria.disabled = !lista.length;
+}
+
+function inicializarSubcategoriasChamado() {
   const categoria = document.getElementById("categoriaChamado");
   const subcategoria = document.getElementById("subcategoriaChamado");
 
-  if (!categoria || !subcategoria) return;
+  if (!categoria || !subcategoria || categoria.dataset.subcategoriasInicializadas === "true") return;
 
+  categoria.dataset.subcategoriasInicializadas = "true";
   categoria.addEventListener("change", () => {
-    const valor = categoria.value;
-    subcategoria.innerHTML = '<option value="">Selecione</option>';
-
-    if (!categoriasManutencao[valor]) return;
-
-    categoriasManutencao[valor].forEach(item => {
-      const option = document.createElement("option");
-      option.value = item;
-      option.textContent = item;
-      subcategoria.appendChild(option);
-    });
+    atualizarSubcategoriasChamado(categoria.value, "");
   });
-});
+
+  atualizarSubcategoriasChamado(categoria.value, subcategoria.value);
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", inicializarSubcategoriasChamado);
+} else {
+  inicializarSubcategoriasChamado();
+}
 
 
 const locaisPorAndarManutencao = {
@@ -160,10 +183,17 @@ function atualizarLocaisPorAndarManutencao() {
   local.disabled = !locais.length;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function inicializarLocaisPorAndarManutencao() {
   const andar = document.getElementById("andarChamado");
-  if (!andar) return;
+  if (!andar || andar.dataset.locaisInicializados === "true") return;
 
+  andar.dataset.locaisInicializados = "true";
   andar.addEventListener("change", atualizarLocaisPorAndarManutencao);
   atualizarLocaisPorAndarManutencao();
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", inicializarLocaisPorAndarManutencao);
+} else {
+  inicializarLocaisPorAndarManutencao();
+}

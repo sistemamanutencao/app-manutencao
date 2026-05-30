@@ -460,8 +460,9 @@ function criarCardPainel(chamado) {
         <p><strong>Tipo de manutenção:</strong> ${escaparHTML(chamado.tipoManutencao || "Corretiva")}</p>
         <p><strong>Prioridade:</strong> ${escaparHTML(chamado.prioridade)}</p>
         <p><strong>SLA:</strong> ${escaparHTML(textoSLA)}</p>
-        <p><strong>Solicitante:</strong> ${escaparHTML(chamado.solicitanteNome || "Não informado")}</p>
-        <p><strong>Setor:</strong> ${escaparHTML(chamado.setor || "Não informado")}</p>
+        <p><strong>Criado por:</strong> ${escaparHTML(chamado.criadoPorNome || chamado.solicitanteNome || "Não informado")}</p>
+        <p><strong>Solicitante informado:</strong> ${escaparHTML(chamado.setorSolicitante || chamado.solicitanteNome || chamado.setor || "Não informado")}</p>
+        <p><strong>Andar:</strong> ${escaparHTML(chamado.andar || "Não informado")}</p>
         <p><strong>Melhor horário:</strong> ${escaparHTML(chamado.horario || "Não informado")}</p>
         <p><strong>Necessário acompanhar:</strong> ${escaparHTML(chamado.precisaAcompanhamento || "Não informado")}</p>
 

@@ -23,8 +23,9 @@ async function criarChamado() {
 
   const local = localInput.value.trim();
   const andar = andarInput.value.trim();
-  const setorSolicitante = setorInput.value.trim();
-  const setor = andar;
+  const solicitanteInformado = setorInput.value.trim();
+  const setorSolicitante = solicitanteInformado;
+  const setor = solicitanteInformado;
   const equipamentoCodigo = equipamentoInput ? equipamentoInput.value.trim().toUpperCase() : "";
   const ativoVinculado = equipamentoCodigo && typeof encontrarAtivoPorCodigo === "function" ? encontrarAtivoPorCodigo(equipamentoCodigo) : null;
   const equipamentoNome = ativoVinculado ? (ativoVinculado.nome || "") : "";
@@ -32,12 +33,12 @@ async function criarChamado() {
   const precisaAcompanhamento = acompanhamentoInput ? acompanhamentoInput.value : "Não informado";
   const categoria = categoriaInput.value;
   const prioridade = prioridadeInput.value;
-  const subcategoria = subcategoriaInput ? subcategoriaInput.value : "";
+  const subcategoria = obterValorSelectChamado(subcategoriaInput);
   const tipoManutencao = tipoManutencaoInput ? tipoManutencaoInput.value : "Corretiva";
   const descricao = descricaoInput.value.trim();
   const arquivosFotos = obterArquivosFotosChamado(fotoInput);
 
-  if (!andar || !local || !setorSolicitante || !horario || !categoria || !subcategoria || !descricao) {
+  if (!andar || !local || !solicitanteInformado || !horario || !categoria || !subcategoria || !descricao) {
     alert("Preencha andar, local do andar, nome do solicitante, melhor horário, categoria, subcategoria e descrição do problema.");
     return;
   }
@@ -87,17 +88,17 @@ async function criarChamado() {
     fotoData: fotoPrincipal ? fotoPrincipal.data : "",
     fotos: fotosAnexadas,
     solicitanteId: usuarioAtual.id,
-    solicitanteNome: usuarioAtual.nome,
+    solicitanteNome: solicitanteInformado,
     solicitanteEmail: usuarioAtual.email,
     criadoPorUid: usuarioAtual.id,
-    criadoPorNome: usuarioAtual.nome,
+    criadoPorNome: usuarioAtual.nome || solicitanteInformado,
     criadoPorEmail: usuarioAtual.email,
     justificativaAguardando: "",
     historico: [
       {
         data: dataAtual,
         acao: "OS aberta",
-        descricao: `${numeroOS} registrada por ${usuarioAtual.nome}${equipamentoCodigo ? ` e vinculada ao ativo ${equipamentoCodigo}` : ""}. Categoria: ${categoria}${subcategoria ? ` / ${subcategoria}` : ""}.`
+        descricao: `${numeroOS} registrada por ${usuarioAtual.nome || solicitanteInformado}. Solicitante informado: ${solicitanteInformado}${equipamentoCodigo ? ` e vinculada ao ativo ${equipamentoCodigo}` : ""}. Categoria: ${categoria}${subcategoria ? ` / ${subcategoria}` : ""}.`
       }
     ]
   };
@@ -117,6 +118,15 @@ async function criarChamado() {
     console.error("Erro ao enviar chamado:", erro);
     alert("Não foi possível enviar o chamado para o Firebase.");
   }
+}
+
+
+function obterValorSelectChamado(select) {
+  if (!select) return "";
+  const valor = (select.value || "").trim();
+  if (valor) return valor;
+  const opcaoSelecionada = select.options && select.selectedIndex >= 0 ? select.options[select.selectedIndex] : null;
+  return opcaoSelecionada && opcaoSelecionada.value ? String(opcaoSelecionada.value).trim() : "";
 }
 
 function obterArquivosFotosChamado(fotoInput) {
@@ -182,6 +192,14 @@ function limparFormularioChamado() {
       campo.value = "";
     }
   });
+
+  if (typeof atualizarSubcategoriasChamado === "function") {
+    atualizarSubcategoriasChamado("");
+  }
+
+  if (typeof atualizarLocaisPorAndarManutencao === "function") {
+    atualizarLocaisPorAndarManutencao();
+  }
 
   const prioridadeInput = document.getElementById("prioridadeChamado");
   const acompanhamentoInput = document.getElementById("precisaAcompanhamento");
@@ -321,7 +339,7 @@ function criarCardChamado(chamado) {
           ${escaparHTML(chamado.local)}
           ${chamado.equipamentoCodigo ? `&nbsp;•&nbsp; Ativo ${escaparHTML(chamado.equipamentoCodigo)}` : ""}
           &nbsp;•&nbsp;
-          ${escaparHTML(chamado.setor || "Setor não informado")}
+          ${escaparHTML(chamado.setorSolicitante || chamado.solicitanteNome || chamado.setor || "Solicitante não informado")}
           &nbsp;•&nbsp;
           ${escaparHTML(chamado.data)}
         </p>
