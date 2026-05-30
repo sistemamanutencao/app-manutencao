@@ -297,3 +297,10 @@
   text-align: center;
   white-space: nowrap;
 }
+
+.foto-section-title {
+  display: block;
+  margin: 12px 0 8px;
+  font-size: 13px;
+  color: #334155;
+}

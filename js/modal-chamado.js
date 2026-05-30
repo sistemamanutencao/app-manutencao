@@ -219,8 +219,9 @@ async function executarCancelamentoChamado(id, motivo, acaoHistorico, botao) {
 
 function renderizarFotoDetalhe(chamado) {
   const fotos = obterFotosDoChamado(chamado);
+  const fotosFinalizacao = obterFotosFinalizacaoDoChamado(chamado);
 
-  if (fotos.length === 0) {
+  if (fotos.length === 0 && fotosFinalizacao.length === 0) {
     if (chamado.fotoNome) {
       return escaparHTML(`${chamado.fotoNome} (prévia indisponível)`);
     }
@@ -229,19 +230,39 @@ function renderizarFotoDetalhe(chamado) {
   }
 
   return `
-    <div class="foto-preview-grid">
-      ${fotos.map((foto, indice) => `
-        <div class="foto-preview-wrapper">
-          <button type="button" class="foto-preview-button" onclick="abrirFotoChamadoAtual(${indice})">
-            <img class="foto-preview" src="${foto.data}" alt="${escaparHTML(foto.nome)}" />
-          </button>
-          <small>${escaparHTML(`${indice + 1}/${fotos.length} • ${foto.nome}`)}</small>
-          <button type="button" class="foto-preview-link" onclick="abrirFotoChamadoAtual(${indice})">
-            Visualizar foto
-          </button>
-        </div>
-      `).join("")}
-    </div>
+    ${fotos.length > 0 ? `
+      <strong class="foto-section-title">Antes / abertura do chamado</strong>
+      <div class="foto-preview-grid">
+        ${fotos.map((foto, indice) => `
+          <div class="foto-preview-wrapper">
+            <button type="button" class="foto-preview-button" onclick="abrirFotoChamadoAtual(${indice})">
+              <img class="foto-preview" src="${foto.data}" alt="${escaparHTML(foto.nome)}" />
+            </button>
+            <small>${escaparHTML(`${indice + 1}/${fotos.length} • ${foto.nome}`)}</small>
+            <button type="button" class="foto-preview-link" onclick="abrirFotoChamadoAtual(${indice})">
+              Visualizar foto
+            </button>
+          </div>
+        `).join("")}
+      </div>
+    ` : ""}
+
+    ${fotosFinalizacao.length > 0 ? `
+      <strong class="foto-section-title">Depois / finalização da manutenção</strong>
+      <div class="foto-preview-grid">
+        ${fotosFinalizacao.map((foto, indice) => `
+          <div class="foto-preview-wrapper">
+            <button type="button" class="foto-preview-button" onclick="abrirFotoFinalizacaoChamadoAtual(${indice})">
+              <img class="foto-preview" src="${foto.data}" alt="${escaparHTML(foto.nome)}" />
+            </button>
+            <small>${escaparHTML(`${indice + 1}/${fotosFinalizacao.length} • ${foto.nome}`)}</small>
+            <button type="button" class="foto-preview-link" onclick="abrirFotoFinalizacaoChamadoAtual(${indice})">
+              Visualizar foto
+            </button>
+          </div>
+        `).join("")}
+      </div>
+    ` : ""}
   `;
 }
 
@@ -273,6 +294,19 @@ function obterFotosDoChamado(chamado) {
   return [];
 }
 
+function obterFotosFinalizacaoDoChamado(chamado) {
+  if (!chamado || !Array.isArray(chamado.fotosFinalizacao)) {
+    return [];
+  }
+
+  return chamado.fotosFinalizacao
+    .map(foto => ({
+      nome: foto && foto.nome ? String(foto.nome) : "Foto de finalização",
+      data: foto && foto.data ? String(foto.data) : ""
+    }))
+    .filter(foto => foto.data.startsWith("data:image"));
+}
+
 function abrirFotoChamadoAtual(indiceFoto = 0) {
   const chamado = obterChamadoSelecionado();
 
@@ -286,6 +320,25 @@ function abrirFotoChamadoAtual(indiceFoto = 0) {
 
   if (!foto) {
     alert("Este chamado não possui uma foto disponível para visualização.");
+    return;
+  }
+
+  abrirVisualizacaoFoto(foto.data, foto.nome);
+}
+
+function abrirFotoFinalizacaoChamadoAtual(indiceFoto = 0) {
+  const chamado = obterChamadoSelecionado();
+
+  if (!chamado) {
+    alert("Nenhum chamado selecionado.");
+    return;
+  }
+
+  const fotos = obterFotosFinalizacaoDoChamado(chamado);
+  const foto = fotos[indiceFoto];
+
+  if (!foto) {
+    alert("Este chamado não possui uma foto de finalização disponível para visualização.");
     return;
   }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v11-multiplas-fotos";
+const CACHE_NAME = "app-manutencao-v12-colaborador-simples-foto-final";
 
 const FILES_TO_CACHE = [
   "./",

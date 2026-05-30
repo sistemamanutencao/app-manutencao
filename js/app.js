@@ -79,6 +79,18 @@ async function processarEstadoAutenticacao(usuarioFirebase) {
     return;
   }
 
+  if (usuarioFirebase.isAnonymous) {
+    if (!configurarColaboradorAnonimo(usuarioFirebase)) {
+      prepararTelaSemSessao();
+      return;
+    }
+
+    aplicarPermissoesNaTela();
+    iniciarMonitoresDeDados();
+    openPage("inicio");
+    return;
+  }
+
   try {
     const perfil = await buscarPerfilFirebase(usuarioFirebase.uid);
 
@@ -105,6 +117,28 @@ async function processarEstadoAutenticacao(usuarioFirebase) {
     alert("Não foi possível carregar o perfil do usuário no Firebase.");
     await encerrarSessaoFirebase();
   }
+}
+
+function configurarColaboradorAnonimo(usuarioFirebase) {
+  const colaboradorLocal = typeof obterColaboradorLocal === "function" ? obterColaboradorLocal() : {};
+
+  if (!colaboradorLocal.nome || !colaboradorLocal.setor) {
+    return false;
+  }
+
+  usuarioAtual = {
+    id: usuarioFirebase.uid,
+    nome: colaboradorLocal.nome,
+    setor: colaboradorLocal.setor,
+    email: "",
+    unidade: "Senac Campo Mourão",
+    perfil: "colaborador",
+    manutencaoAutorizado: false,
+    perfilConfigurado: true
+  };
+
+  preencherFormularioPerfil();
+  return true;
 }
 
 function normalizarUsuarioLogado(usuarioFirebase, perfil) {

@@ -417,33 +417,68 @@
 
   <!-- FORMULÁRIO DE LOGIN / IDENTIFICAÇÃO -->
   <div class="form-card profile-form-card" id="areaFormularioPerfil">
+    <h2>Acesso do colaborador</h2>
+    <p class="form-help">Para abrir e acompanhar chamados, informe apenas seus dados de identificação.</p>
+
     <label>
-      E-mail
+      Nome do colaborador
       <input
-        id="loginEmailUsuario"
-        type="email"
-        autocomplete="email"
-        placeholder="usuario@senac.com"
+        id="loginNomeColaborador"
+        type="text"
+        autocomplete="name"
+        placeholder="Digite seu nome"
       />
     </label>
 
     <label>
-      Senha
+      Setor onde trabalha
       <input
-        id="loginSenhaUsuario"
-        type="password"
-        autocomplete="current-password"
-        placeholder="Digite sua senha"
+        id="loginSetorColaborador"
+        type="text"
+        placeholder="Ex: Administração, Biblioteca, Laboratório..."
       />
     </label>
 
     <button
       type="button"
       class="primary-button"
-      onclick="entrarComFirebase(this)"
+      onclick="entrarComoColaborador(this)"
     >
-      Entrar no app
+      Entrar como colaborador
     </button>
+
+    <div class="maintenance-login-box">
+      <h2>Acesso da manutenção</h2>
+      <p class="form-help">Uso exclusivo da equipe de manutenção autorizada.</p>
+
+      <label>
+        E-mail
+        <input
+          id="loginEmailUsuario"
+          type="email"
+          autocomplete="email"
+          placeholder="manutencao@senac.com"
+        />
+      </label>
+
+      <label>
+        Senha
+        <input
+          id="loginSenhaUsuario"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Digite sua senha"
+        />
+      </label>
+
+      <button
+        type="button"
+        class="secondary-button"
+        onclick="entrarComFirebase(this)"
+      >
+        Entrar como manutenção
+      </button>
+    </div>
   </div>
 
   <!-- ÁREA EXIBIDA SOMENTE DEPOIS DO LOGIN -->

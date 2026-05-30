@@ -32,6 +32,10 @@ function autenticarUsuario(email, senha) {
   return firebaseAuth.signInWithEmailAndPassword(email, senha);
 }
 
+function autenticarColaboradorAnonimo() {
+  return firebaseAuth.signInAnonymously();
+}
+
 function encerrarSessaoFirebase() {
   return firebaseAuth.signOut();
 }
@@ -164,6 +168,7 @@ function normalizarChamadoFirebase(documento) {
     fotoNome: dados.fotoNome || (fotos[0] ? fotos[0].nome : ""),
     fotoData: dados.fotoData || (fotos[0] ? fotos[0].data : ""),
     fotos,
+    fotosFinalizacao: normalizarFotosFinalizacaoChamadoFirebase(dados),
     solicitanteId: dados.solicitanteId || dados.criadoPorUid || "",
     solicitanteNome: dados.solicitanteNome || dados.criadoPorNome || "Não informado",
     solicitanteEmail: dados.solicitanteEmail || dados.criadoPorEmail || "",
@@ -202,6 +207,20 @@ function normalizarFotosChamadoFirebase(dados) {
   }
 
   return [];
+}
+
+function normalizarFotosFinalizacaoChamadoFirebase(dados) {
+  if (!Array.isArray(dados.fotosFinalizacao)) {
+    return [];
+  }
+
+  return dados.fotosFinalizacao
+    .map(foto => ({
+      nome: foto && foto.nome ? String(foto.nome) : "Foto de finalização",
+      data: foto && foto.data ? String(foto.data) : "",
+      adicionadaEm: foto && foto.adicionadaEm ? String(foto.adicionadaEm) : ""
+    }))
+    .filter(foto => foto.data.startsWith("data:image"));
 }
 
 function normalizarComunicadoFirebase(documento) {

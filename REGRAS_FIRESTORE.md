@@ -2,6 +2,8 @@
 
 Cole estas regras em **Firestore Database > Regras**.
 
+> Esta versão usa login simplificado para colaboradores com autenticação anônima do Firebase. Por isso, habilite também **Authentication > Sign-in method > Anonymous** no Firebase Console.
+
 ```js
 rules_version = '2';
 
@@ -48,9 +50,7 @@ service cloud.firestore {
 
     function chamadoPertenceAoUsuario() {
       return resource.data.criadoPorUid == request.auth.uid
-        || resource.data.solicitanteId == request.auth.uid
-        || resource.data.criadoPorEmail == request.auth.token.email
-        || resource.data.solicitanteEmail == request.auth.token.email;
+        || resource.data.solicitanteId == request.auth.uid;
     }
 
     function chamadoNaoFinalizado() {
@@ -72,7 +72,8 @@ service cloud.firestore {
     }
 
     function colaboradorPodeCancelarChamado() {
-      return chamadoPertenceAoUsuario()
+      return estaLogado()
+        && chamadoPertenceAoUsuario()
         && chamadoNaoFinalizado()
         && request.resource.data.status == "CANCELADO"
         && request.resource.data.canceladoPorUid == request.auth.uid
@@ -119,18 +120,19 @@ service cloud.firestore {
     }
 
     match /chamados/{chamadoId} {
-      allow create: if estaAtivo()
+      allow create: if estaLogado()
         && request.resource.data.criadoPorUid == request.auth.uid
+        && request.resource.data.solicitanteId == request.auth.uid
         && aguardandoTemJustificativa();
 
-      allow read: if estaAtivo()
+      allow read: if estaLogado()
         && (
           resource.data.criadoPorUid == request.auth.uid
           || resource.data.solicitanteId == request.auth.uid
           || ehManutencaoOuAdmin()
         );
 
-      allow update: if estaAtivo()
+      allow update: if estaLogado()
         && aguardandoTemJustificativa()
         && (
           ehManutencaoOuAdmin()
@@ -141,14 +143,14 @@ service cloud.firestore {
     }
 
     match /comunicados/{comunicadoId} {
-      allow read: if estaAtivo();
+      allow read: if estaLogado();
       allow create, update, delete: if ehManutencaoOuAdmin();
     }
 
     match /notificacoes/{notificacaoId} {
-      allow read: if estaAtivo() && podeLerNotificacao();
-      allow create: if estaAtivo() && notificacaoCriadaCorretamente();
-      allow update: if estaAtivo()
+      allow read: if estaLogado() && podeLerNotificacao();
+      allow create: if estaLogado() && notificacaoCriadaCorretamente();
+      allow update: if estaLogado()
         && podeLerNotificacao()
         && marcouSomenteLeituraNotificacao();
       allow delete: if ehAdmin();

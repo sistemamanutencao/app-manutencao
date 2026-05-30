@@ -2,6 +2,8 @@
    PERFIL E PERMISSÕES
 ===================================================== */
 
+const CHAVE_COLABORADOR_LOCAL = "appManutencaoColaborador";
+
 function usuarioTemPerfilSalvo() {
   return usuarioAtual && usuarioAtual.perfilConfigurado === true;
 }
@@ -40,7 +42,7 @@ function aplicarPermissoesNaTela() {
   if (perfilTextoOrientacao) {
     perfilTextoOrientacao.textContent = perfilSalvo
       ? "Dados do usuário e permissões de acesso."
-      : "Entre com o e-mail e senha cadastrados no Firebase.";
+      : "Colaboradores entram com nome e setor. Manutenção entra com e-mail e senha.";
   }
 
   if (botaoPainel) {
@@ -91,15 +93,87 @@ function obterNomePerfilFormatado(perfil) {
 }
 
 function preencherFormularioPerfil() {
+  const nomeInput = document.getElementById("loginNomeColaborador");
+  const setorInput = document.getElementById("loginSetorColaborador");
   const emailInput = document.getElementById("loginEmailUsuario");
   const senhaInput = document.getElementById("loginSenhaUsuario");
+  const colaboradorLocal = obterColaboradorLocal();
+
+  if (nomeInput) {
+    nomeInput.value = colaboradorLocal.nome || "";
+  }
+
+  if (setorInput) {
+    setorInput.value = colaboradorLocal.setor || "";
+  }
 
   if (emailInput) {
-    emailInput.value = usuarioTemPerfilSalvo() ? usuarioAtual.email || "" : "";
+    emailInput.value = usuarioEhManutencaoAutorizada() ? usuarioAtual.email || "" : "";
   }
 
   if (senhaInput) {
     senhaInput.value = "";
+  }
+}
+
+function obterColaboradorLocal() {
+  try {
+    return JSON.parse(localStorage.getItem(CHAVE_COLABORADOR_LOCAL) || "{}");
+  } catch (erro) {
+    return {};
+  }
+}
+
+function salvarColaboradorLocal(dados) {
+  localStorage.setItem(CHAVE_COLABORADOR_LOCAL, JSON.stringify(dados));
+}
+
+function removerColaboradorLocal() {
+  localStorage.removeItem(CHAVE_COLABORADOR_LOCAL);
+}
+
+async function entrarComoColaborador(botao) {
+  const nomeInput = document.getElementById("loginNomeColaborador");
+  const setorInput = document.getElementById("loginSetorColaborador");
+
+  if (!nomeInput || !setorInput) {
+    alert("Campos de identificação do colaborador não encontrados no HTML.");
+    return;
+  }
+
+  const nome = nomeInput.value.trim();
+  const setor = setorInput.value.trim();
+
+  if (!nome || !setor) {
+    alert("Informe seu nome e o setor onde trabalha.");
+    return;
+  }
+
+  try {
+    if (botao) {
+      botao.disabled = true;
+      botao.textContent = "Entrando...";
+    }
+
+    salvarColaboradorLocal({ nome, setor });
+
+    if (!firebaseAuth.currentUser || !firebaseAuth.currentUser.isAnonymous) {
+      await autenticarColaboradorAnonimo();
+      return;
+    }
+
+    configurarColaboradorAnonimo(firebaseAuth.currentUser);
+    aplicarPermissoesNaTela();
+    iniciarMonitoresDeDados();
+    openPage("inicio");
+  } catch (erro) {
+    console.error("Erro ao entrar como colaborador:", erro);
+    alert("Não foi possível entrar como colaborador. Verifique se o login anônimo está habilitado no Firebase Authentication.");
+  } finally {
+    if (botao) {
+      botao.disabled = false;
+      botao.textContent = "Entrar como colaborador";
+    }
   }
 }
 
@@ -116,7 +190,7 @@ async function entrarComFirebase(botao) {
   const senha = senhaInput.value;
 
   if (!email || !senha) {
-    alert("Informe e-mail e senha para entrar.");
+    alert("Informe e-mail e senha para entrar como manutenção.");
     return;
   }
 
@@ -126,6 +200,7 @@ async function entrarComFirebase(botao) {
       botao.textContent = "Entrando...";
     }
 
+    removerColaboradorLocal();
     await autenticarUsuario(email, senha);
   } catch (erro) {
     console.error("Erro de login:", erro);
@@ -133,13 +208,14 @@ async function entrarComFirebase(botao) {
   } finally {
     if (botao) {
       botao.disabled = false;
-      botao.textContent = "Entrar no app";
+      botao.textContent = "Entrar como manutenção";
     }
   }
 }
 
 async function sairDaConta() {
   try {
+    removerColaboradorLocal();
     await encerrarSessaoFirebase();
     fecharDetalhesChamado();
 

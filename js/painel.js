@@ -153,6 +153,12 @@ function criarCardPainel(chamado) {
         <button class="admin-action-button admin-secondary-action" onclick="abrirDetalhesChamado(${formatarParametroJS(chamado.id)})">
           Ver detalhes
         </button>
+
+        ${chamado.status === "CONCLUÍDO" ? `
+          <button class="admin-action-button blue" onclick="selecionarFotoFinalizacao(${formatarParametroJS(chamado.id)}, this)">
+            Adicionar foto final
+          </button>
+        ` : ""}
       </div>
     </div>
   `;
@@ -342,4 +348,83 @@ async function cancelarChamado(id, botao) {
 
   await cancelarChamadoComMotivo(id, motivo.trim(), "Chamado cancelado pela manutenção");
   aplicarFeedbackSucesso(botao, "Cancelado", "Salvar status");
+}
+
+
+async function selecionarFotoFinalizacao(id, botao) {
+  if (!usuarioEhManutencaoAutorizada()) {
+    alert("Somente a manutenção autorizada pode incluir foto de finalização.");
+    return;
+  }
+
+  const chamado = chamados.find(item => idsIguais(item.id, id));
+
+  if (!chamado) {
+    alert("Chamado não encontrado.");
+    return;
+  }
+
+  if (chamado.status !== "CONCLUÍDO") {
+    alert("A foto de finalização só pode ser incluída depois que o chamado estiver concluído.");
+    return;
+  }
+
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+
+  input.addEventListener("change", async () => {
+    const arquivo = input.files && input.files[0];
+
+    if (!arquivo || !String(arquivo.type || "").startsWith("image/")) {
+      return;
+    }
+
+    await anexarFotoFinalizacao(id, arquivo, botao);
+  });
+
+  input.click();
+}
+
+async function anexarFotoFinalizacao(id, arquivo, botao) {
+  if (!usuarioEhManutencaoAutorizada()) {
+    alert("Somente a manutenção autorizada pode incluir foto de finalização.");
+    return;
+  }
+
+  try {
+    if (botao) {
+      botao.disabled = true;
+      botao.textContent = "Anexando...";
+    }
+
+    const fotoBase64 = await converterFotoParaBase64(arquivo);
+    const agora = new Date();
+    const fotoFinalizacao = {
+      nome: arquivo.name || "Foto de finalização",
+      data: fotoBase64,
+      adicionadaEm: agora.toISOString()
+    };
+    const itemHistorico = {
+      data: agora.toLocaleString("pt-BR"),
+      acao: "Foto de finalização anexada",
+      descricao: `Foto anexada pela manutenção: ${fotoFinalizacao.nome}.`
+    };
+
+    await atualizarChamadoFirebase(id, {
+      fotosFinalizacao: adicionarItemArrayFirebase(fotoFinalizacao),
+      historico: adicionarItemArrayFirebase(itemHistorico)
+    });
+
+    aplicarFeedbackSucesso(botao, "Foto anexada", "Adicionar foto final");
+    alert("Foto de finalização anexada com sucesso.");
+  } catch (erro) {
+    console.error("Erro ao anexar foto de finalização:", erro);
+    alert("Não foi possível anexar a foto de finalização.");
+
+    if (botao) {
+      botao.disabled = false;
+      botao.textContent = "Adicionar foto final";
+    }
+  }
 }
