@@ -29,3 +29,19 @@ feat: adicionar técnico responsável padrão e logs automáticos nas OS
 
 Commit sugerido:
 refactor: remover solicitante manual e usar usuario autenticado como criador da OS
+
+
+---
+
+## Correção emergencial - envio de OS ao Firebase
+
+- Corrigida a criação de OS após a remoção do campo manual de solicitante.
+- Mantido o visual limpo usando apenas **Criado por** na interface.
+- Adicionados campos internos de compatibilidade (`solicitanteId`, `solicitanteNome`, `solicitanteEmail`) preenchidos automaticamente com o usuário autenticado, para evitar bloqueio por regras antigas do Firestore.
+- Melhorada a mensagem técnica de erro no envio ao Firebase.
+
+### Commit sugerido
+
+```txt
+fix: manter compatibilidade com regras do firebase ao criar OS autenticada
+```

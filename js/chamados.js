@@ -71,7 +71,8 @@ async function criarChamado() {
     openPage("chamados");
   } catch (erro) {
     console.error("Erro ao enviar OS:", erro);
-    alert("Não foi possível enviar a OS para o Firebase. Verifique conexão, login e permissões.");
+    const detalheErro = erro && (erro.code || erro.message) ? `\nDetalhe técnico: ${erro.code || erro.message}` : "";
+    alert(`Não foi possível enviar a OS para o Firebase. Verifique conexão, login e permissões.${detalheErro}`);
   }
 }
 
@@ -166,9 +167,14 @@ function marcarCamposObrigatoriosChamado(campos, camposPendentes) {
 
 function montarObjetoChamado({ numeroOS, dataAtual, valores, fotosAnexadas, fotoPrincipal }) {
   const usuario = usuarioAtual || {};
-  const criadoPorNome = usuario.nome || "Jefferson Gomes";
-  const criadoPorId = usuario.id || "colaborador-local";
-  const criadoPorEmail = usuario.email || "";
+  const usuarioFirebase = firebaseAuth && firebaseAuth.currentUser ? firebaseAuth.currentUser : null;
+  const criadoPorNome = usuario.nome || (usuarioFirebase && usuarioFirebase.displayName) || "Jefferson Gomes";
+  const criadoPorId = usuario.id || (usuarioFirebase && usuarioFirebase.uid) || "";
+  const criadoPorEmail = usuario.email || (usuarioFirebase && usuarioFirebase.email) || "";
+
+  if (!criadoPorId) {
+    throw new Error("Usuário autenticado não identificado para registrar a OS.");
+  }
 
   const tecnicoResponsavel = typeof obterTecnicoResponsavelPadrao === "function"
     ? obterTecnicoResponsavelPadrao()
@@ -217,6 +223,11 @@ function montarObjetoChamado({ numeroOS, dataAtual, valores, fotosAnexadas, foto
     criadoPorUid: criadoPorId,
     criadoPorNome,
     criadoPorEmail,
+    // Campos internos de compatibilidade com regras antigas do Firestore.
+    // O campo manual de solicitante foi removido da interface; estes valores seguem o usuário autenticado.
+    solicitanteId: criadoPorId,
+    solicitanteNome: criadoPorNome,
+    solicitanteEmail: criadoPorEmail,
     justificativaAguardando: "",
     logs: logInicial ? [logInicial] : [],
     historico: [
