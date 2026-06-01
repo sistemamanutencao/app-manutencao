@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-exportacoes-etapa11";
+const CACHE_NAME = "app-manutencao-login-limpo-etapa12";
 
 const FILES_TO_CACHE = [
   "./",

@@ -1,5 +1,25 @@
 # Atualização
 
+## Etapa 12 — Limpeza inicial da tela de login
+
+- Removido o título **Perfil** da aba de login.
+- Removido o texto informativo **Colaboradores entram com nome e setor. Manutenção entra com e-mail e senha.**
+- Removida a manipulação dinâmica desse texto no módulo `js/perfil.js`, evitando referência a elemento inexistente.
+- Mantida a estrutura atual de acesso do colaborador e da manutenção.
+- Mantido o layout original, sem aplicar ainda a nova proposta visual da aba.
+- Cache do PWA atualizado para carregar a nova versão da tela.
+- Não houve alteração em Firebase Authentication.
+- Não houve alteração em coleções Firebase.
+- Não houve necessidade de alteração em `firestore.rules`.
+
+### Commit sugerido
+
+```txt
+refactor: remover textos iniciais da tela de login
+```
+
+---
+
 ## Exportação de OS finalizadas
 
 - Adicionado bloco de exportação na tela de Ordens de Serviço para usuários da manutenção.

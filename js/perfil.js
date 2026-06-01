@@ -23,7 +23,6 @@ function aplicarPermissoesNaTela() {
   const areaNavegacao = obterAreaNavegacao();
   const areaFormularioPerfil = document.getElementById("areaFormularioPerfil");
   const areaPerfilLogado = document.getElementById("areaPerfilLogado");
-  const perfilTextoOrientacao = document.getElementById("perfilTextoOrientacao");
   const botaoPainel = document.getElementById("botaoPainelManutencao");
   const areaNovoComunicado = document.getElementById("areaNovoComunicado");
   const areaNovoAtivo = document.getElementById("areaNovoAtivo");
@@ -41,11 +40,6 @@ function aplicarPermissoesNaTela() {
     areaPerfilLogado.style.display = perfilSalvo ? "block" : "none";
   }
 
-  if (perfilTextoOrientacao) {
-    perfilTextoOrientacao.textContent = perfilSalvo
-      ? "Dados do usuário e permissões de acesso."
-      : "Colaboradores entram com nome e setor. Manutenção entra com e-mail e senha.";
-  }
 
   if (botaoPainel) {
     botaoPainel.style.display = usuarioEhManutencaoAutorizada() ? "block" : "none";
