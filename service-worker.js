@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-etapa17-permissoes-simplificadas-v1";
+const CACHE_NAME = "app-manutencao-etapa18-identidade-colaborador-v1";
 
 const FILES_TO_CACHE = [
   "./",

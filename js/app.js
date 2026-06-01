@@ -137,17 +137,29 @@ async function processarEstadoAutenticacao(usuarioFirebase) {
 
 function configurarColaboradorAnonimo(usuarioFirebase) {
   const colaboradorLocal = typeof obterColaboradorLocal === "function" ? obterColaboradorLocal() : {};
-  const colaboradorLocalId = typeof garantirIdColaboradorLocal === "function"
-    ? garantirIdColaboradorLocal()
-    : colaboradorLocal.colaboradorLocalId || usuarioFirebase.uid;
+  const colaboradorChave = colaboradorLocal.colaboradorChave
+    || (typeof gerarChaveColaborador === "function" ? gerarChaveColaborador(colaboradorLocal.nome, colaboradorLocal.setor) : "");
+  const colaboradorLocalId = colaboradorLocal.colaboradorLocalId
+    || (typeof obterIdColaboradorLocal === "function" ? obterIdColaboradorLocal() : "")
+    || colaboradorChave
+    || (typeof garantirIdColaboradorLocal === "function" ? garantirIdColaboradorLocal() : usuarioFirebase.uid);
 
   if (!colaboradorLocal.nome || !colaboradorLocal.setor) {
     return false;
   }
 
+  if (!colaboradorLocal.colaboradorChave && typeof salvarColaboradorLocal === "function") {
+    salvarColaboradorLocal({
+      ...colaboradorLocal,
+      colaboradorLocalId,
+      colaboradorChave
+    });
+  }
+
   usuarioAtual = {
     id: usuarioFirebase.uid,
     colaboradorLocalId,
+    colaboradorChave,
     nome: colaboradorLocal.nome,
     setor: colaboradorLocal.setor,
     email: "",

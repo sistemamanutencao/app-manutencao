@@ -68,12 +68,17 @@ function observarChamadosFirebase(usuario, callback, callbackErro) {
 
   const consultasColaborador = [];
 
+  if (usuario.colaboradorChave) {
+    consultasColaborador.push(colecaoChamados.where("colaboradorChave", "==", usuario.colaboradorChave));
+  }
+
   if (usuario.colaboradorLocalId) {
     consultasColaborador.push(colecaoChamados.where("colaboradorLocalId", "==", usuario.colaboradorLocalId));
   }
 
   if (usuario.id) {
     consultasColaborador.push(colecaoChamados.where("criadoPorUid", "==", usuario.id));
+    consultasColaborador.push(colecaoChamados.where("solicitanteId", "==", usuario.id));
   }
 
   if (!consultasColaborador.length) {
@@ -319,6 +324,8 @@ function normalizarChamadoFirebase(documento) {
     criadoPorNome: dados.criadoPorNome || "Não informado",
     criadoPorEmail: dados.criadoPorEmail || "",
     colaboradorLocalId: dados.colaboradorLocalId || "",
+    colaboradorChave: dados.colaboradorChave || "",
+    criadoPorColaboradorId: dados.criadoPorColaboradorId || dados.colaboradorLocalId || dados.colaboradorChave || "",
     canceladoPorUid: dados.canceladoPorUid || "",
     canceladoPorNome: dados.canceladoPorNome || "",
     canceladoMotivo: dados.canceladoMotivo || "",

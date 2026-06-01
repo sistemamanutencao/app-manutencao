@@ -1,55 +1,52 @@
-# Atualização - Etapa 17
+# Atualização - Etapa 18
 
-## Permissões simplificadas
+## Persistência real das OS do colaborador
 
-Nesta etapa o sistema de perfis foi simplificado para trabalhar somente com dois papéis operacionais:
-
-- Colaborador
-- Manutenção
+Esta etapa corrige o problema em que o colaborador atualizava a página, saía e entrava depois, e suas OS não apareciam corretamente em **Minhas OS**.
 
 ## Ajustes realizados
 
-- Removido o perfil `admin` da centralização de perfis.
-- Removidas permissões específicas de administrador como papel separado.
-- A manutenção passa a concentrar as permissões avançadas do sistema.
-- Atualizado `src/constants/perfis.js`.
-- Atualizado `src/constants/permissoes.js`.
-- Atualizado `js/auth-permissions.js`.
-- Ajustado login para considerar apenas manutenção como perfil técnico autorizado.
+- Criada chave persistente do colaborador baseada em nome + setor normalizados.
+- Mantido o identificador local antigo para compatibilidade com OS já criadas.
+- As novas OS passam a salvar também:
+  - `colaboradorChave`;
+  - `criadoPorColaboradorId`;
+  - `criadoPorPerfil`;
+  - `colaboradorLocalId`;
+  - `criadoPorUid`.
+- A consulta de **Minhas OS** agora busca por múltiplos vínculos compatíveis:
+  - `colaboradorChave`;
+  - `colaboradorLocalId`;
+  - `criadoPorUid`;
+  - `solicitanteId`.
+- A validação de OS própria foi centralizada em `usuarioEhAutorChamado(chamado)`.
+- O cancelamento de OS própria agora considera a identidade persistente, não apenas o UID temporário do Firebase Auth.
+- Atualizado o cache do PWA para evitar carregamento de JavaScript antigo.
 
-## Permissões atuais
+## Arquivos alterados
 
-### Colaborador
-
-- Abrir OS.
-- Ver somente suas OS.
-- Cancelar OS própria, se ainda não iniciada.
-- Ver comunicados.
-- Ver notificações próprias.
-- Ver perfil.
-
-### Manutenção
-
-- Ver todas as OS.
-- Assumir atendimento.
-- Alterar status.
-- Finalizar OS.
-- Criar preventivas.
-- Gerenciar ativos.
-- Publicar comunicados.
-- Ver painel.
-- Ver logs técnicos.
-- Gerenciar usuários.
-- Exportar dados.
-- Ajustar configurações.
-- Auditar histórico.
+- `js/perfil.js`
+- `js/app.js`
+- `js/firebase-service.js`
+- `js/chamados-form.js`
+- `js/modal-chamado.js`
+- `service-worker.js`
+- `ATUALIZACAO.md`
 
 ## Firebase
 
-Não houve alteração em coleções nem necessidade de ajuste em `firestore.rules`.
+Não foi criada nova coleção.
+
+Não é necessário alterar `firestore.rules` nesta etapa, porque os novos campos são salvos dentro da coleção já existente `chamados`, que as regras atuais já permitem para usuários autenticados.
+
+Atenção: o login anônimo do Firebase Authentication precisa continuar habilitado, pois o colaborador usa esse fluxo para ter autenticação técnica no Firestore.
+
+## Observação importante
+
+Para recuperar OS antigas, o app mantém compatibilidade com os campos antigos. Para OS novas, o vínculo fica mais forte e menos dependente do UID anônimo.
 
 ## Commit sugerido
 
 ```txt
-refactor: simplificar perfis e permissoes
+fix: persistir minhas OS por identidade do colaborador
 ```

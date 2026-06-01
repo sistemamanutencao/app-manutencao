@@ -98,6 +98,7 @@ function montarObjetoChamado({ numeroOS, dataAtual, valores, fotosAnexadas, foto
   const criadoPorId = usuario.id || (usuarioFirebase && usuarioFirebase.uid) || "";
   const criadoPorEmail = usuario.email || (usuarioFirebase && usuarioFirebase.email) || "";
   const colaboradorLocalId = usuario.colaboradorLocalId || (typeof obterIdColaboradorLocal === "function" ? obterIdColaboradorLocal() : "");
+  const colaboradorChave = usuario.colaboradorChave || (typeof obterChaveColaboradorLocal === "function" ? obterChaveColaboradorLocal() : "");
 
   if (!criadoPorId) {
     throw new Error("Usuário autenticado não identificado para registrar a OS.");
@@ -151,6 +152,9 @@ function montarObjetoChamado({ numeroOS, dataAtual, valores, fotosAnexadas, foto
     criadoPorNome,
     criadoPorEmail,
     colaboradorLocalId,
+    colaboradorChave,
+    criadoPorColaboradorId: colaboradorChave || colaboradorLocalId || criadoPorId,
+    criadoPorPerfil: usuario.perfil || "",
     // Campos internos de compatibilidade com regras antigas do Firestore.
     // O campo manual de solicitante foi removido da interface; estes valores seguem o usuário autenticado.
     solicitanteId: criadoPorId,

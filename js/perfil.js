@@ -118,6 +118,58 @@ function obterColaboradorLocal() {
   }
 }
 
+function normalizarIdentificadorColaborador(valor) {
+  return String(valor || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function gerarChaveColaborador(nome, setor) {
+  const nomeNormalizado = normalizarIdentificadorColaborador(nome);
+  const setorNormalizado = normalizarIdentificadorColaborador(setor);
+
+  if (!nomeNormalizado || !setorNormalizado) {
+    return "";
+  }
+
+  return `colaborador-${setorNormalizado}-${nomeNormalizado}`;
+}
+
+function obterChaveColaboradorLocal() {
+  const colaboradorLocal = obterColaboradorLocal();
+  return colaboradorLocal.colaboradorChave || gerarChaveColaborador(colaboradorLocal.nome, colaboradorLocal.setor);
+}
+
+function usuarioEhAutorChamado(chamado) {
+  if (!chamado || !usuarioAtual || !usuarioTemPerfilSalvo()) {
+    return false;
+  }
+
+  if (usuarioPodeVerTodasOS()) {
+    return true;
+  }
+
+  const idsUsuario = [
+    usuarioAtual.id,
+    usuarioAtual.colaboradorLocalId,
+    usuarioAtual.colaboradorChave
+  ].filter(Boolean);
+
+  const idsChamado = [
+    chamado.criadoPorUid,
+    chamado.solicitanteId,
+    chamado.colaboradorLocalId,
+    chamado.colaboradorChave,
+    chamado.criadoPorColaboradorId
+  ].filter(Boolean);
+
+  return idsUsuario.some(idUsuario => idsChamado.some(idChamado => idsIguais(idUsuario, idChamado)));
+}
+
 function gerarIdColaboradorLocal() {
   if (window.crypto && typeof window.crypto.randomUUID === "function") {
     return window.crypto.randomUUID();
@@ -143,12 +195,15 @@ function garantirIdColaboradorLocal() {
 }
 
 function salvarColaboradorLocal(dados) {
-  const idLocal = dados.colaboradorLocalId || garantirIdColaboradorLocal();
+  const colaboradorChave = dados.colaboradorChave || gerarChaveColaborador(dados.nome, dados.setor);
+  const idExistente = dados.colaboradorLocalId || obterIdColaboradorLocal();
+  const idLocal = idExistente || colaboradorChave || garantirIdColaboradorLocal();
 
   localStorage.setItem(CHAVE_COLABORADOR_ID_LOCAL, idLocal);
   localStorage.setItem(CHAVE_COLABORADOR_LOCAL, JSON.stringify({
     ...dados,
-    colaboradorLocalId: idLocal
+    colaboradorLocalId: idLocal,
+    colaboradorChave
   }));
 }
 
@@ -184,7 +239,7 @@ async function entrarComoColaborador(botao) {
       botao.textContent = "Entrando...";
     }
 
-    salvarColaboradorLocal({ nome, setor, colaboradorLocalId: garantirIdColaboradorLocal() });
+    salvarColaboradorLocal({ nome, setor, colaboradorChave: gerarChaveColaborador(nome, setor) });
 
     if (!firebaseAuth.currentUser || !firebaseAuth.currentUser.isAnonymous) {
       await autenticarColaboradorAnonimo();
@@ -266,7 +321,7 @@ async function sairDaConta() {
 
 function atualizarResumoPerfil() {
   const totalChamados = chamados.length;
-  const meusChamados = chamados.filter(chamado => idsIguais(chamado.criadoPorUid, usuarioAtual.id)).length;
+  const meusChamados = chamados.filter(chamado => usuarioEhAutorChamado(chamado)).length;
   const chamadosAbertos = chamados.filter(chamado => !statusFinalizado(chamado.status)).length;
   const chamadosCancelados = chamados.filter(chamado => chamado.status === "CANCELADO").length;
 
