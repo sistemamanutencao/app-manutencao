@@ -17,7 +17,7 @@ function obterCamposFormularioChamado() {
     foto: document.getElementById("fotoChamado")
   };
 
-  const obrigatorios = ["andar", "local", "horario", "categoria", "subcategoria", "prioridade", "descricao"];
+  const obrigatorios = ["andar", "local", "horario", "acompanhamento", "categoria", "subcategoria", "prioridade", "descricao"];
   const ausentes = obrigatorios.filter(nome => !campos[nome]);
 
   return {
@@ -39,11 +39,11 @@ function lerValoresFormularioChamado(campos) {
     equipamentoCodigo,
     equipamentoNome: ativoVinculado ? (ativoVinculado.nome || "") : "",
     horario: obterValorCampoChamado(campos.horario),
-    precisaAcompanhamento: obterValorCampoChamado(campos.acompanhamento) || "Não informado",
+    precisaAcompanhamento: obterValorCampoChamado(campos.acompanhamento),
     categoria: obterValorCampoChamado(campos.categoria),
     subcategoria: obterValorCampoChamado(campos.subcategoria),
     tipoManutencao: obterValorCampoChamado(campos.tipoManutencao) || "Corretiva",
-    prioridade: obterValorCampoChamado(campos.prioridade) || "Baixa",
+    prioridade: obterValorCampoChamado(campos.prioridade),
     descricao: obterValorCampoChamado(campos.descricao),
     arquivosFotos: obterArquivosFotosChamado(campos.foto)
   };
@@ -59,6 +59,7 @@ function validarValoresFormularioChamado(valores) {
     ["Escolher o andar", valores.andar],
     ["Local do andar", valores.local],
     ["Melhor horário para atendimento", valores.horario],
+    ["Necessário acompanhar", valores.precisaAcompanhamento],
     ["Categoria da OS", valores.categoria],
     ["Subcategoria", valores.subcategoria],
     ["Prioridade", valores.prioridade],
@@ -75,6 +76,7 @@ function marcarCamposObrigatoriosChamado(campos, camposPendentes) {
     "Escolher o andar": campos.andar,
     "Local do andar": campos.local,
     "Melhor horário para atendimento": campos.horario,
+    "Necessário acompanhar": campos.acompanhamento,
     "Categoria da OS": campos.categoria,
     "Subcategoria": campos.subcategoria,
     "Prioridade": campos.prioridade,
@@ -82,19 +84,25 @@ function marcarCamposObrigatoriosChamado(campos, camposPendentes) {
   };
 
   Object.values(mapa).forEach(campo => {
-    if (campo) campo.classList.remove("campo-obrigatorio-pendente");
+    if (campo) {
+      campo.classList.remove("campo-obrigatorio-pendente");
+      campo.removeAttribute("aria-invalid");
+    }
   });
 
   camposPendentes.forEach(nome => {
     const campo = mapa[nome];
-    if (campo) campo.classList.add("campo-obrigatorio-pendente");
+    if (campo) {
+      campo.classList.add("campo-obrigatorio-pendente");
+      campo.setAttribute("aria-invalid", "true");
+    }
   });
 }
 
 function montarObjetoChamado({ numeroOS, dataAtual, valores, fotosAnexadas, fotoPrincipal }) {
   const usuario = usuarioAtual || {};
   const usuarioFirebase = firebaseAuth && firebaseAuth.currentUser ? firebaseAuth.currentUser : null;
-  const criadoPorNome = usuario.nome || (usuarioFirebase && usuarioFirebase.displayName) || "Jefferson Gomes";
+  const criadoPorNome = usuario.nome || (usuarioFirebase && usuarioFirebase.displayName) || "Colaborador";
   const criadoPorId = usuario.id || (usuarioFirebase && usuarioFirebase.uid) || "";
   const criadoPorEmail = usuario.email || (usuarioFirebase && usuarioFirebase.email) || "";
   const colaboradorLocalId = usuario.colaboradorLocalId || (typeof obterIdColaboradorLocal === "function" ? obterIdColaboradorLocal() : "");
@@ -107,17 +115,17 @@ function montarObjetoChamado({ numeroOS, dataAtual, valores, fotosAnexadas, foto
   const tecnicoResponsavel = typeof obterTecnicoResponsavelPadrao === "function"
     ? obterTecnicoResponsavelPadrao()
     : {
-        nome: "Jefferson Gomes",
-        funcao: "Oficial de Manutenção",
+        nome: "Equipe de manutenção",
+        funcao: "Responsável a definir",
         setor: "Manutenção",
-        ativo: true
+        ativo: false
       };
 
   const logInicial = typeof gerarLogOS === "function"
     ? gerarLogOS({
         acao: "OS criada",
         descricao: `${numeroOS} criada por ${criadoPorNome}.`,
-        usuario: tecnicoResponsavel.nome
+        usuario: criadoPorNome
       })
     : null;
 
@@ -125,7 +133,7 @@ function montarObjetoChamado({ numeroOS, dataAtual, valores, fotosAnexadas, foto
     numeroOS,
     tipoRegistro: "OS",
     etapaFluxo: "Solicitação registrada",
-    responsavelManutencao: tecnicoResponsavel.nome,
+    responsavelManutencao: "A definir",
     tecnicoResponsavel,
     iniciadoEmISO: "",
     concluidoEmISO: "",
@@ -135,7 +143,7 @@ function montarObjetoChamado({ numeroOS, dataAtual, valores, fotosAnexadas, foto
     local: valores.local,
     equipamentoCodigo: valores.equipamentoCodigo,
     equipamentoNome: valores.equipamentoNome,
-    setor: usuario.setor || "Manutenção",
+    setor: usuario.setor || "Não informado",
     horario: valores.horario,
     precisaAcompanhamento: valores.precisaAcompanhamento,
     categoria: valores.categoria,
@@ -219,7 +227,6 @@ function limparFormularioChamado() {
   const campos = [
     "andarChamado",
     "localChamado",
-    "setorChamado",
     "equipamentoChamado",
     "horarioChamado",
     "categoriaChamado",
@@ -249,7 +256,7 @@ function limparFormularioChamado() {
   const acompanhamentoInput = document.getElementById("precisaAcompanhamento");
 
   if (prioridadeInput) {
-    prioridadeInput.value = "Baixa";
+    prioridadeInput.value = "";
   }
 
   if (acompanhamentoInput) {
@@ -258,6 +265,11 @@ function limparFormularioChamado() {
 
   document.querySelectorAll(".category-fast-button").forEach(botao => {
     botao.classList.remove("active");
+  });
+
+  document.querySelectorAll(".campo-obrigatorio-pendente").forEach(campo => {
+    campo.classList.remove("campo-obrigatorio-pendente");
+    campo.removeAttribute("aria-invalid");
   });
 }
 

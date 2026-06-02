@@ -170,6 +170,79 @@
     });
   }
 
+
+
+  function solicitarTextoFeedback(mensagem, opcoes = {}) {
+    const modal = garantirEstruturaModal();
+    const card = modal.querySelector(".app-feedback-card");
+    const icone = modal.querySelector("#appFeedbackIcon");
+    const mensagemElemento = modal.querySelector("#appFeedbackMessage");
+    const acoes = modal.querySelector("#appFeedbackActions");
+
+    card.className = "app-feedback-card app-feedback-aviso";
+    icone.className = "app-feedback-icon app-feedback-icon-aviso";
+    icone.textContent = "!";
+    mensagemElemento.textContent = normalizarMensagem(mensagem);
+
+    const campo = document.createElement("textarea");
+    campo.className = "app-feedback-input";
+    campo.rows = Number(opcoes.linhas || 4);
+    campo.placeholder = opcoes.placeholder || "Digite aqui";
+    campo.value = opcoes.valorInicial || "";
+
+    mensagemElemento.appendChild(campo);
+    acoes.innerHTML = "";
+
+    return new Promise(resolve => {
+      const botaoCancelar = document.createElement("button");
+      botaoCancelar.type = "button";
+      botaoCancelar.className = "app-feedback-button app-feedback-button-secondary";
+      botaoCancelar.textContent = opcoes.textoCancelar || "Cancelar";
+
+      const botaoConfirmar = document.createElement("button");
+      botaoConfirmar.type = "button";
+      botaoConfirmar.className = "app-feedback-button app-feedback-button-primary";
+      botaoConfirmar.textContent = opcoes.textoConfirmar || "Confirmar";
+
+      botaoCancelar.onclick = () => fecharModal(modal, resolve, null);
+      const avisoObrigatorio = document.createElement("small");
+      avisoObrigatorio.className = "app-feedback-field-error";
+      avisoObrigatorio.textContent = opcoes.mensagemObrigatorio || "Este campo é obrigatório.";
+      avisoObrigatorio.hidden = true;
+      mensagemElemento.appendChild(avisoObrigatorio);
+
+      botaoConfirmar.onclick = () => {
+        const valor = campo.value.trim();
+
+        if (opcoes.obrigatorio && !valor) {
+          campo.classList.add("app-feedback-input-error");
+          campo.setAttribute("aria-invalid", "true");
+          avisoObrigatorio.hidden = false;
+          campo.focus();
+          return;
+        }
+
+        fecharModal(modal, resolve, valor);
+      };
+
+      campo.addEventListener("input", () => {
+        if (campo.value.trim()) {
+          campo.classList.remove("app-feedback-input-error");
+          campo.removeAttribute("aria-invalid");
+          avisoObrigatorio.hidden = true;
+        }
+      });
+
+      acoes.appendChild(botaoCancelar);
+      acoes.appendChild(botaoConfirmar);
+
+      modal.classList.add("is-visible");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("app-feedback-open");
+      setTimeout(() => campo.focus(), 80);
+    });
+  }
+
   window.appFeedback = mostrarFeedback;
   window.appConfirm = function (mensagem, opcoes = {}) {
     return mostrarFeedback(mensagem, {
@@ -178,6 +251,8 @@
       confirmacao: true
     });
   };
+
+  window.appPrompt = solicitarTextoFeedback;
 
   window.alert = function (mensagem) {
     mostrarFeedback(mensagem);

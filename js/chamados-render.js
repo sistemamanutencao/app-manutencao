@@ -3,6 +3,12 @@
 ===================================================== */
 
 function obterChamadosVisiveis() {
+  if (typeof usuarioPossuiPerfil === "function"
+    && usuarioPossuiPerfil(PERFIS_USUARIO.COLABORADOR)
+    && typeof usuarioEhAutorChamado === "function") {
+    return chamados.filter(chamado => usuarioEhAutorChamado(chamado));
+  }
+
   return chamados;
 }
 
@@ -113,7 +119,7 @@ function criarCardChamado(chamado) {
 function filtrarChamados(status, botao) {
   filtroStatusAtual = status;
 
-  document.querySelectorAll("#filtrosChamados .filter").forEach(botaoFiltro => {
+  document.querySelectorAll("#filtrosOS .filter, #filtrosChamados .filter").forEach(botaoFiltro => {
     botaoFiltro.classList.remove("active");
   });
 

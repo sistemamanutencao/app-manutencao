@@ -1,11 +1,11 @@
 
 const TECNICO_PADRAO = {
-  nome: "Jefferson Gomes",
-  funcao: "Oficial de Manutenção",
+  nome: "Equipe de manutenção",
+  funcao: "Responsável a definir",
   setor: "Manutenção",
   telefone: "",
   assinatura: "",
-  ativo: true
+  ativo: false
 };
 
 function obterTecnicoResponsavelPadrao() {

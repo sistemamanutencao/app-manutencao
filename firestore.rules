@@ -3,28 +3,99 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function estaAutenticado() {
+      return request.auth != null;
+    }
+
+    function perfilUsuario() {
+      return estaAutenticado()
+        && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.perfil
+        : "colaborador";
+    }
+
+    function ehManutencao() {
+      return estaAutenticado() && perfilUsuario() == "manutencao";
+    }
+
+    function ehAutorChamado(dados) {
+      return estaAutenticado()
+        && (
+          dados.criadoPorUid == request.auth.uid
+          || dados.solicitanteId == request.auth.uid
+        );
+    }
+
+    function colaboradorPodeCriarChamado() {
+      return estaAutenticado()
+        && request.resource.data.criadoPorUid == request.auth.uid
+        && request.resource.data.solicitanteId == request.auth.uid
+        && request.resource.data.status == "ABERTO";
+    }
+
+    function colaboradorPodeCancelarChamado() {
+      return estaAutenticado()
+        && ehAutorChamado(resource.data)
+        && resource.data.status == "ABERTO"
+        && request.resource.data.status == "CANCELADO"
+        && request.resource.data.criadoPorUid == resource.data.criadoPorUid
+        && request.resource.data.solicitanteId == resource.data.solicitanteId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status",
+          "etapaFluxo",
+          "historico",
+          "canceladoPorUid",
+          "canceladoPorNome",
+          "canceladoMotivo",
+          "canceladoEmISO",
+          "atualizadoEm"
+        ]);
+    }
+
+    function usuarioPodeMarcarNotificacaoComoLida() {
+      return estaAutenticado()
+        && resource.data.destinatarioUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "lidaPorUids",
+          "atualizadoEm"
+        ]);
+    }
+
     match /chamados/{id} {
-      allow read, create, update, delete: if request.auth != null;
+      allow read: if ehManutencao() || ehAutorChamado(resource.data);
+      allow create: if ehManutencao() || colaboradorPodeCriarChamado();
+      allow update: if ehManutencao() || colaboradorPodeCancelarChamado();
+      allow delete: if ehManutencao();
     }
 
     match /planosPreventivos/{id} {
-      allow read, create, update, delete: if request.auth != null;
+      allow read: if estaAutenticado();
+      allow create, update, delete: if ehManutencao();
     }
 
     match /ativos/{id} {
-      allow read, create, update, delete: if request.auth != null;
+      allow read: if estaAutenticado();
+      allow create, update, delete: if ehManutencao();
     }
 
     match /comunicados/{id} {
-      allow read, create, update, delete: if request.auth != null;
+      allow read: if estaAutenticado();
+      allow create, update, delete: if ehManutencao();
     }
 
     match /notificacoes/{id} {
-      allow read, create, update, delete: if request.auth != null;
+      allow read: if ehManutencao()
+        || resource.data.destinatarioUid == request.auth.uid
+        || resource.data.destinatarioPerfil == "colaborador";
+      allow create: if estaAutenticado();
+      allow update: if ehManutencao() || usuarioPodeMarcarNotificacaoComoLida();
+      allow delete: if ehManutencao();
     }
 
     match /usuarios/{id} {
-      allow read, write: if request.auth != null;
+      allow read: if estaAutenticado() && (id == request.auth.uid || ehManutencao());
+      allow create, update: if estaAutenticado() && (id == request.auth.uid || ehManutencao());
+      allow delete: if ehManutencao();
     }
 
     match /{document=**} {

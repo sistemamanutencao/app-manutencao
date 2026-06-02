@@ -482,3 +482,34 @@
   outline: 3px solid rgba(11, 94, 215, 0.28);
   outline-offset: 3px;
 }
+
+
+.app-feedback-input {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 500;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.app-feedback-input:focus {
+  outline: 3px solid rgba(11, 94, 215, 0.18);
+  border-color: #0b5ed7;
+}
+
+
+.app-feedback-input-error {
+  border-color: #c0392b;
+  box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.12);
+}
+
+.app-feedback-field-error {
+  display: block;
+  margin-top: 8px;
+  color: #c0392b;
+  font-weight: 600;
+}

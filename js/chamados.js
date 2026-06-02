@@ -3,6 +3,12 @@
 ===================================================== */
 
 async function criarChamado() {
+  const botaoEnvio = document.querySelector('button[onclick="criarChamado()"]');
+
+  if (botaoEnvio && botaoEnvio.disabled) {
+    return;
+  }
+
   if (typeof inicializarFormularioOS === "function") {
     inicializarFormularioOS();
   }
@@ -10,7 +16,7 @@ async function criarChamado() {
   const campos = obterCamposFormularioChamado();
 
   if (!campos.formularioValido) {
-    alert("Erro: alguns campos do formulário de OS não foram encontrados no HTML. Atualize a página e tente novamente.");
+    await appFeedback("Erro: alguns campos do formulário de OS não foram encontrados no HTML. Atualize a página e tente novamente.", { tipo: "erro" });
     console.error("Campos ausentes na OS:", campos.ausentes);
     return;
   }
@@ -29,13 +35,19 @@ async function criarChamado() {
   marcarCamposObrigatoriosChamado(campos, camposPendentes);
 
   if (camposPendentes.length > 0) {
-    alert(`Preencha os campos obrigatórios da OS:\n- ${camposPendentes.join("\n- ")}`);
+    await appFeedback(`Preencha os campos obrigatórios da OS:\n- ${camposPendentes.join("\n- ")}`, { tipo: "aviso" });
     return;
   }
 
   if (valores.arquivosFotos.length > LIMITE_FOTOS_CHAMADO) {
-    alert(`Selecione no máximo ${LIMITE_FOTOS_CHAMADO} imagens por chamado.`);
+    await appFeedback(`Selecione no máximo ${LIMITE_FOTOS_CHAMADO} imagens por chamado.`, { tipo: "aviso" });
     return;
+  }
+
+  if (botaoEnvio) {
+    botaoEnvio.disabled = true;
+    botaoEnvio.dataset.textoOriginal = botaoEnvio.textContent;
+    botaoEnvio.textContent = "Enviando...";
   }
 
   const agora = new Date();
@@ -45,7 +57,7 @@ async function criarChamado() {
   const fotoPrincipal = fotosAnexadas[0] || null;
 
   if (resultadoFotos.falhas > 0) {
-    alert("Uma ou mais imagens não puderam ser anexadas. A OS será criada com as imagens válidas.");
+    await appFeedback("Uma ou mais imagens não puderam ser anexadas. A OS será criada com as imagens válidas.", { tipo: "aviso" });
   }
 
   const numeroOS = gerarNumeroOS(agora);
@@ -65,14 +77,20 @@ async function criarChamado() {
       await registrarNotificacaoNovoChamado(chamadoId, novoChamado);
     }
 
-    alert(`OS ${numeroOS} aberta com sucesso!`);
+    await appFeedback(`OS ${numeroOS} aberta com sucesso!`, { tipo: "sucesso" });
     limparFormularioChamado();
     prepararAbaChamadosAposEnvio();
     openPage("chamados");
   } catch (erro) {
     console.error("Erro ao enviar OS:", erro);
     const detalheErro = erro && (erro.code || erro.message) ? `\nDetalhe técnico: ${erro.code || erro.message}` : "";
-    alert(`Não foi possível enviar a OS para o Firebase. Verifique conexão, login e permissões.${detalheErro}`);
+    await appFeedback(`Não foi possível enviar a OS para o Firebase. Verifique conexão, login e permissões.${detalheErro}`, { tipo: "erro" });
+  } finally {
+    if (botaoEnvio) {
+      botaoEnvio.disabled = false;
+      botaoEnvio.textContent = botaoEnvio.dataset.textoOriginal || "Abrir OS";
+      delete botaoEnvio.dataset.textoOriginal;
+    }
   }
 }
 

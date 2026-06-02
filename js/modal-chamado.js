@@ -6,7 +6,7 @@ function abrirDetalhesChamado(id) {
   const chamado = chamados.find(item => idsIguais(item.id, id));
 
   if (!chamado) {
-    alert("Chamado não encontrado.");
+    appFeedback("Chamado não encontrado.", { tipo: "erro" });
     return;
   }
 
@@ -179,19 +179,24 @@ async function cancelarChamadoAtual(botao) {
   const chamado = obterChamadoSelecionado();
 
   if (!chamado) {
-    alert("Nenhum chamado selecionado para cancelamento.");
+    await appFeedback("Nenhum chamado selecionado para cancelamento.", { tipo: "aviso" });
     return;
   }
 
   if (!chamadoPodeSerCancelado(chamado)) {
-    alert("Este chamado não pode ser cancelado.");
+    await appFeedback("Este chamado não pode ser cancelado.", { tipo: "aviso" });
     return;
   }
 
-  const motivo = prompt("Informe o motivo do cancelamento:");
+  const motivo = await appPrompt("Informe o motivo do cancelamento. Esta ação não poderá ser desfeita pelo colaborador.", {
+    placeholder: "Descreva o motivo do cancelamento",
+    textoCancelar: "Voltar",
+    textoConfirmar: "Confirmar cancelamento",
+    obrigatorio: true,
+    mensagemObrigatorio: "Para cancelar a OS, informe o motivo."
+  });
 
-  if (!motivo || !motivo.trim()) {
-    alert("Para cancelar o chamado, é obrigatório informar o motivo.");
+  if (!motivo) {
     return;
   }
 
@@ -206,7 +211,7 @@ async function executarCancelamentoChamado(id, motivo, acaoHistorico, botao) {
   const chamado = chamados.find(item => idsIguais(item.id, id));
 
   if (!chamado) {
-    alert("Chamado não encontrado.");
+    appFeedback("Chamado não encontrado.", { tipo: "erro" });
     return;
   }
 
@@ -236,16 +241,16 @@ async function executarCancelamentoChamado(id, motivo, acaoHistorico, botao) {
     }
 
     fecharDetalhesChamado();
-    alert("Chamado cancelado com sucesso.");
+    await appFeedback("Chamado cancelado com sucesso.", { tipo: "sucesso" });
   } catch (erro) {
     console.error("Erro ao cancelar chamado:", erro);
 
     if (erro && erro.code === "permission-denied") {
-      alert("Não foi possível cancelar o chamado no Firebase. Verifique se as regras do Firestore desta versão foram publicadas no Firebase Console.");
+      await appFeedback("Não foi possível cancelar o chamado no Firebase. Verifique se as regras do Firestore desta versão foram publicadas no Firebase Console.", { tipo: "erro" });
       return;
     }
 
-    alert("Não foi possível cancelar o chamado no Firebase.");
+    await appFeedback("Não foi possível cancelar o chamado no Firebase.", { tipo: "erro" });
   }
 
 }
@@ -344,7 +349,7 @@ function abrirFotoChamadoAtual(indiceFoto = 0) {
   const chamado = obterChamadoSelecionado();
 
   if (!chamado) {
-    alert("Nenhum chamado selecionado.");
+    appFeedback("Nenhum chamado selecionado.", { tipo: "aviso" });
     return;
   }
 
@@ -352,7 +357,7 @@ function abrirFotoChamadoAtual(indiceFoto = 0) {
   const foto = fotos[indiceFoto];
 
   if (!foto) {
-    alert("Este chamado não possui uma foto disponível para visualização.");
+    appFeedback("Este chamado não possui uma foto disponível para visualização.", { tipo: "aviso" });
     return;
   }
 
@@ -363,7 +368,7 @@ function abrirFotoFinalizacaoChamadoAtual(indiceFoto = 0) {
   const chamado = obterChamadoSelecionado();
 
   if (!chamado) {
-    alert("Nenhum chamado selecionado.");
+    appFeedback("Nenhum chamado selecionado.", { tipo: "aviso" });
     return;
   }
 
@@ -371,7 +376,7 @@ function abrirFotoFinalizacaoChamadoAtual(indiceFoto = 0) {
   const foto = fotos[indiceFoto];
 
   if (!foto) {
-    alert("Este chamado não possui uma foto de finalização disponível para visualização.");
+    appFeedback("Este chamado não possui uma foto de finalização disponível para visualização.", { tipo: "aviso" });
     return;
   }
 
