@@ -19,8 +19,8 @@ const LOCAIS_PRIMEIRO_ANDAR_MANUTENCAO = Object.freeze([
   "Sala-10 INFORMATICA",
   "Sala-11 INFORMATICA",
   "Sala-12",
-  "Sala-13 Laboratório informática",
-  "Sala-14 Medicina",
+  "Sala-13 Laboratório de Hardware",
+  "Sala-14 Enfermagem",
   "Escadaria"
 ]);
 
