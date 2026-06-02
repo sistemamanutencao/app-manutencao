@@ -99,6 +99,14 @@ async function processarEstadoAutenticacao(usuarioFirebase) {
       return;
     }
 
+    try {
+      await garantirVinculoColaboradorAtual();
+    } catch (erro) {
+      console.error("Erro ao registrar vínculo do colaborador:", erro);
+      alert("Não foi possível validar o vínculo do colaborador no Firebase. Verifique as regras publicadas e tente novamente.");
+      return;
+    }
+
     aplicarPermissoesNaTela();
     aplicarPermissoesInterface();
     iniciarMonitoresDeDados();
@@ -180,6 +188,27 @@ function configurarColaboradorAnonimo(usuarioFirebase) {
   }
 
   return true;
+}
+
+async function garantirVinculoColaboradorAtual() {
+  if (!usuarioAtual || usuarioAtual.perfil !== PERFIS_USUARIO.COLABORADOR) {
+    return;
+  }
+
+  if (typeof registrarVinculoColaboradorFirebase !== "function") {
+    return;
+  }
+
+  const codigo = usuarioAtual.colaboradorCodigo || usuarioAtual.colaboradorLocalId;
+
+  if (!codigo) {
+    throw new Error("Código fixo do colaborador não encontrado.");
+  }
+
+  await registrarVinculoColaboradorFirebase(codigo, {
+    nome: usuarioAtual.nome,
+    setor: usuarioAtual.setor
+  });
 }
 
 function normalizarUsuarioLogado(usuarioFirebase, perfil) {
