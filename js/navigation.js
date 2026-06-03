@@ -11,7 +11,7 @@ function openPage(pageId, navElement) {
     itemNavegacao = null;
   }
 
-  const paginasRestritasManutencao = ["painel", "ativos", "preventivas"];
+  const paginasRestritasManutencao = ["painel", "ativos", "preventivas", "diagnostico-manutencao"];
 
   if (paginasRestritasManutencao.includes(paginaDestino) && !usuarioEhManutencaoAutorizada()) {
     alert("Acesso permitido somente para a manutenção autorizada.");
@@ -93,6 +93,10 @@ function executarRenderizacaoDaPagina(pageId) {
 
   if (pageId === "preventivas" && typeof renderizarPlanosPreventivos === "function") {
     renderizarPlanosPreventivos();
+  }
+
+  if (pageId === "diagnostico-manutencao" && typeof renderizarDiagnosticosManutencao === "function") {
+    renderizarDiagnosticosManutencao();
   }
 
   if (pageId === "perfil") {

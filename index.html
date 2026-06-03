@@ -129,6 +129,17 @@
             <h3 class="manut-only-title">Preventivas</h3>
             <p>Planos recorrentes</p>
           </div>
+
+          <div class="quick-card manut-only" onclick="openPage('diagnostico-manutencao')">
+            <div class="quick-icon orange-bg">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M5 4h14v16H5V4Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-linecap="round" />
+              </svg>
+            </div>
+            <h3 class="manut-only-title">Diagnóstico</h3>
+            <p>Checklist inicial da unidade</p>
+          </div>
         </div>
       </section>
 
@@ -556,6 +567,139 @@
 
       <div class="preventive-list" id="listaPlanosPreventivos">
         <!-- Planos carregados pelo JavaScript -->
+      </div>
+    </section>
+
+
+
+    <!-- ABA DIAGNÓSTICO DA MANUTENÇÃO -->
+    <section class="page" id="diagnostico-manutencao">
+      <header class="page-header">
+        <h1>Diagnóstico inicial</h1>
+        <p>Checklist de uso exclusivo da manutenção para levantar corretivas, preventivas, inspeções, melhorias e recorrências.</p>
+      </header>
+
+      <div class="dashboard-grid diagnostico-summary-grid">
+        <div class="dashboard-card"><span>Pendentes</span><strong id="totalDiagnosticosPendentes">0</strong><small>Itens ainda sem OS</small></div>
+        <div class="dashboard-card"><span>Com OS</span><strong id="totalDiagnosticosComOS">0</strong><small>Itens convertidos em OS</small></div>
+        <div class="dashboard-card"><span>Alta/Urgente</span><strong id="totalDiagnosticosCriticos">0</strong><small>Prioridade operacional</small></div>
+        <div class="dashboard-card"><span>Total</span><strong id="totalDiagnosticosRegistrados">0</strong><small>Itens levantados</small></div>
+      </div>
+
+      <div class="form-card">
+        <h3>Novo item do diagnóstico</h3>
+
+        <div class="form-row">
+          <label>
+            Andar
+            <select id="andarDiagnosticoManutencao">
+              <option value="">Selecione</option>
+              <option value="1º ANDAR">1º ANDAR</option>
+              <option value="SL ANDAR">SL ANDAR</option>
+              <option value="0º ANDAR">0º ANDAR</option>
+              <option value="-1º ANDAR">-1º ANDAR</option>
+              <option value="Telhado">Telhado</option>
+            </select>
+          </label>
+
+          <label>
+            Ambiente/local
+            <input id="localDiagnosticoManutencao" type="text" placeholder="Ex: Sala 04, banheiro feminino, telhado..." />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Categoria
+            <select id="categoriaDiagnosticoManutencao">
+              <option value="Elétrica">Elétrica</option>
+              <option value="Hidráulica">Hidráulica</option>
+              <option value="Alvenaria">Alvenaria</option>
+              <option value="Pintura">Pintura</option>
+              <option value="Eletrônica">Eletrônica</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </label>
+
+          <label>
+            Tipo
+            <select id="tipoDiagnosticoManutencao">
+              <option value="Corretiva">Corretiva</option>
+              <option value="Preventiva">Preventiva</option>
+              <option value="Inspeção" selected>Inspeção</option>
+              <option value="Melhoria">Melhoria</option>
+              <option value="Recorrente">Recorrente</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Item verificado
+          <select id="itemDiagnosticoManutencao">
+            <option value="">Selecione ou descreva abaixo</option>
+            <option>Fios expostos, tomada solta ou aquecimento</option>
+            <option>Lâmpada queimada, piscando ou iluminação insuficiente</option>
+            <option>Vazamento, torneira pingando ou descarga com defeito</option>
+            <option>Ar-condicionado com ruído, sem gelar ou filtro sujo</option>
+            <option>Porta, fechadura, janela ou mobiliário danificado</option>
+            <option>Piso, forro, parede, trinca ou infiltração</option>
+            <option>Extintor, rota de fuga ou iluminação de emergência</option>
+            <option>Calha, telhado, ralo externo ou drenagem</option>
+            <option>Melhoria de organização, sinalização ou segurança</option>
+          </select>
+        </label>
+
+        <label>
+          Descrição do item
+          <textarea id="descricaoDiagnosticoManutencao" placeholder="Descreva o problema, risco ou melhoria observada. Use este campo quando o item acima não for suficiente."></textarea>
+        </label>
+
+        <div class="form-row">
+          <label>
+            Prioridade
+            <select id="prioridadeDiagnosticoManutencao">
+              <option value="Baixa">Baixa</option>
+              <option value="Média" selected>Média</option>
+              <option value="Alta">Alta</option>
+              <option value="Urgente">Urgente</option>
+            </select>
+          </label>
+
+          <label>
+            Situação
+            <select id="situacaoDiagnosticoManutencao">
+              <option value="Pendente" selected>Pendente</option>
+              <option value="Em observação">Em observação</option>
+              <option value="Resolvido na inspeção">Resolvido na inspeção</option>
+            </select>
+          </label>
+        </div>
+
+        <button type="button" class="primary-button" onclick="salvarDiagnosticoManutencao()">
+          Salvar item do diagnóstico
+        </button>
+      </div>
+
+      <div class="form-card">
+        <div class="form-row">
+          <label>
+            Filtrar por status
+            <select id="filtroStatusDiagnosticoManutencao" onchange="renderizarDiagnosticosManutencao()">
+              <option value="TODOS">Todos</option>
+              <option value="PENDENTE">Pendentes</option>
+              <option value="OS_GERADA">Com OS gerada</option>
+            </select>
+          </label>
+
+          <label>
+            Buscar
+            <input id="buscaDiagnosticoManutencao" type="search" placeholder="Local, categoria, item ou observação" oninput="renderizarDiagnosticosManutencao()" />
+          </label>
+        </div>
+      </div>
+
+      <div class="diagnostico-list" id="listaDiagnosticosManutencao">
+        <!-- Diagnósticos carregados pelo JavaScript -->
       </div>
     </section>
 
@@ -1282,6 +1426,7 @@
   <script src="js/ativos.js"></script>
   <script src="js/leitor-qr.js"></script>
   <script src="js/preventivas.js"></script>
+  <script src="js/diagnostico-manutencao.js"></script>
   <script src="js/app.js"></script>
 
   <script>

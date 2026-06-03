@@ -6,6 +6,7 @@ const COLLECTIONS = Object.freeze({
   CHAMADOS: "chamados",
   PREVENTIVAS: "planosPreventivos",
   ATIVOS: "ativos",
+  DIAGNOSTICOS: "diagnosticosManutencao",
   USUARIOS: "usuarios",
   COLABORADORES: "colaboradores",
   NOTIFICACOES: "notificacoes",

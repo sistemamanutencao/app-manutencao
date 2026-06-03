@@ -284,6 +284,19 @@ function iniciarMonitoresDeDados() {
     alert("Não foi possível carregar os planos preventivos do Firebase.");
   });
 
+  if (usuarioEhManutencaoAutorizada() && typeof observarDiagnosticosManutencaoFirebase === "function") {
+    monitorDiagnosticosManutencao = observarDiagnosticosManutencaoFirebase(lista => {
+      diagnosticosManutencao = lista;
+
+      if (typeof renderizarDiagnosticosManutencao === "function") {
+        renderizarDiagnosticosManutencao();
+      }
+    }, erro => {
+      console.error("Erro ao carregar diagnósticos da manutenção:", erro);
+      alert("Não foi possível carregar os diagnósticos da manutenção no Firebase.");
+    });
+  }
+
 }
 
 function encerrarMonitoresDeDados() {
@@ -311,6 +324,11 @@ function encerrarMonitoresDeDados() {
     monitorPlanosPreventivos();
     monitorPlanosPreventivos = null;
   }
+  if (typeof monitorDiagnosticosManutencao === "function") {
+    monitorDiagnosticosManutencao();
+    monitorDiagnosticosManutencao = null;
+  }
+
 }
 
 

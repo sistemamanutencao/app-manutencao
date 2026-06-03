@@ -221,6 +221,57 @@ function normalizarPlanoPreventivoFirebase(documento) {
   };
 }
 
+
+function observarDiagnosticosManutencaoFirebase(callback, callbackErro) {
+  return firebaseDb
+    .collection(COLLECTIONS.DIAGNOSTICOS)
+    .orderBy("criadoEm", "desc")
+    .onSnapshot(snapshot => {
+      const lista = snapshot.docs.map(documento => normalizarDiagnosticoManutencaoFirebase(documento));
+      callback(lista);
+    }, callbackErro);
+}
+
+async function criarDiagnosticoManutencaoFirebase(diagnostico) {
+  await firebaseDb.collection(COLLECTIONS.DIAGNOSTICOS).add({
+    ...diagnostico,
+    criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+async function atualizarDiagnosticoManutencaoFirebase(id, dados) {
+  await firebaseDb.collection(COLLECTIONS.DIAGNOSTICOS).doc(String(id)).update({
+    ...dados,
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+function normalizarDiagnosticoManutencaoFirebase(documento) {
+  const dados = documento.data();
+  const criadoEm = converterTimestampParaData(dados.criadoEm) || new Date(dados.criadoEmISO || Date.now());
+
+  return {
+    id: documento.id,
+    ambiente: dados.ambiente || "Não informado",
+    andar: dados.andar || "",
+    local: dados.local || "",
+    categoria: dados.categoria || "Outros",
+    tipoManutencao: dados.tipoManutencao || "Inspeção",
+    prioridade: dados.prioridade || "Média",
+    item: dados.item || "Item sem descrição",
+    situacao: dados.situacao || "Pendente",
+    observacao: dados.observacao || "",
+    status: dados.status || "PENDENTE",
+    osGeradaId: dados.osGeradaId || "",
+    osGeradaNumero: dados.osGeradaNumero || "",
+    criadoPorUid: dados.criadoPorUid || "",
+    criadoPorNome: dados.criadoPorNome || "Manutenção",
+    criadoEmISO: dados.criadoEmISO || criadoEm.toISOString(),
+    data: dados.data || criadoEm.toLocaleDateString("pt-BR")
+  };
+}
+
 function observarComunicadosFirebase(callback, callbackErro) {
   return firebaseDb
     .collection(COLLECTIONS.COMUNICADOS)
