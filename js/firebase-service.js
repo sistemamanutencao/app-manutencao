@@ -221,6 +221,58 @@ function normalizarPlanoPreventivoFirebase(documento) {
   };
 }
 
+
+function observarDiagnosticosFirebase(callback, callbackErro) {
+  return firebaseDb
+    .collection("diagnosticos")
+    .orderBy("criadoEm", "desc")
+    .onSnapshot(snapshot => {
+      const lista = snapshot.docs.map(documento => normalizarDiagnosticoFirebase(documento));
+      callback(lista);
+    }, callbackErro);
+}
+
+async function criarDiagnosticoFirebase(diagnostico) {
+  await firebaseDb.collection("diagnosticos").add({
+    ...diagnostico,
+    criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+async function atualizarDiagnosticoFirebase(id, dados) {
+  await firebaseDb.collection("diagnosticos").doc(String(id)).update({
+    ...dados,
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+function normalizarDiagnosticoFirebase(documento) {
+  const dados = documento.data();
+  const criadoEm = converterTimestampParaData(dados.criadoEm) || new Date(dados.criadoEmISO || Date.now());
+
+  return {
+    id: documento.id,
+    local: dados.local || "Não informado",
+    sistema: dados.sistema || "Inspeção geral",
+    tipo: dados.tipo || "Inspeção",
+    prioridade: dados.prioridade || "P3 - Normal",
+    status: dados.status || "Pendente",
+    descricao: dados.descricao || "Item sem descrição",
+    risco: dados.risco || "",
+    acao: dados.acao || "",
+    material: dados.material || "",
+    data: dados.data || criadoEm.toLocaleDateString("pt-BR"),
+    criadoEmISO: dados.criadoEmISO || criadoEm.toISOString(),
+    criadoPorUid: dados.criadoPorUid || "",
+    criadoPorNome: dados.criadoPorNome || "Oficial de manutenção",
+    unidade: dados.unidade || "Senac Campo Mourão",
+    resolvidoEmISO: dados.resolvidoEmISO || "",
+    resolvidoPorUid: dados.resolvidoPorUid || "",
+    resolvidoPorNome: dados.resolvidoPorNome || ""
+  };
+}
+
 function observarDiagnosticosManutencaoFirebase(callback, callbackErro) {
   return firebaseDb
     .collection(COLLECTIONS.DIAGNOSTICOS)

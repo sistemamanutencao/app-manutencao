@@ -60,7 +60,6 @@ function atualizarItemNavegacaoAtivo(pageId, navElement) {
     chamados: 1,
     novo: 2,
     diagnostico: 3,
-    "diagnostico-manutencao": 3,
     perfil: 4
   };
 
@@ -96,10 +95,20 @@ function executarRenderizacaoDaPagina(pageId) {
     renderizarPlanosPreventivos();
   }
 
-  if (pageId === "diagnostico-manutencao" && typeof renderizarDiagnosticosManutencao === "function") {
-    renderizarDiagnosticosManutencao();
+  if (pageId === "diagnostico") {
+    if (typeof inicializarFormularioDiagnostico === "function") {
+      inicializarFormularioDiagnostico();
+    }
+
+    if (typeof renderizarDiagnosticos === "function") {
+      renderizarDiagnosticos();
+    }
   }
 
+ if (pageId === "diagnostico-manutencao" && typeof renderizarDiagnosticosManutencao === "function") {
+   renderizarDiagnosticosManutencao();
+  }
+  
 
   if (pageId === "perfil") {
     aplicarPermissoesNaTela();

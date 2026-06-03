@@ -51,7 +51,7 @@ function filtrarDiagnosticosManutencao(itens) {
 
       return passaStatus && (!busca || texto.includes(busca));
     })
-    .sort((a, b) => obterPesoPrioridadeDiagnostico(b.prioridade) - obterPesoPrioridadeDiagnostico(a.prioridade));
+    .sort((a, b) => obterPesoPrioridadeDiagnosticoManutencao(b.prioridade) - obterPesoPrioridadeDiagnosticoManutencao(a.prioridade));
 }
 
 function criarCardDiagnosticoManutencao(item) {
@@ -243,7 +243,7 @@ function limparFormularioDiagnosticoManutencao() {
   if (situacao) situacao.value = "Pendente";
 }
 
-function obterPesoPrioridadeDiagnostico(prioridade) {
+function obterPesoPrioridadeDiagnosticoManutencao(prioridade) {
   const pesos = {
     Urgente: 4,
     Alta: 3,

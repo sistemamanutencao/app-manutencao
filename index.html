@@ -84,7 +84,7 @@
             <p>Acompanhar</p>
           </div>
 
-          <div class="quick-card manut-only" onclick="openPage('diagnostico-manutencao')">
+          <div class="quick-card manut-only" onclick="openPage('diagnostico')">
             <div class="quick-icon orange-bg">
               <svg viewBox="0 0 24 24" fill="none">
                 <path d="M9 11l2 2 4-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
@@ -92,8 +92,8 @@
                 <path d="M8 17h8" stroke="currentColor" stroke-linecap="round" />
               </svg>
             </div>
-            <h3>Diagnóstico inicial</h3>
-            <p>Inspeção técnica da unidade</p>
+            <h3>Checklist inicial</h3>
+            <p>Diagnóstico checklist inicial da unidade</p>
           </div>
 
           <div class="quick-card" onclick="openPage('comunicados')">
@@ -149,8 +149,8 @@
                 <path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-linecap="round" />
               </svg>
             </div>
-            <h3 class="manut-only-title">Diagnóstico</h3>
-            <p>Checklist inicial da unidade</p>
+            <h3 class="manut-only-title">Inspeção técnica</h3>
+            <p>Diagnóstico inicial da unidade</p>
           </div>
         </div>
       </section>
@@ -318,7 +318,7 @@
     <!-- ABA DIAGNÓSTICO INICIAL -->
     <section class="page manut-only" id="diagnostico">
       <header class="page-header">
-        <h1>Diagnóstico inicial</h1>
+        <h1>Diagnóstico checklist inicial da unidade</h1>
         <p>Levante a situação atual da unidade sem misturar vistoria, urgência, preventiva e melhoria.</p>
       </header>
 
@@ -722,8 +722,8 @@
     <!-- ABA DIAGNÓSTICO DA MANUTENÇÃO -->
     <section class="page" id="diagnostico-manutencao">
       <header class="page-header">
-        <h1>Diagnóstico inicial</h1>
-        <p>Checklist de uso exclusivo da manutenção para levantar corretivas, preventivas, inspeções, melhorias e recorrências.</p>
+        <h1>Diagnóstico inicial — inspeção técnica da unidade</h1>
+        <p>Uso exclusivo da manutenção para levantar corretivas, preventivas, inspeções, melhorias e recorrências.</p>
       </header>
 
       <div class="dashboard-grid diagnostico-summary-grid">
@@ -1517,7 +1517,7 @@
       Novo
     </div>
 
-    <div class="nav-item manut-only" onclick="openPage('diagnostico-manutencao', this)">
+    <div class="nav-item manut-only" onclick="openPage('diagnostico', this)">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M9 11l2 2 4-5" stroke-linecap="round" stroke-linejoin="round" />
         <path d="M5 4h14v16H5V4Z" stroke-linejoin="round" />
@@ -1574,6 +1574,8 @@
   <script src="js/ativos.js"></script>
   <script src="js/leitor-qr.js"></script>
   <script src="js/preventivas.js"></script>
+  <script src="js/preventivas.js"></script>
+  <script src="js/diagnostico.js"></script>
   <script src="js/diagnostico-manutencao.js"></script>
   <script src="js/app.js"></script>
 

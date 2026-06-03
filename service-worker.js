@@ -1,4 +1,4 @@
-const CACHE_NAME = "controle-tecnico-manutencao-senac-v2";
+const CACHE_NAME = "controle-tecnico-manutencao-senac-v2-diagnostico";
 
 const FILES_TO_CACHE = [
   "./",
@@ -16,6 +16,7 @@ const FILES_TO_CACHE = [
   "./css/comunicados.css",
   "./css/notificacoes.css",
   "./css/areas.css",
+  "./css/diagnostico.css",
   "./css/diagnostico-manutencao.css",
   "./css/responsive.css",
   "./src/constants/andares.js",
@@ -52,6 +53,7 @@ const FILES_TO_CACHE = [
   "./js/ativos.js",
   "./js/leitor-qr.js",
   "./js/preventivas.js",
+  "./js/diagnostico.js",
   "./js/diagnostico-manutencao.js",
   "./js/app.js",
   "./img/senac-predio.png",
