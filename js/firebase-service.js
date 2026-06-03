@@ -221,6 +221,108 @@ function normalizarPlanoPreventivoFirebase(documento) {
   };
 }
 
+
+function observarDiagnosticosFirebase(callback, callbackErro) {
+  return firebaseDb
+    .collection("diagnosticos")
+    .orderBy("criadoEm", "desc")
+    .onSnapshot(snapshot => {
+      const lista = snapshot.docs.map(documento => normalizarDiagnosticoFirebase(documento));
+      callback(lista);
+    }, callbackErro);
+}
+
+async function criarDiagnosticoFirebase(diagnostico) {
+  await firebaseDb.collection("diagnosticos").add({
+    ...diagnostico,
+    criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+async function atualizarDiagnosticoFirebase(id, dados) {
+  await firebaseDb.collection("diagnosticos").doc(String(id)).update({
+    ...dados,
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+function normalizarDiagnosticoFirebase(documento) {
+  const dados = documento.data();
+  const criadoEm = converterTimestampParaData(dados.criadoEm) || new Date(dados.criadoEmISO || Date.now());
+
+  return {
+    id: documento.id,
+    local: dados.local || "Não informado",
+    sistema: dados.sistema || "Inspeção geral",
+    tipo: dados.tipo || "Inspeção",
+    prioridade: dados.prioridade || "P3 - Normal",
+    status: dados.status || "Pendente",
+    descricao: dados.descricao || "Item sem descrição",
+    risco: dados.risco || "",
+    acao: dados.acao || "",
+    material: dados.material || "",
+    data: dados.data || criadoEm.toLocaleDateString("pt-BR"),
+    criadoEmISO: dados.criadoEmISO || criadoEm.toISOString(),
+    criadoPorUid: dados.criadoPorUid || "",
+    criadoPorNome: dados.criadoPorNome || "Oficial de manutenção",
+    unidade: dados.unidade || "Senac Campo Mourão",
+    resolvidoEmISO: dados.resolvidoEmISO || "",
+    resolvidoPorUid: dados.resolvidoPorUid || "",
+    resolvidoPorNome: dados.resolvidoPorNome || ""
+  };
+}
+
+function observarDiagnosticosManutencaoFirebase(callback, callbackErro) {
+  return firebaseDb
+    .collection(COLLECTIONS.DIAGNOSTICOS)
+    .orderBy("criadoEm", "desc")
+    .onSnapshot(snapshot => {
+      const lista = snapshot.docs.map(documento => normalizarDiagnosticoManutencaoFirebase(documento));
+      callback(lista);
+    }, callbackErro);
+}
+
+async function criarDiagnosticoManutencaoFirebase(diagnostico) {
+  await firebaseDb.collection(COLLECTIONS.DIAGNOSTICOS).add({
+    ...diagnostico,
+    criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+async function atualizarDiagnosticoManutencaoFirebase(id, dados) {
+  await firebaseDb.collection(COLLECTIONS.DIAGNOSTICOS).doc(String(id)).update({
+    ...dados,
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+function normalizarDiagnosticoManutencaoFirebase(documento) {
+  const dados = documento.data();
+  const criadoEm = converterTimestampParaData(dados.criadoEm) || new Date(dados.criadoEmISO || Date.now());
+
+  return {
+    id: documento.id,
+    ambiente: dados.ambiente || "Não informado",
+    andar: dados.andar || "",
+    local: dados.local || "",
+    categoria: dados.categoria || "Outros",
+    tipoManutencao: dados.tipoManutencao || "Inspeção",
+    prioridade: dados.prioridade || "Média",
+    item: dados.item || "Item sem descrição",
+    situacao: dados.situacao || "Pendente",
+    observacao: dados.observacao || "",
+    status: dados.status || "PENDENTE",
+    osGeradaId: dados.osGeradaId || "",
+    osGeradaNumero: dados.osGeradaNumero || "",
+    criadoPorUid: dados.criadoPorUid || "",
+    criadoPorNome: dados.criadoPorNome || "Manutenção",
+    criadoEmISO: dados.criadoEmISO || criadoEm.toISOString(),
+    data: dados.data || criadoEm.toLocaleDateString("pt-BR")
+  };
+}
+
 function observarComunicadosFirebase(callback, callbackErro) {
   return firebaseDb
     .collection(COLLECTIONS.COMUNICADOS)

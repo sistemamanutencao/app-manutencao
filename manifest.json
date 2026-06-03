@@ -1,7 +1,7 @@
 {
-  "name": "App Manutenção Predial",
-  "short_name": "Manutenção",
-  "description": "Aplicativo para abertura e controle de chamados de manutenção predial.",
+  "name": "Controle Técnico de Manutenção SENAC",
+  "short_name": "Controle Técnico",
+  "description": "Diagnóstico inicial, ordens de serviço, preventivas e rastreabilidade para o Oficial de Manutenção.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f5f7fc",

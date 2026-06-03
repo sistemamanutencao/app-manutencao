@@ -15,6 +15,8 @@ let comunicados = [];
 let notificacoes = [];
 let ativos = [];
 let planosPreventivos = [];
+let diagnosticos = [];
+let diagnosticosManutencao = [];
 
 let filtroStatusAtual = "TODOS";
 let chamadoSelecionadoId = null;
@@ -31,3 +33,5 @@ let monitorComunicados = null;
 let monitorNotificacoes = null;
 let monitorAtivos = null;
 let monitorPlanosPreventivos = null;
+let monitorDiagnosticos = null;
+let monitorDiagnosticosManutencao = null;
