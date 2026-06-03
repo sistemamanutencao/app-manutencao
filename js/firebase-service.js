@@ -321,10 +321,10 @@ async function excluirComunicadoFirebase(id) {
 function observarNotificacoesFirebase(usuario, callback, callbackErro) {
   let consulta = firebaseDb.collection(COLLECTIONS.NOTIFICACOES);
 
-  if (!perfilPode(usuario.perfil, PERMISSOES_APP.VER_TODAS_OS)) {
-    consulta = consulta.where("destinatarioUid", "==", usuario.id);
-  } else {
+  if (usuario && normalizarPerfilUsuario(usuario.perfil) === PERFIS_USUARIO.MANUTENCAO) {
     consulta = consulta.where("destinatarioPerfil", "==", PERFIS_USUARIO.MANUTENCAO);
+  } else {
+    consulta = consulta.where("destinatarioUid", "==", usuario.id);
   }
 
   return consulta.onSnapshot(snapshot => {

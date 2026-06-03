@@ -106,6 +106,7 @@ function criarCardChamado(chamado) {
           ${chamado.equipamentoCodigo ? `&nbsp;•&nbsp; Ativo ${escaparHTML(chamado.equipamentoCodigo)}` : ""}
           &nbsp;•&nbsp;
           ${escaparHTML(chamado.data)}
+          ${usuarioPodeVerTodasOS() ? `&nbsp;•&nbsp; Solicitante: ${escaparHTML(chamado.criadoPorNome || "Não informado")}` : ""}
         </p>
 
         <small class="sla-badge ${sla.classe}">${escaparHTML(textoSLA)}</small>

@@ -80,8 +80,8 @@
                 <path d="M4 7h.01M4 12h.01M4 17h.01" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
               </svg>
             </div>
-            <h3>Minhas OS</h3>
-            <p>Acompanhar</p>
+            <h3 id="tituloCardChamadosRapido">Minhas OS</h3>
+            <p id="textoCardChamadosRapido">Acompanhar</p>
           </div>
 
           <div class="quick-card" onclick="openPage('comunicados')">
@@ -169,8 +169,8 @@
     <!-- ABA CHAMADOS -->
     <section class="page" id="chamados">
       <header class="page-header">
-        <h1>Ordens de Serviço</h1>
-        <p>Acompanhe as OS abertas, em triagem, execução, validação e encerramento.</p>
+        <h1 id="tituloPaginaChamados">Ordens de Serviço</h1>
+        <p id="textoPaginaChamados">Acompanhe as OS abertas, em triagem, execução, validação e encerramento.</p>
       </header>
 
       <div class="filter-row" id="filtrosOS">
@@ -931,8 +931,8 @@
     </div>
 
     <div class="maintenance-login-box login-access-card login-access-card-manutencao">
-      <h2>Acesso da manutenção</h2>
-      <p class="form-help">Uso exclusivo da equipe de manutenção autorizada.</p>
+      <h2>Acesso autorizado</h2>
+      <p class="form-help">Uso exclusivo da manutenção e da gerência cadastradas no Firebase.</p>
 
       <label>
         E-mail
@@ -940,7 +940,7 @@
           id="loginEmailUsuario"
           type="email"
           autocomplete="email"
-          placeholder="manutencao@senac.com"
+          placeholder="usuario@senac.com"
         />
       </label>
 
@@ -959,7 +959,7 @@
         class="secondary-button"
         onclick="entrarComFirebase(this)"
       >
-        Entrar como manutencao
+        Entrar com e-mail
       </button>
     </div>
 
