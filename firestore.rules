@@ -113,18 +113,9 @@ service cloud.firestore {
       allow create, update, delete: if ehManutencao();
     }
 
-    match /diagnosticosManutencao/{id} {
-      allow read, create, update, delete: if ehManutencao();
-    }
-
     match /comunicados/{id} {
       allow read: if estaAutenticado();
       allow create, update, delete: if ehManutencao();
-    }
-
-
-    match /diagnosticos/{id} {
-      allow read, create, update, delete: if ehManutencao();
     }
 
     match /notificacoes/{id} {

@@ -62,10 +62,6 @@ function aplicarPermissoesNaTela() {
   if (typeof renderizarPlanosPreventivos === "function") {
     renderizarPlanosPreventivos();
   }
-
-  if (typeof renderizarDiagnosticos === "function") {
-    renderizarDiagnosticos();
-  }
 }
 
 function obterAreaNavegacao() {
