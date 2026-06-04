@@ -15,6 +15,7 @@ const firebaseConfig = {
 
 let firebaseAuth = null;
 let firebaseDb = null;
+let firebaseFunctions = null;
 
 function inicializarFirebaseServico() {
   if (firebase.apps.length === 0) {
@@ -23,6 +24,7 @@ function inicializarFirebaseServico() {
 
   firebaseAuth = firebase.auth();
   firebaseDb = firebase.firestore();
+  firebaseFunctions = firebase.functions ? firebase.functions() : null;
 }
 
 function observarAutenticacao(callback) {
@@ -33,12 +35,54 @@ function autenticarUsuario(email, senha) {
   return firebaseAuth.signInWithEmailAndPassword(email, senha);
 }
 
-function autenticarColaboradorAnonimo() {
-  return firebaseAuth.signInAnonymously();
-}
-
 function encerrarSessaoFirebase() {
   return firebaseAuth.signOut();
+}
+
+function enviarEmailRedefinicaoSenha(email) {
+  return firebaseAuth.sendPasswordResetEmail(email);
+}
+
+function chamarFuncaoFirebase(nomeFuncao, dados = {}) {
+  if (!firebaseFunctions) {
+    return Promise.reject(new Error("Firebase Functions não foi inicializado. Verifique o script firebase-functions-compat.js no HTML."));
+  }
+
+  return firebaseFunctions.httpsCallable(nomeFuncao)(dados);
+}
+
+async function criarUsuarioPorConviteFirebase(dadosUsuario) {
+  const resultado = await chamarFuncaoFirebase("criarUsuario", dadosUsuario);
+  return resultado.data || {};
+}
+
+async function reenviarConviteUsuarioFirebase(uid) {
+  const resultado = await chamarFuncaoFirebase("reenviarConvite", { uid });
+  return resultado.data || {};
+}
+
+async function alterarPerfilUsuarioFirebase(uid, perfil) {
+  const resultado = await chamarFuncaoFirebase("alterarPerfil", { uid, perfil });
+  return resultado.data || {};
+}
+
+async function definirStatusUsuarioFirebase(uid, ativo) {
+  const resultado = await chamarFuncaoFirebase(ativo ? "reativarUsuario" : "desativarUsuario", { uid });
+  return resultado.data || {};
+}
+
+function observarUsuariosFirebase(callback, callbackErro) {
+  return firebaseDb
+    .collection(COLLECTIONS.USUARIOS)
+    .orderBy("nome", "asc")
+    .onSnapshot(snapshot => {
+      const lista = snapshot.docs.map(documento => ({
+        id: documento.id,
+        uid: documento.id,
+        ...documento.data()
+      }));
+      callback(lista);
+    }, callbackErro);
 }
 
 async function registrarVinculoColaboradorFirebase(codigoColaborador, dados = {}) {
@@ -93,10 +137,6 @@ function observarChamadosFirebase(usuario, callback, callbackErro) {
   if (usuario.id) {
     consultasColaborador.push(colecaoChamados.where("criadoPorUid", "==", usuario.id));
     consultasColaborador.push(colecaoChamados.where("solicitanteId", "==", usuario.id));
-  }
-
-  if (usuario.colaboradorCodigo || usuario.colaboradorLocalId) {
-    consultasColaborador.push(colecaoChamados.where("colaboradorCodigo", "==", usuario.colaboradorCodigo || usuario.colaboradorLocalId));
   }
 
   if (!consultasColaborador.length) {

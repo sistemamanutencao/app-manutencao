@@ -55,6 +55,10 @@ function usuarioEhGerencia() {
   return usuarioPossuiPerfil(PERFIS_USUARIO.GERENCIA);
 }
 
+function usuarioEhAdministrador() {
+  return usuarioPossuiPerfil(PERFIS_USUARIO.ADMINISTRADOR);
+}
+
 function usuarioEhPerfilOperacionalManutencao() {
   return usuarioEhManutencaoAutorizada();
 }

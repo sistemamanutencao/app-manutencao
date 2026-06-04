@@ -886,87 +886,60 @@
 
 <!-- ABA PERFIL -->
 <section class="page" id="perfil">
-  <!-- FORMULÁRIO DE LOGIN / IDENTIFICAÇÃO -->
-  <div class="form-card profile-form-card" id="areaFormularioPerfil">
-    <div class="login-header">
-      <h1>Central de Manutenção</h1>
-      <span class="login-accent-line" aria-hidden="true"></span>
-      <p>Acesso ao sistema</p>
-    </div>
-
-    <div class="login-access-card login-access-card-colaborador">
-      <h2>Acesso do colaborador</h2>
-      <p class="form-help">Para abrir e acompanhar OS, informe seus dados.</p>
-
-      <label>
-        Nome do colaborador
-        <input
-          id="loginNomeColaborador"
-          type="text"
-          autocomplete="name"
-          placeholder="Digite seu nome"
-        />
-      </label>
-
-      <label>
-        Setor onde trabalha
-        <input
-          id="loginSetorColaborador"
-          type="text"
-          placeholder="Ex: Administração, Biblioteca, Laboratório ..."
-        />
-      </label>
-
-      <button
-        type="button"
-        class="primary-button"
-        onclick="entrarComoColaborador(this)"
-      >
-        Entrar como colaborador
-      </button>
-    </div>
-
-    <div class="login-divider" aria-hidden="true">
-      <span>ou</span>
-    </div>
-
-    <div class="maintenance-login-box login-access-card login-access-card-manutencao">
-      <h2>Acesso autorizado</h2>
-      <p class="form-help">Uso exclusivo da manutenção e da gerência cadastradas no Firebase.</p>
-
-      <label>
-        E-mail
-        <input
-          id="loginEmailUsuario"
-          type="email"
-          autocomplete="email"
-          placeholder="usuario@senac.com"
-        />
-      </label>
-
-      <label>
-        Senha
-        <input
-          id="loginSenhaUsuario"
-          type="password"
-          autocomplete="current-password"
-          placeholder="Digite sua senha"
-        />
-      </label>
-
-      <button
-        type="button"
-        class="secondary-button"
-        onclick="entrarComFirebase(this)"
-      >
-        Entrar com e-mail
-      </button>
-    </div>
-
-    <p class="login-secure-note">Acesso seguro e monitorado</p>
+<!-- FORMULÁRIO DE LOGIN -->
+<div class="form-card profile-form-card" id="areaFormularioPerfil">
+  <div class="login-header">
+    <h1>Central de Manutenção</h1>
+    <span class="login-accent-line" aria-hidden="true"></span>
+    <p>Acesso ao sistema</p>
   </div>
 
-  <!-- ÁREA EXIBIDA SOMENTE DEPOIS DO LOGIN -->
+  <div class="login-access-card login-access-card-manutencao">
+    <h2>Entrar com e-mail e senha</h2>
+    <p class="form-help">Use a senha criada pelo link de ativação enviado ao seu e-mail.</p>
+
+    <label>
+      E-mail
+      <input
+        id="loginEmailUsuario"
+        type="email"
+        autocomplete="email"
+        placeholder="usuario@senac.com"
+      />
+    </label>
+
+    <label>
+      Senha
+      <input
+        id="loginSenhaUsuario"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Digite sua senha"
+        onkeydown="if(event.key === 'Enter') entrarComFirebase()"
+      />
+    </label>
+
+    <button
+      type="button"
+      class="primary-button"
+      onclick="entrarComFirebase(this)"
+    >
+      Entrar
+    </button>
+
+    <button
+      type="button"
+      class="secondary-button"
+      onclick="enviarRedefinicaoSenhaLogin(this)"
+    >
+      Esqueci minha senha
+    </button>
+  </div>
+
+  <p class="login-secure-note">Acesso individual, autenticado e monitorado</p>
+</div>
+
+<!-- ÁREA EXIBIDA SOMENTE DEPOIS DO LOGIN -->
   <div id="areaPerfilLogado">
     <div class="profile-card">
       <div class="avatar" id="perfilAvatar">CO</div>
@@ -1031,6 +1004,14 @@
       Painel da manutenção
     </button>
 
+    <button 
+      id="botaoUsuariosAdmin" 
+      class="primary-button admin-only" 
+      onclick="openPage('usuarios')"
+    >
+      Gerenciar usuários
+    </button>
+
 
     <button 
       type="button" 
@@ -1039,6 +1020,40 @@
       Sair da conta
     </button>
   </div>
+</section>
+
+
+<!-- ABA USUÁRIOS / ADMINISTRAÇÃO -->
+<section class="page" id="usuarios">
+  <header class="page-header">
+    <h1>Usuários</h1>
+    <p>Cadastre colaboradores, gerência e manutenção por convite. A senha é criada pelo próprio usuário pelo link enviado por e-mail.</p>
+  </header>
+
+  <div class="form-card admin-only" id="areaCadastroUsuarioAdmin">
+    <h2>Novo usuário</h2>
+    <p class="form-help">Esta ação cria a conta no Firebase Authentication, grava o perfil em usuarios/{uid} e envia o link de criação de senha.</p>
+
+    <label>Nome completo<input id="adminUsuarioNome" type="text" autocomplete="name" placeholder="Nome do usuário" /></label>
+    <label>E-mail<input id="adminUsuarioEmail" type="email" autocomplete="email" placeholder="usuario@senac.com" /></label>
+    <label>Setor<input id="adminUsuarioSetor" type="text" placeholder="Ex: Administração, Biblioteca, Manutenção" /></label>
+    <label>Cargo<input id="adminUsuarioCargo" type="text" placeholder="Ex: Assistente, Oficial de manutenção, Gerente" /></label>
+
+    <label>
+      Perfil de acesso
+      <select id="adminUsuarioPerfil">
+        <option value="colaborador">Colaborador</option>
+        <option value="gerencia">Gerência</option>
+        <option value="manutencao">Manutenção</option>
+        <option value="administrador">Administrador</option>
+      </select>
+    </label>
+
+    <button type="button" class="primary-button" onclick="criarUsuarioAdmin(this)">Cadastrar e enviar convite</button>
+  </div>
+
+  <div class="section-header spacing"><h2>Usuários cadastrados</h2></div>
+  <div class="tickets-card" id="listaUsuariosSistema"><!-- Usuários carregados pelo JavaScript --></div>
 </section>
 
 <!-- ABA PAINEL DA MANUTENÇÃO -->
@@ -1410,6 +1425,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
   <script src="src/constants/andares.js"></script>
   <script src="src/constants/locais.js"></script>
   <script src="src/constants/categorias.js"></script>
@@ -1441,6 +1457,7 @@
   <script src="js/painel-status.js"></script>
   <script src="js/painel.js"></script>
   <script src="js/perfil.js"></script>
+  <script src="js/usuarios-admin.js"></script>
   <script src="js/comunicados.js"></script>
   <script src="js/ativos.js"></script>
   <script src="js/leitor-qr.js"></script>

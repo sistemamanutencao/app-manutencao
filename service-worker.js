@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-gerencia-v1";
+const CACHE_NAME = "app-manutencao-auth-perfis-v1";
 
 const FILES_TO_CACHE = [
   "./",
@@ -31,6 +31,7 @@ const FILES_TO_CACHE = [
   "./src/constants/exportacoes.js",
   "./src/constants/index.js",
   "./js/state.js",
+  "./js/ui-feedback.js",
   "./js/auth-permissions.js",
   "./js/firebase-service.js",
   "./js/utils.js",
@@ -48,6 +49,7 @@ const FILES_TO_CACHE = [
   "./js/painel-status.js",
   "./js/painel.js",
   "./js/perfil.js",
+  "./js/usuarios-admin.js",
   "./js/comunicados.js",
   "./js/ativos.js",
   "./js/leitor-qr.js",

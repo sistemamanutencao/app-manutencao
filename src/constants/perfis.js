@@ -6,19 +6,22 @@
 const PERFIS_USUARIO = Object.freeze({
   COLABORADOR: "colaborador",
   GERENCIA: "gerencia",
-  MANUTENCAO: "manutencao"
+  MANUTENCAO: "manutencao",
+  ADMINISTRADOR: "administrador"
 });
 
 const PERFIS_USUARIO_LISTA = Object.freeze([
   PERFIS_USUARIO.COLABORADOR,
   PERFIS_USUARIO.GERENCIA,
-  PERFIS_USUARIO.MANUTENCAO
+  PERFIS_USUARIO.MANUTENCAO,
+  PERFIS_USUARIO.ADMINISTRADOR
 ]);
 
 const NOMES_PERFIS_USUARIO = Object.freeze({
   [PERFIS_USUARIO.COLABORADOR]: "Colaborador",
   [PERFIS_USUARIO.GERENCIA]: "Gerência",
-  [PERFIS_USUARIO.MANUTENCAO]: "Manutenção"
+  [PERFIS_USUARIO.MANUTENCAO]: "Manutenção",
+  [PERFIS_USUARIO.ADMINISTRADOR]: "Administrador"
 });
 
 const ALIASES_PERFIS_USUARIO = Object.freeze({
@@ -36,5 +39,8 @@ const ALIASES_PERFIS_USUARIO = Object.freeze({
   manutencao_predial: PERFIS_USUARIO.MANUTENCAO,
   tecnico: PERFIS_USUARIO.MANUTENCAO,
   tecnica: PERFIS_USUARIO.MANUTENCAO,
-  responsavel_manutencao: PERFIS_USUARIO.MANUTENCAO
+  responsavel_manutencao: PERFIS_USUARIO.MANUTENCAO,
+  administrador: PERFIS_USUARIO.ADMINISTRADOR,
+  admin: PERFIS_USUARIO.ADMINISTRADOR,
+  administracao: PERFIS_USUARIO.ADMINISTRADOR
 });

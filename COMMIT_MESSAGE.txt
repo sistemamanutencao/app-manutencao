@@ -1,0 +1,9 @@
+Implementa login por convite mantendo perfis operacionais
+
+- Mantém os perfis colaborador, gerencia, manutencao e administrador.
+- Remove o fluxo antigo de entrada por nome e setor.
+- Exige login por e-mail e senha para todos os perfis.
+- Vincula novas OS ao UID autenticado do Firebase Authentication.
+- Mantém gerência com acompanhamento de todas as OS sem ações técnicas.
+- Mantém manutenção com permissões operacionais completas.
+- Mantém administrador para cadastro, convite e gestão de usuários.

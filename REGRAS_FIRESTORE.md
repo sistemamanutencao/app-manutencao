@@ -1,174 +1,73 @@
-# Regras do Firestore para esta versão
+# Regras do Firestore - versão com login por e-mail e senha
 
-Cole estas regras em **Firestore Database > Regras**.
+Esta versão não utiliza mais autenticação anônima nem entrada por nome/setor.
+Todos os usuários precisam existir em:
 
-> Esta versão usa login simplificado para colaboradores com autenticação anônima do Firebase. Por isso, habilite também **Authentication > Sign-in method > Anonymous** no Firebase Console.
+```text
+Authentication
+usuarios/{uid}
+```
 
-```js
-rules_version = '2';
+Perfis ativos:
 
-service cloud.firestore {
-  match /databases/{database}/documents {
+```text
+colaborador
+ gerencia
+manutencao
+administrador
+```
 
-    function estaLogado() {
-      return request.auth != null;
-    }
+## Resumo das permissões
 
-    function temCadastro() {
-      return estaLogado() && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid));
-    }
+### colaborador
 
-    function usuarioAtual() {
-      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
-    }
+- Pode abrir OS.
+- Pode visualizar e cancelar apenas as próprias OS enquanto estiverem abertas.
+- Entra sempre com e-mail e senha.
 
-    function estaAtivo() {
-      return temCadastro() && usuarioAtual().ativo == true;
-    }
+### gerencia
 
-    function ehAdmin() {
-      return estaAtivo()
-        && usuarioAtual().perfil in ["admin", "Admin", "administrador", "Administrador"];
-    }
+- Pode abrir OS.
+- Pode visualizar OS de todos os colaboradores.
+- Não possui ações operacionais da manutenção.
+- Entra sempre com e-mail e senha.
 
-    function ehManutencao() {
-      return estaAtivo()
-        && usuarioAtual().perfil in ["manutencao", "manutenção", "Manutenção", "MANUTENCAO", "MANUTENÇÃO"];
-    }
+### manutencao
 
-    function ehManutencaoOuAdmin() {
-      return ehManutencao() || ehAdmin();
-    }
+- Pode visualizar todas as OS.
+- Pode assumir, alterar status, finalizar e excluir OS.
+- Pode gerenciar ativos, preventivas, comunicados e diagnóstico inicial.
+- Entra sempre com e-mail e senha.
 
-    function aguardandoTemJustificativa() {
-      return request.resource.data.status != "AGUARDANDO"
-        || (
-          request.resource.data.justificativaAguardando is string
-          && request.resource.data.justificativaAguardando.size() > 0
-        );
-    }
+### administrador
 
-    function chamadoPertenceAoUsuario() {
-      return resource.data.criadoPorUid == request.auth.uid
-        || resource.data.solicitanteId == request.auth.uid;
-    }
+- Pode cadastrar usuários por convite.
+- Pode reenviar convite, alterar perfil, desativar e reativar usuários.
+- Deve ser criado manualmente no primeiro acesso do sistema.
 
-    function chamadoNaoFinalizado() {
-      return resource.data.status != "CONCLUÍDO"
-        && resource.data.status != "CANCELADO";
-    }
+## Coleção usuarios
 
-    function alterouSomenteCancelamentoColaborador() {
-      return request.resource.data.diff(resource.data).affectedKeys()
-        .hasOnly([
-          "status",
-          "historico",
-          "atualizadoEm",
-          "canceladoPorUid",
-          "canceladoPorNome",
-          "canceladoMotivo",
-          "canceladoEmISO"
-        ]);
-    }
+Cada conta deve possuir um documento em:
 
-    function colaboradorPodeCancelarChamado() {
-      return estaLogado()
-        && chamadoPertenceAoUsuario()
-        && chamadoNaoFinalizado()
-        && request.resource.data.status == "CANCELADO"
-        && request.resource.data.canceladoPorUid == request.auth.uid
-        && request.resource.data.canceladoMotivo is string
-        && request.resource.data.canceladoMotivo.size() > 0
-        && alterouSomenteCancelamentoColaborador();
-    }
+```text
+usuarios/{uid}
+```
 
-    function podeLerNotificacao() {
-      return resource.data.destinatarioUid == request.auth.uid
-        || (resource.data.destinatarioPerfil == "manutencao" && ehManutencaoOuAdmin())
-        || (resource.data.destinatarioPerfil == "admin" && ehAdmin());
-    }
+Exemplo:
 
-    function notificacaoCriadaCorretamente() {
-      return request.resource.data.criadaPorUid == request.auth.uid
-        && request.resource.data.titulo is string
-        && request.resource.data.titulo.size() > 0
-        && request.resource.data.mensagem is string
-        && request.resource.data.tipo is string
-        && request.resource.data.lidaPorUids is list
-        && request.resource.data.lidaPorUids.size() == 0
-        && (
-          (
-            request.resource.data.destinatarioUid is string
-            && request.resource.data.destinatarioUid.size() > 0
-          )
-          || request.resource.data.destinatarioPerfil in ["manutencao", "admin"]
-        );
-    }
-
-    function marcouSomenteLeituraNotificacao() {
-      return request.resource.data.diff(resource.data).affectedKeys()
-        .hasOnly(["lidaPorUids", "atualizadoEm"])
-        && resource.data.lidaPorUids is list
-        && request.resource.data.lidaPorUids is list
-        && request.resource.data.lidaPorUids.hasAll(resource.data.lidaPorUids)
-        && request.auth.uid in request.resource.data.lidaPorUids;
-    }
-
-    match /usuarios/{userId} {
-      allow read: if estaAtivo() && (request.auth.uid == userId || ehManutencaoOuAdmin());
-      allow create, update, delete: if ehAdmin();
-    }
-
-    match /chamados/{chamadoId} {
-      allow create: if estaLogado()
-        && request.resource.data.criadoPorUid == request.auth.uid
-        && request.resource.data.solicitanteId == request.auth.uid
-        && aguardandoTemJustificativa();
-
-      allow read: if estaLogado()
-        && (
-          resource.data.criadoPorUid == request.auth.uid
-          || resource.data.solicitanteId == request.auth.uid
-          || ehManutencaoOuAdmin()
-        );
-
-      allow update: if estaLogado()
-        && aguardandoTemJustificativa()
-        && (
-          ehManutencaoOuAdmin()
-          || colaboradorPodeCancelarChamado()
-        );
-
-      allow delete: if ehAdmin();
-    }
-
-    match /ativos/{ativoId} {
-      allow read: if estaLogado();
-      allow create, update, delete: if ehManutencaoOuAdmin();
-    }
-
-    match /planosPreventivos/{planoId} {
-      allow read: if estaLogado();
-      allow create, update, delete: if ehManutencaoOuAdmin();
-    }
-
-    match /comunicados/{comunicadoId} {
-      allow read: if estaLogado();
-      allow create, update, delete: if ehManutencaoOuAdmin();
-    }
-
-    match /notificacoes/{notificacaoId} {
-      allow read: if estaLogado() && podeLerNotificacao();
-      allow create: if estaLogado() && notificacaoCriadaCorretamente();
-      allow update: if estaLogado()
-        && podeLerNotificacao()
-        && marcouSomenteLeituraNotificacao();
-      allow delete: if ehAdmin();
-    }
-
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
+```json
+{
+  "uid": "UID_DO_AUTH",
+  "nome": "Nome do usuário",
+  "email": "usuario@senac.com",
+  "setor": "Setor",
+  "cargo": "Cargo",
+  "perfil": "colaborador",
+  "ativo": true,
+  "primeiroAcesso": true
 }
 ```
+
+## Observação sobre coleção colaboradores
+
+A coleção `colaboradores` fica apenas como compatibilidade histórica. Novos registros devem usar `usuarios/{uid}` e OS vinculadas por `criadoPorUid` / `solicitanteId`.
