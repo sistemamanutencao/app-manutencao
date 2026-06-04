@@ -51,6 +51,14 @@ function usuarioEhManutencaoAutorizada() {
     && (usuarioPode(PERMISSOES_APP.VER_PAINEL) || usuarioPode(PERMISSOES_APP.VER_TODAS_OS));
 }
 
+function usuarioEhGerencia() {
+  return usuarioPossuiPerfil(PERFIS_USUARIO.GERENCIA);
+}
+
+function usuarioEhPerfilOperacionalManutencao() {
+  return usuarioEhManutencaoAutorizada();
+}
+
 function usuarioPodeVerPainel() {
   return usuarioPode(PERMISSOES_APP.VER_PAINEL);
 }

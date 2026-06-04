@@ -226,6 +226,9 @@ function normalizarUsuarioLogado(usuarioFirebase, perfil) {
     email: perfil.email || usuarioFirebase.email || "",
     unidade: perfil.unidade || "Senac Campo Mourão",
     perfil: tipoPerfil,
+    colaboradorLocalId: perfil.colaboradorLocalId || perfil.colaboradorCodigo || "",
+    colaboradorCodigo: perfil.colaboradorCodigo || perfil.colaboradorLocalId || "",
+    colaboradorChave: perfil.colaboradorChave || "",
     manutencaoAutorizado: tipoPerfil === PERFIS_USUARIO.MANUTENCAO,
     perfilConfigurado: true
   };
@@ -342,12 +345,49 @@ function aplicarPermissoesInterface() {
     ? usuarioEhManutencaoAutorizada()
     : Boolean(usuarioAtual && usuarioAtual.manutencaoAutorizado);
 
+  const gerencia = typeof usuarioEhGerencia === "function" ? usuarioEhGerencia() : false;
+
   document.querySelectorAll(".manut-only").forEach((elemento) => {
     elemento.style.display = manutencao ? "" : "none";
   });
+
+  document.querySelectorAll(".gerencia-only").forEach((elemento) => {
+    elemento.style.display = gerencia ? "" : "none";
+  });
+
+  atualizarRotulosVisaoChamados();
 
   document.querySelectorAll("[data-permissao]").forEach(elemento => {
     const permissao = elemento.getAttribute("data-permissao");
     elemento.style.display = usuarioPode(permissao) ? "" : "none";
   });
+}
+
+
+function atualizarRotulosVisaoChamados() {
+  const podeVerTodas = typeof usuarioPodeVerTodasOS === "function" && usuarioPodeVerTodasOS();
+  const ehGerencia = typeof usuarioEhGerencia === "function" && usuarioEhGerencia();
+
+  const tituloRapido = document.getElementById("tituloCardChamadosRapido");
+  const textoRapido = document.getElementById("textoCardChamadosRapido");
+  const tituloPagina = document.getElementById("tituloPaginaChamados");
+  const textoPagina = document.getElementById("textoPaginaChamados");
+
+  if (tituloRapido) {
+    tituloRapido.textContent = podeVerTodas ? "Todas as OS" : "Minhas OS";
+  }
+
+  if (textoRapido) {
+    textoRapido.textContent = podeVerTodas ? "Acompanhar chamados" : "Acompanhar";
+  }
+
+  if (tituloPagina) {
+    tituloPagina.textContent = ehGerencia ? "Acompanhamento de OS" : "Ordens de Serviço";
+  }
+
+  if (textoPagina) {
+    textoPagina.textContent = ehGerencia
+      ? "Acompanhe chamados de todos os colaboradores, status e histórico, sem permissões operacionais da manutenção."
+      : "Acompanhe as OS abertas, em triagem, execução, validação e encerramento.";
+  }
 }

@@ -103,7 +103,7 @@ function preencherFormularioPerfil() {
   }
 
   if (emailInput) {
-    emailInput.value = usuarioEhManutencaoAutorizada() ? usuarioAtual.email || "" : "";
+    emailInput.value = (usuarioEhManutencaoAutorizada() || (typeof usuarioEhGerencia === "function" && usuarioEhGerencia())) ? usuarioAtual.email || "" : "";
   }
 
   if (senhaInput) {
@@ -278,7 +278,7 @@ async function entrarComFirebase(botao) {
   const senha = senhaInput.value;
 
   if (!email || !senha) {
-    alert("Informe e-mail e senha para entrar como manutenção.");
+    alert("Informe e-mail e senha para entrar com acesso autorizado.");
     return;
   }
 
@@ -296,14 +296,14 @@ async function entrarComFirebase(botao) {
   } finally {
     if (botao) {
       botao.disabled = false;
-      botao.textContent = "Entrar como manutenção";
+      botao.textContent = "Entrar com e-mail";
     }
   }
 }
 
 async function sairDaConta() {
   try {
-    if (usuarioEhManutencaoAutorizada()) {
+    if (usuarioEhManutencaoAutorizada() || (typeof usuarioEhGerencia === "function" && usuarioEhGerencia())) {
       removerColaboradorLocal();
     } else {
       removerDadosIdentificacaoColaborador();

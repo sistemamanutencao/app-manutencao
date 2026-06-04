@@ -14,8 +14,36 @@ service cloud.firestore {
         : "colaborador";
     }
 
+    function perfilEhUmDos(valoresAceitos) {
+      return perfilUsuario() in valoresAceitos;
+    }
+
     function ehManutencao() {
-      return estaAutenticado() && perfilUsuario() == "manutencao";
+      return estaAutenticado()
+        && perfilEhUmDos([
+          "manutencao",
+          "manutenção",
+          "Manutencao",
+          "Manutenção",
+          "MANUTENCAO",
+          "MANUTENÇÃO"
+        ]);
+    }
+
+    function ehGerencia() {
+      return estaAutenticado()
+        && perfilEhUmDos([
+          "gerencia",
+          "gerência",
+          "Gerencia",
+          "Gerência",
+          "GERENCIA",
+          "GERÊNCIA"
+        ]);
+    }
+
+    function podeAcompanharTodosChamados() {
+      return ehManutencao() || ehGerencia();
     }
 
     function colaboradorExiste(codigo) {
@@ -47,7 +75,14 @@ service cloud.firestore {
         && uidAutorizadoNoCodigo(request.resource.data.colaboradorCodigo);
     }
 
-    function colaboradorPodeCancelarChamado() {
+    function gerenciaPodeCriarChamado() {
+      return ehGerencia()
+        && request.resource.data.criadoPorUid == request.auth.uid
+        && request.resource.data.solicitanteId == request.auth.uid
+        && request.resource.data.status == "ABERTO";
+    }
+
+    function podeCancelarProprioChamado() {
       return estaAutenticado()
         && ehAutorChamado(resource.data)
         && resource.data.status == "ABERTO"
@@ -91,14 +126,14 @@ service cloud.firestore {
     }
 
     match /chamados/{id} {
-      allow read: if ehManutencao() || ehAutorChamado(resource.data);
-      allow create: if ehManutencao() || colaboradorPodeCriarChamado();
-      allow update: if ehManutencao() || colaboradorPodeCancelarChamado();
+      allow read: if podeAcompanharTodosChamados() || ehAutorChamado(resource.data);
+      allow create: if ehManutencao() || gerenciaPodeCriarChamado() || colaboradorPodeCriarChamado();
+      allow update: if ehManutencao() || podeCancelarProprioChamado();
       allow delete: if ehManutencao();
     }
 
     match /colaboradores/{id} {
-      allow read: if ehManutencao() || (estaAutenticado() && request.auth.uid in resource.data.uidsAutorizados);
+      allow read: if podeAcompanharTodosChamados() || (estaAutenticado() && request.auth.uid in resource.data.uidsAutorizados);
       allow create, update: if podeCriarOuAtualizarCodigoColaborador(id);
       allow delete: if ehManutencao();
     }
@@ -119,7 +154,7 @@ service cloud.firestore {
     }
 
     match /notificacoes/{id} {
-      allow read: if ehManutencao()
+      allow read: if podeAcompanharTodosChamados()
         || resource.data.destinatarioUid == request.auth.uid
         || resource.data.destinatarioPerfil == "colaborador";
       allow create: if estaAutenticado();
