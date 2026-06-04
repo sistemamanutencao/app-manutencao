@@ -288,34 +288,3 @@
     padding: 18px 16px;
   }
 }
-
-/* Administração de usuários */
-.admin-only {
-  display: none;
-}
-
-.usuario-admin-card {
-  display: grid;
-  gap: 12px;
-}
-
-.usuario-admin-actions {
-  display: grid;
-  gap: 8px;
-}
-
-.usuario-admin-actions select {
-  width: 100%;
-  border: 1px solid #dfe6f3;
-  background: #f8faff;
-  border-radius: 13px;
-  padding: 12px;
-  font-size: 13px;
-  color: var(--text-dark);
-  font-weight: 800;
-}
-
-.usuario-admin-actions button {
-  min-height: 42px;
-  margin-top: 0;
-}

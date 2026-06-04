@@ -15,7 +15,6 @@ function aplicarPermissoesNaTela() {
   const areaNovoComunicado = document.getElementById("areaNovoComunicado");
   const areaNovoAtivo = document.getElementById("areaNovoAtivo");
   const areaNovoPlanoPreventivo = document.getElementById("areaNovoPlanoPreventivo");
-  const botaoUsuariosAdmin = document.getElementById("botaoUsuariosAdmin");
 
   if (areaNavegacao) {
     areaNavegacao.style.display = perfilSalvo ? "" : "none";
@@ -45,14 +44,6 @@ function aplicarPermissoesNaTela() {
   if (areaNovoPlanoPreventivo) {
     areaNovoPlanoPreventivo.style.display = usuarioPodeGerenciarPreventivas() ? "grid" : "none";
   }
-
-  if (botaoUsuariosAdmin) {
-    botaoUsuariosAdmin.style.display = usuarioPodeGerenciarUsuarios() ? "block" : "none";
-  }
-
-  document.querySelectorAll(".admin-only").forEach(elemento => {
-    elemento.style.display = usuarioPodeGerenciarUsuarios() ? "grid" : "none";
-  });
 
   if (typeof aplicarPermissoesInterface === "function") {
     aplicarPermissoesInterface();
@@ -97,11 +88,22 @@ function preencherResumoUsuarioNaTela() {
 
 
 function preencherFormularioPerfil() {
+  const nomeInput = document.getElementById("loginNomeColaborador");
+  const setorInput = document.getElementById("loginSetorColaborador");
   const emailInput = document.getElementById("loginEmailUsuario");
   const senhaInput = document.getElementById("loginSenhaUsuario");
+  const colaboradorLocal = obterColaboradorLocal();
 
-  if (emailInput && usuarioAtual && usuarioAtual.email) {
-    emailInput.value = usuarioAtual.email;
+  if (nomeInput) {
+    nomeInput.value = colaboradorLocal.nome || "";
+  }
+
+  if (setorInput) {
+    setorInput.value = colaboradorLocal.setor || "";
+  }
+
+  if (emailInput) {
+    emailInput.value = (usuarioEhManutencaoAutorizada() || (typeof usuarioEhGerencia === "function" && usuarioEhGerencia())) ? usuarioAtual.email || "" : "";
   }
 
   if (senhaInput) {
@@ -206,15 +208,61 @@ function salvarColaboradorLocal(dados) {
 
 function removerColaboradorLocal() {
   localStorage.removeItem(CHAVE_COLABORADOR_LOCAL);
-  localStorage.removeItem(CHAVE_COLABORADOR_ID_LOCAL);
+  // O código fixo do colaborador é preservado para manter o vínculo com OS antigas
+  // mesmo quando a sessão anônima do Firebase muda após logout/login.
 }
 
 function removerDadosIdentificacaoColaborador() {
-  removerColaboradorLocal();
+  localStorage.removeItem(CHAVE_COLABORADOR_LOCAL);
 }
 
 async function entrarComoColaborador(botao) {
-  return entrarComFirebase(botao);
+  const nomeInput = document.getElementById("loginNomeColaborador");
+  const setorInput = document.getElementById("loginSetorColaborador");
+
+  if (!nomeInput || !setorInput) {
+    alert("Campos de identificação do colaborador não encontrados no HTML.");
+    return;
+  }
+
+  const nome = nomeInput.value.trim();
+  const setor = setorInput.value.trim();
+
+  if (!nome || !setor) {
+    alert("Informe seu nome e o setor onde trabalha.");
+    return;
+  }
+
+  try {
+    if (botao) {
+      botao.disabled = true;
+      botao.textContent = "Entrando...";
+    }
+
+    salvarColaboradorLocal({ nome, setor, colaboradorChave: gerarChaveColaborador(nome, setor) });
+
+    if (!firebaseAuth.currentUser || !firebaseAuth.currentUser.isAnonymous) {
+      await autenticarColaboradorAnonimo();
+      return;
+    }
+
+    if (typeof registrarVinculoColaboradorFirebase === "function") {
+      await registrarVinculoColaboradorFirebase(obterIdColaboradorLocal(), { nome, setor });
+    }
+
+    configurarColaboradorAnonimo(firebaseAuth.currentUser);
+    aplicarPermissoesNaTela();
+    iniciarMonitoresDeDados();
+    openPage("inicio");
+  } catch (erro) {
+    console.error("Erro ao entrar como colaborador:", erro);
+    alert("Não foi possível entrar como colaborador. Verifique se o login anônimo está habilitado no Firebase Authentication.");
+  } finally {
+    if (botao) {
+      botao.disabled = false;
+      botao.textContent = "Entrar como colaborador";
+    }
+  }
 }
 
 async function entrarComFirebase(botao) {
@@ -230,7 +278,7 @@ async function entrarComFirebase(botao) {
   const senha = senhaInput.value;
 
   if (!email || !senha) {
-    alert("Informe e-mail e senha para entrar.");
+    alert("Informe e-mail e senha para entrar com acesso autorizado.");
     return;
   }
 
@@ -244,19 +292,22 @@ async function entrarComFirebase(botao) {
     await autenticarUsuario(email, senha);
   } catch (erro) {
     console.error("Erro de login:", erro);
-    alert("Não foi possível entrar. Confira o e-mail, a senha ou se sua conta já foi ativada pelo link enviado.");
+    alert("Não foi possível entrar. Confira o e-mail e a senha cadastrados no Firebase.");
   } finally {
     if (botao) {
       botao.disabled = false;
-      botao.textContent = "Entrar";
+      botao.textContent = "Entrar com e-mail";
     }
   }
 }
 
 async function sairDaConta() {
   try {
-    removerColaboradorLocal();
-    removerDadosIdentificacaoColaborador();
+    if (usuarioEhManutencaoAutorizada() || (typeof usuarioEhGerencia === "function" && usuarioEhGerencia())) {
+      removerColaboradorLocal();
+    } else {
+      removerDadosIdentificacaoColaborador();
+    }
 
     await encerrarSessaoFirebase();
     fecharDetalhesChamado();
@@ -272,42 +323,14 @@ async function sairDaConta() {
   }
 }
 
-async function enviarRedefinicaoSenhaLogin(botao) {
-  const emailInput = document.getElementById("loginEmailUsuario");
-  const email = emailInput ? emailInput.value.trim() : "";
-
-  if (!email) {
-    alert("Informe seu e-mail para receber o link de redefinição de senha.");
-    return;
-  }
-
-  try {
-    if (botao) {
-      botao.disabled = true;
-      botao.textContent = "Enviando...";
-    }
-
-    await enviarEmailRedefinicaoSenha(email);
-    alert("Link enviado. Verifique a caixa de entrada do e-mail informado.");
-  } catch (erro) {
-    console.error("Erro ao enviar redefinição de senha:", erro);
-    alert("Não foi possível enviar o link de senha. Verifique o e-mail informado.");
-  } finally {
-    if (botao) {
-      botao.disabled = false;
-      botao.textContent = "Esqueci minha senha";
-    }
-  }
-}
-
 function atualizarResumoPerfil() {
   const totalChamados = chamados.length;
   const meusChamados = chamados.filter(chamado => usuarioEhAutorChamado(chamado)).length;
   const chamadosAbertos = chamados.filter(chamado => !statusFinalizado(chamado.status)).length;
   const chamadosCancelados = chamados.filter(chamado => chamado.status === "CANCELADO").length;
 
-  setTextContent("perfilTotalOS", totalChamados);
-  setTextContent("perfilMeusOS", meusChamados);
-  setTextContent("perfilOSAbertos", chamadosAbertos);
-  setTextContent("perfilOSCancelados", chamadosCancelados);
+  setTextContent("perfilTotalChamados", totalChamados);
+  setTextContent("perfilMeusChamados", meusChamados);
+  setTextContent("perfilChamadosAbertos", chamadosAbertos);
+  setTextContent("perfilChamadosCancelados", chamadosCancelados);
 }

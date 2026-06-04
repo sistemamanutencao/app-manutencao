@@ -105,12 +105,9 @@ function montarObjetoChamado({ numeroOS, dataAtual, valores, fotosAnexadas, foto
   const criadoPorNome = usuario.nome || (usuarioFirebase && usuarioFirebase.displayName) || "Colaborador";
   const criadoPorId = usuario.id || (usuarioFirebase && usuarioFirebase.uid) || "";
   const criadoPorEmail = usuario.email || (usuarioFirebase && usuarioFirebase.email) || "";
-  // Novo fluxo: toda OS é vinculada ao UID do Firebase Authentication.
-  // Campos legados de colaborador local ficam vazios em novos registros e permanecem
-  // apenas para leitura de OS antigas já gravadas antes do login por e-mail/senha.
-  const colaboradorLocalId = "";
-  const colaboradorCodigo = "";
-  const colaboradorChave = "";
+  const colaboradorLocalId = usuario.colaboradorLocalId || (typeof obterIdColaboradorLocal === "function" ? obterIdColaboradorLocal() : "");
+  const colaboradorCodigo = usuario.colaboradorCodigo || colaboradorLocalId;
+  const colaboradorChave = usuario.colaboradorChave || (typeof obterChaveColaboradorLocal === "function" ? obterChaveColaboradorLocal() : "");
 
   if (!criadoPorId) {
     throw new Error("Usuário autenticado não identificado para registrar a OS.");

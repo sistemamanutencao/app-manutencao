@@ -11,15 +11,10 @@ function openPage(pageId, navElement) {
     itemNavegacao = null;
   }
 
-  const paginasRestritasManutencao = ["painel", "ativos", "preventivas", "diagnostico"];
+  const paginasRestritasManutencao = ["painel", "ativos", "preventivas"];
 
   if (paginasRestritasManutencao.includes(paginaDestino) && !usuarioEhManutencaoAutorizada()) {
     alert("Acesso permitido somente para a manutenção autorizada.");
-    return;
-  }
-
-  if (paginaDestino === "usuarios" && !usuarioPodeGerenciarUsuarios()) {
-    alert("Acesso permitido somente ao administrador do sistema.");
     return;
   }
 
@@ -107,9 +102,5 @@ function executarRenderizacaoDaPagina(pageId) {
 
   if (pageId === "perfil") {
     aplicarPermissoesNaTela();
-  }
-
-  if (pageId === "usuarios" && typeof renderizarUsuariosSistema === "function") {
-    renderizarUsuariosSistema();
   }
 }

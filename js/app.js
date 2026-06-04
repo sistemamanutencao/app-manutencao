@@ -58,7 +58,6 @@ function prepararTelaSemSessao() {
   ativos = [];
   planosPreventivos = [];
   diagnosticos = [];
-  usuariosSistema = [];
 
   preencherFormularioPerfil();
   aplicarPermissoesNaTela();
@@ -100,8 +99,23 @@ async function processarEstadoAutenticacao(usuarioFirebase) {
   }
 
   if (usuarioFirebase.isAnonymous) {
-    await encerrarSessaoFirebase();
-    prepararTelaSemSessao();
+    if (!configurarColaboradorAnonimo(usuarioFirebase)) {
+      prepararTelaSemSessao();
+      return;
+    }
+
+    try {
+      await garantirVinculoColaboradorAtual();
+    } catch (erro) {
+      console.error("Erro ao registrar vínculo do colaborador:", erro);
+      alert("Não foi possível validar o vínculo do colaborador no Firebase. Verifique as regras publicadas e tente novamente.");
+      return;
+    }
+
+    aplicarPermissoesNaTela();
+    aplicarPermissoesInterface();
+    iniciarMonitoresDeDados();
+    openPage("inicio");
     return;
   }
 
@@ -126,12 +140,7 @@ async function processarEstadoAutenticacao(usuarioFirebase) {
     aplicarPermissoesNaTela();
     aplicarPermissoesInterface();
     iniciarMonitoresDeDados();
-
-    if (typeof iniciarMonitorUsuariosSistema === "function") {
-      iniciarMonitorUsuariosSistema();
-    }
-
-    openPage(usuarioPodeGerenciarUsuarios() ? "usuarios" : (usuarioEhManutencaoAutorizada() ? "painel" : "inicio"));
+    openPage(usuarioEhManutencaoAutorizada() ? "painel" : "inicio");
   } catch (erro) {
     console.error("Erro ao carregar usuário:", erro);
     alert("Não foi possível carregar o perfil do usuário no Firebase.");
@@ -139,6 +148,73 @@ async function processarEstadoAutenticacao(usuarioFirebase) {
   }
 }
 
+function configurarColaboradorAnonimo(usuarioFirebase) {
+  const colaboradorLocal = typeof obterColaboradorLocal === "function" ? obterColaboradorLocal() : {};
+  const colaboradorChave = colaboradorLocal.colaboradorChave
+    || (typeof gerarChaveColaborador === "function" ? gerarChaveColaborador(colaboradorLocal.nome, colaboradorLocal.setor) : "");
+  const colaboradorLocalId = colaboradorLocal.colaboradorLocalId
+    || (typeof obterIdColaboradorLocal === "function" ? obterIdColaboradorLocal() : "")
+    || colaboradorChave
+    || (typeof garantirIdColaboradorLocal === "function" ? garantirIdColaboradorLocal() : usuarioFirebase.uid);
+
+  if (!colaboradorLocal.nome || !colaboradorLocal.setor) {
+    return false;
+  }
+
+  if (!colaboradorLocal.colaboradorChave && typeof salvarColaboradorLocal === "function") {
+    salvarColaboradorLocal({
+      ...colaboradorLocal,
+      colaboradorLocalId,
+      colaboradorChave
+    });
+  }
+
+  usuarioAtual = {
+    id: usuarioFirebase.uid,
+    colaboradorLocalId,
+    colaboradorCodigo: colaboradorLocalId,
+    colaboradorChave,
+    nome: colaboradorLocal.nome,
+    setor: colaboradorLocal.setor,
+    email: "",
+    unidade: "Senac Campo Mourão",
+    perfil: PERFIS_USUARIO.COLABORADOR,
+    manutencaoAutorizado: false,
+    perfilConfigurado: true
+  };
+
+  preencherFormularioPerfil();
+
+  if (typeof registrarVinculoColaboradorFirebase === "function") {
+    registrarVinculoColaboradorFirebase(colaboradorLocalId, {
+      nome: colaboradorLocal.nome,
+      setor: colaboradorLocal.setor
+    }).catch(erro => console.warn("Não foi possível registrar o vínculo do colaborador:", erro));
+  }
+
+  return true;
+}
+
+async function garantirVinculoColaboradorAtual() {
+  if (!usuarioAtual || usuarioAtual.perfil !== PERFIS_USUARIO.COLABORADOR) {
+    return;
+  }
+
+  if (typeof registrarVinculoColaboradorFirebase !== "function") {
+    return;
+  }
+
+  const codigo = usuarioAtual.colaboradorCodigo || usuarioAtual.colaboradorLocalId;
+
+  if (!codigo) {
+    throw new Error("Código fixo do colaborador não encontrado.");
+  }
+
+  await registrarVinculoColaboradorFirebase(codigo, {
+    nome: usuarioAtual.nome,
+    setor: usuarioAtual.setor
+  });
+}
 
 function normalizarUsuarioLogado(usuarioFirebase, perfil) {
   const tipoPerfil = normalizarPerfilUsuario(perfil.perfil);
@@ -154,8 +230,6 @@ function normalizarUsuarioLogado(usuarioFirebase, perfil) {
     colaboradorCodigo: perfil.colaboradorCodigo || perfil.colaboradorLocalId || "",
     colaboradorChave: perfil.colaboradorChave || "",
     manutencaoAutorizado: tipoPerfil === PERFIS_USUARIO.MANUTENCAO,
-    primeiroAcesso: perfil.primeiroAcesso === true,
-    ativo: perfil.ativo !== false,
     perfilConfigurado: true
   };
 }
@@ -262,10 +336,6 @@ function encerrarMonitoresDeDados() {
   if (typeof monitorDiagnosticos === "function") {
     monitorDiagnosticos();
     monitorDiagnosticos = null;
-  }
-
-  if (typeof encerrarMonitorUsuariosSistema === "function") {
-    encerrarMonitorUsuariosSistema();
   }
 }
 

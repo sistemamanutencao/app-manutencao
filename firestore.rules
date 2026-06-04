@@ -14,50 +14,62 @@ service cloud.firestore {
         : "colaborador";
     }
 
-    function usuarioAtivo() {
-      return estaAutenticado()
-        && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid))
-        && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.ativo == true;
-    }
-
-    function ehAdministrador() {
-      return usuarioAtivo() && perfilUsuario() == "administrador";
-    }
-
     function ehManutencao() {
-      return usuarioAtivo() && perfilUsuario() == "manutencao";
+      return estaAutenticado() && perfilUsuario() == "manutencao";
     }
 
     function ehGerencia() {
-      return usuarioAtivo() && perfilUsuario() == "gerencia";
+      return estaAutenticado() && perfilUsuario() == "gerencia";
     }
 
     function podeAcompanharTodosChamados() {
-      return ehAdministrador() || ehManutencao() || ehGerencia();
+      return ehManutencao() || ehGerencia();
+    }
+
+    function colaboradorExiste(codigo) {
+      return codigo is string
+        && codigo.size() > 0
+        && exists(/databases/$(database)/documents/colaboradores/$(codigo));
+    }
+
+    function uidAutorizadoNoCodigo(codigo) {
+      return estaAutenticado()
+        && colaboradorExiste(codigo)
+        && request.auth.uid in get(/databases/$(database)/documents/colaboradores/$(codigo)).data.uidsAutorizados;
     }
 
     function ehAutorChamado(dados) {
-      return usuarioAtivo()
+      return estaAutenticado()
         && (
           dados.criadoPorUid == request.auth.uid
           || dados.solicitanteId == request.auth.uid
+          || uidAutorizadoNoCodigo(dados.colaboradorCodigo)
         );
     }
 
-    function usuarioPodeCriarChamado() {
-      return usuarioAtivo()
+    function colaboradorPodeCriarChamado() {
+      return estaAutenticado()
+        && request.resource.data.criadoPorUid == request.auth.uid
+        && request.resource.data.solicitanteId == request.auth.uid
+        && request.resource.data.status == "ABERTO"
+        && uidAutorizadoNoCodigo(request.resource.data.colaboradorCodigo);
+    }
+
+    function gerenciaPodeCriarChamado() {
+      return ehGerencia()
         && request.resource.data.criadoPorUid == request.auth.uid
         && request.resource.data.solicitanteId == request.auth.uid
         && request.resource.data.status == "ABERTO";
     }
 
     function podeCancelarProprioChamado() {
-      return usuarioAtivo()
+      return estaAutenticado()
         && ehAutorChamado(resource.data)
         && resource.data.status == "ABERTO"
         && request.resource.data.status == "CANCELADO"
         && request.resource.data.criadoPorUid == resource.data.criadoPorUid
         && request.resource.data.solicitanteId == resource.data.solicitanteId
+        && request.resource.data.colaboradorCodigo == resource.data.colaboradorCodigo
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "status",
           "etapaFluxo",
@@ -71,7 +83,7 @@ service cloud.firestore {
     }
 
     function usuarioPodeMarcarNotificacaoComoLida() {
-      return usuarioAtivo()
+      return estaAutenticado()
         && resource.data.destinatarioUid == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "lidaPorUids",
@@ -79,25 +91,45 @@ service cloud.firestore {
         ]);
     }
 
+    function podeCriarOuAtualizarCodigoColaborador(id) {
+      return estaAutenticado()
+        && request.resource.data.codigo == id
+        && request.auth.uid in request.resource.data.uidsAutorizados
+        && request.resource.data.keys().hasOnly([
+          "codigo",
+          "nome",
+          "setor",
+          "uidsAutorizados",
+          "criadoEm",
+          "atualizadoEm"
+        ]);
+    }
+
     match /chamados/{id} {
       allow read: if podeAcompanharTodosChamados() || ehAutorChamado(resource.data);
-      allow create: if usuarioPodeCriarChamado();
-      allow update: if ehManutencao() || ehAdministrador() || podeCancelarProprioChamado();
-      allow delete: if ehAdministrador() || ehManutencao();
+      allow create: if ehManutencao() || gerenciaPodeCriarChamado() || colaboradorPodeCriarChamado();
+      allow update: if ehManutencao() || podeCancelarProprioChamado();
+      allow delete: if ehManutencao();
+    }
+
+    match /colaboradores/{id} {
+      allow read: if podeAcompanharTodosChamados() || (estaAutenticado() && request.auth.uid in resource.data.uidsAutorizados);
+      allow create, update: if podeCriarOuAtualizarCodigoColaborador(id);
+      allow delete: if ehManutencao();
     }
 
     match /planosPreventivos/{id} {
-      allow read: if usuarioAtivo();
+      allow read: if estaAutenticado();
       allow create, update, delete: if ehManutencao();
     }
 
     match /ativos/{id} {
-      allow read: if usuarioAtivo();
+      allow read: if estaAutenticado();
       allow create, update, delete: if ehManutencao();
     }
 
     match /comunicados/{id} {
-      allow read: if usuarioAtivo();
+      allow read: if estaAutenticado();
       allow create, update, delete: if ehManutencao();
     }
 
@@ -105,24 +137,20 @@ service cloud.firestore {
       allow read: if podeAcompanharTodosChamados()
         || resource.data.destinatarioUid == request.auth.uid
         || resource.data.destinatarioPerfil == "colaborador";
-      allow create: if usuarioAtivo();
-      allow update: if ehManutencao() || ehAdministrador() || usuarioPodeMarcarNotificacaoComoLida();
-      allow delete: if ehAdministrador() || ehManutencao();
+      allow create: if estaAutenticado();
+      allow update: if ehManutencao() || usuarioPodeMarcarNotificacaoComoLida();
+      allow delete: if ehManutencao();
     }
+
 
     match /diagnosticos/{id} {
       allow read, create, update, delete: if ehManutencao();
     }
 
     match /usuarios/{id} {
-      allow read: if usuarioAtivo() && (id == request.auth.uid || ehAdministrador());
-      allow create, update, delete: if ehAdministrador();
-    }
-
-    // Coleção mantida apenas para compatibilidade com versões anteriores.
-    // O novo fluxo usa usuarios/{uid} e login por e-mail/senha para todos os perfis.
-    match /colaboradores/{id} {
-      allow read, write: if ehAdministrador();
+      allow read: if estaAutenticado() && (id == request.auth.uid || ehManutencao());
+      allow create, update: if estaAutenticado() && (id == request.auth.uid || ehManutencao());
+      allow delete: if ehManutencao();
     }
 
     match /{document=**} {
