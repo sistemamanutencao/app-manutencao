@@ -94,7 +94,11 @@ async function enviarEmailConvite({ email, nome, linkSenha }) {
   if (!resposta.ok) {
     const texto = await resposta.text();
     console.error("Erro Resend:", resposta.status, texto);
-    throw new HttpsError("internal", "Usuário criado, mas houve falha ao enviar o e-mail de convite.");
+    return {
+      enviado: false,
+      motivo: `Falha no envio pelo Resend (${resposta.status}). Verifique RESEND_API_KEY e EMAIL_REMETENTE.`,
+      detalhe: texto
+    };
   }
 
   return { enviado: true };
@@ -143,7 +147,14 @@ exports.criarUsuario = onCall({ secrets: [resendApiKey] }, async request => {
   const linkSenha = await gerarLinkSenha(email);
   const envio = await enviarEmailConvite({ email, nome, linkSenha });
 
-  return { uid: usuarioAuth.uid, email, perfil, conviteEnviado: envio.enviado };
+  return {
+    uid: usuarioAuth.uid,
+    email,
+    perfil,
+    conviteEnviado: envio.enviado,
+    avisoEnvio: envio.enviado ? null : envio.motivo,
+    linkSenha: envio.enviado ? null : linkSenha
+  };
 });
 
 exports.reenviarConvite = onCall({ secrets: [resendApiKey] }, async request => {
@@ -161,7 +172,13 @@ exports.reenviarConvite = onCall({ secrets: [resendApiKey] }, async request => {
   const linkSenha = await gerarLinkSenha(email);
   const envio = await enviarEmailConvite({ email, nome, linkSenha });
 
-  return { uid, email, conviteEnviado: envio.enviado };
+  return {
+    uid,
+    email,
+    conviteEnviado: envio.enviado,
+    avisoEnvio: envio.enviado ? null : envio.motivo,
+    linkSenha: envio.enviado ? null : linkSenha
+  };
 });
 
 exports.alterarPerfil = onCall(async request => {

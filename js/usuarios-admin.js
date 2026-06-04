@@ -89,9 +89,16 @@ async function criarUsuarioAdmin(botao) {
       botao.textContent = "Enviando convite...";
     }
 
-    await criarUsuarioPorConviteFirebase({ nome, email, setor, cargo, perfil });
+    const resultado = await criarUsuarioPorConviteFirebase({ nome, email, setor, cargo, perfil });
     limparFormularioUsuarioAdmin();
-    alert("Usuário cadastrado. O convite para criação de senha foi enviado por e-mail.");
+
+    if (resultado && resultado.conviteEnviado === false && resultado.linkSenha) {
+      console.warn("Usuário criado, mas convite não enviado:", resultado.avisoEnvio);
+      alert(`Usuário cadastrado, mas o e-mail de convite não foi enviado. Copie o link no console do navegador ou configure o Resend e use Reenviar convite. Motivo: ${resultado.avisoEnvio || "falha no envio"}`);
+      console.info("Link de criação/redefinição de senha:", resultado.linkSenha);
+    } else {
+      alert("Usuário cadastrado. O convite para criação de senha foi enviado por e-mail.");
+    }
   } catch (erro) {
     console.error("Erro ao criar usuário:", erro);
     alert(obterMensagemErroFuncao(erro, "Não foi possível cadastrar o usuário."));
@@ -107,8 +114,14 @@ async function reenviarConviteUsuarioAdmin(uid) {
   if (!uid || !confirm("Reenviar link de criação/redefinição de senha para este usuário?")) return;
 
   try {
-    await reenviarConviteUsuarioFirebase(uid);
-    alert("Convite reenviado por e-mail.");
+    const resultado = await reenviarConviteUsuarioFirebase(uid);
+    if (resultado && resultado.conviteEnviado === false && resultado.linkSenha) {
+      console.warn("Convite não enviado:", resultado.avisoEnvio);
+      alert(`Convite gerado, mas o e-mail não foi enviado. Copie o link no console do navegador ou ajuste o Resend. Motivo: ${resultado.avisoEnvio || "falha no envio"}`);
+      console.info("Link de criação/redefinição de senha:", resultado.linkSenha);
+    } else {
+      alert("Convite reenviado por e-mail.");
+    }
   } catch (erro) {
     console.error("Erro ao reenviar convite:", erro);
     alert(obterMensagemErroFuncao(erro, "Não foi possível reenviar o convite."));

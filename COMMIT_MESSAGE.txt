@@ -1,9 +1,6 @@
-Implementa login por convite mantendo perfis operacionais
+Corrige falha internal no cadastro por convite
 
-- Mantém os perfis colaborador, gerencia, manutencao e administrador.
-- Remove o fluxo antigo de entrada por nome e setor.
-- Exige login por e-mail e senha para todos os perfis.
-- Vincula novas OS ao UID autenticado do Firebase Authentication.
-- Mantém gerência com acompanhamento de todas as OS sem ações técnicas.
-- Mantém manutenção com permissões operacionais completas.
-- Mantém administrador para cadastro, convite e gestão de usuários.
+- Evita cancelar cadastro quando o envio pelo Resend falha
+- Retorna link de criação de senha para uso manual em contingência
+- Melhora diagnóstico de falha no envio de convite
+- Mantém login por e-mail e senha para todos os perfis
