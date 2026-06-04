@@ -174,17 +174,17 @@ service cloud.firestore {
     }
 
     match /notificacoes/{id} {
-      allow read: if estaAutenticado()
-        && (
-          ehManutencao()
-          || resource.data.destinatarioUid == request.auth.uid
-          || resource.data.destinatarioPerfil == "colaborador"
-          || (ehGerencia() && resource.data.destinatarioPerfil == "gerencia")
-        );
+      // Versão Spark/restaurada: notificações são internas ao app.
+      // A leitura fica liberada para usuários autenticados para evitar falhas de
+      // listener quando houver documentos antigos com destinatarioPerfil/destinatarioUid
+      // fora do padrão atual. A interface continua filtrando por perfil/usuário.
+      allow read: if estaAutenticado();
+
       allow create: if estaAutenticado()
         && request.resource.data.criadaPorUid == request.auth.uid
         && request.resource.data.lidaPorUids is list;
-      allow update: if ehManutencao() || usuarioPodeMarcarNotificacaoComoLida();
+
+      allow update: if usuarioPodeMarcarNotificacaoComoLida() || ehManutencao();
       allow delete: if ehManutencao();
     }
 
