@@ -14,32 +14,12 @@ service cloud.firestore {
         : "colaborador";
     }
 
-    function perfilEhUmDos(valoresAceitos) {
-      return perfilUsuario() in valoresAceitos;
-    }
-
     function ehManutencao() {
-      return estaAutenticado()
-        && perfilEhUmDos([
-          "manutencao",
-          "manutenção",
-          "Manutencao",
-          "Manutenção",
-          "MANUTENCAO",
-          "MANUTENÇÃO"
-        ]);
+      return estaAutenticado() && perfilUsuario() == "manutencao";
     }
 
     function ehGerencia() {
-      return estaAutenticado()
-        && perfilEhUmDos([
-          "gerencia",
-          "gerência",
-          "Gerencia",
-          "Gerência",
-          "GERENCIA",
-          "GERÊNCIA"
-        ]);
+      return estaAutenticado() && perfilUsuario() == "gerencia";
     }
 
     function podeAcompanharTodosChamados() {
