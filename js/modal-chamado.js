@@ -71,9 +71,7 @@ function preencherSLADetalhe(chamado) {
 
   const sla = calcularSLA(chamado);
 
-  detalheSLA.textContent = chamado.prioridade === "Urgente"
-    ? sla.texto
-    : `${sla.texto} • vence em ${formatarVencimentoSLA(chamado)}`;
+  detalheSLA.textContent = formatarTextoSLAChamado(chamado, sla);
 }
 
 function preencherHistoricoDetalhe(chamado) {
@@ -186,10 +184,16 @@ async function alterarPrioridadeChamadoAtual(botao) {
     return;
   }
 
+  const agora = new Date();
+  const camposSLA = montarCamposSLAChamado({
+    ...chamado,
+    prioridade: novaPrioridade
+  }, agora);
+  const vencimentoTexto = formatarDataHoraBR(camposSLA.vencimentoSLAISO);
   const itemHistorico = {
-    data: new Date().toLocaleString("pt-BR"),
+    data: agora.toLocaleString("pt-BR"),
     acao: "Prioridade alterada pela gerência",
-    descricao: `Prioridade alterada de "${prioridadeAnterior}" para "${novaPrioridade}" por ${usuarioAtual.nome || "usuário autorizado"}.`
+    descricao: `Prioridade alterada de "${prioridadeAnterior}" para "${novaPrioridade}" por ${usuarioAtual.nome || "usuário autorizado"}. Novo prazo: ${camposSLA.prazoHoras}h. Vencimento recalculado: ${vencimentoTexto}.`
   };
 
   if (usuarioEhManutencaoAutorizada() && !usuarioEhGerencia()) {
@@ -205,17 +209,20 @@ async function alterarPrioridadeChamadoAtual(botao) {
 
     await atualizarChamadoFirebase(chamado.id, {
       prioridade: novaPrioridade,
+      ...camposSLA,
+      slaRecalculadoEmISO: agora.toISOString(),
       historico: adicionarItemArrayFirebase(itemHistorico),
       prioridadeAlteradaPorUid: usuarioAtual.id,
       prioridadeAlteradaPorNome: usuarioAtual.nome || "Usuário autorizado",
-      prioridadeAlteradaEmISO: new Date().toISOString()
+      prioridadeAlteradaEmISO: agora.toISOString()
     });
 
     chamado.prioridade = novaPrioridade;
+    Object.assign(chamado, camposSLA, { slaRecalculadoEmISO: agora.toISOString() });
     chamado.historico = Array.isArray(chamado.historico) ? [...chamado.historico, itemHistorico] : [itemHistorico];
     chamado.prioridadeAlteradaPorUid = usuarioAtual.id;
     chamado.prioridadeAlteradaPorNome = usuarioAtual.nome || "Usuário autorizado";
-    chamado.prioridadeAlteradaEmISO = new Date().toISOString();
+    chamado.prioridadeAlteradaEmISO = agora.toISOString();
 
     setTextContent("detalhePrioridade", novaPrioridade);
     preencherSLADetalhe(chamado);

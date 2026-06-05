@@ -160,8 +160,8 @@ function calcularDisponibilidadeOperacional(base = chamados) {
   }
 
   const noPrazo = concluidos.filter(chamado => {
-    if (chamado.prioridade === "Urgente") {
-      return true;
+    if (typeof chamado.concluidoNoPrazo === "boolean") {
+      return chamado.concluidoNoPrazo;
     }
 
     const concluidoEm = obterDataValida(chamado.concluidoEmISO, chamado.data);

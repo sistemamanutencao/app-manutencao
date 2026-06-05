@@ -105,8 +105,22 @@ async function alterarStatusPainel(id, novoStatus, botao) {
     dadosAtualizacao.iniciadoEmISO = agora.toISOString();
   }
 
+  if (["ABERTO", "EM ANDAMENTO", "AGUARDANDO"].includes(novoStatus)) {
+    dadosAtualizacao.slaStatusAtual = calcularStatusSLAOperacional({
+      ...chamadoAtual,
+      status: novoStatus
+    }, agora);
+  }
+
   if (novoStatus === "CONCLUÍDO") {
+    const camposSLAFinal = montarCamposSLAFinalizacao({
+      ...chamadoAtual,
+      status: novoStatus
+    }, agora);
+
     dadosAtualizacao.concluidoEmISO = agora.toISOString();
+    Object.assign(dadosAtualizacao, camposSLAFinal);
+    itemHistorico.descricao += ` SLA final: ${obterTextoStatusSLA(camposSLAFinal.slaStatusFinal)}. Tempo até conclusão: ${camposSLAFinal.tempoConclusaoHoras}h. Vencimento: ${formatarDataHoraBR(camposSLAFinal.vencimentoSLAISO)}.`;
   }
 
   try {

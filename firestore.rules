@@ -88,6 +88,11 @@ service cloud.firestore {
         && request.resource.data.prioridade in ["Baixa", "Média", "Alta", "Crítica", "Urgente"]
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "prioridade",
+          "prazoHoras",
+          "vencimentoSLAISO",
+          "slaBasePrioridade",
+          "slaStatusAtual",
+          "slaRecalculadoEmISO",
           "historico",
           "prioridadeAlteradaPorUid",
           "prioridadeAlteradaPorNome",

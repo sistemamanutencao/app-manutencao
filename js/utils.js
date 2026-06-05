@@ -91,22 +91,153 @@ function formatarDataHoraBR(data) {
   });
 }
 
+function normalizarPrioridadeSLA(prioridade) {
+  return String(prioridade || "Baixa")
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 function obterPrazoHoras(prioridade) {
+  const prioridadeNormalizada = normalizarPrioridadeSLA(prioridade);
   const prazos = {
-    Urgente: 0,
-    Alta: 1,
-    Média: 24,
-    Baixa: 72
+    urgente: 0,
+    critica: 0,
+    alta: 1,
+    media: 24,
+    baixa: 72
   };
 
-  return prazos[prioridade] ?? 72;
+  return prazos[prioridadeNormalizada] ?? 72;
+}
+
+function obterDataBaseSLA(chamado) {
+  if (!chamado) {
+    return new Date();
+  }
+
+  return obterDataValida(
+    chamado.criadoEmISO || chamado.criadoEm,
+    chamado.data
+  );
 }
 
 function calcularVencimentoChamado(chamado) {
-  const criadoEm = obterDataValida(chamado.criadoEm, chamado.data);
-  const prazoHoras = obterPrazoHoras(chamado.prioridade);
+  const vencimentoPersistido = chamado && chamado.vencimentoSLAISO
+    ? new Date(chamado.vencimentoSLAISO)
+    : null;
+
+  if (vencimentoPersistido && !Number.isNaN(vencimentoPersistido.getTime())) {
+    return vencimentoPersistido;
+  }
+
+  const criadoEm = obterDataBaseSLA(chamado);
+  const prazoHoras = obterPrazoHoras(chamado && chamado.prioridade);
 
   return new Date(criadoEm.getTime() + prazoHoras * 60 * 60 * 1000);
+}
+
+function calcularStatusSLAOperacional(chamado, referencia = new Date()) {
+  if (!chamado) {
+    return "NO_PRAZO";
+  }
+
+  if (chamado.status === "CANCELADO") {
+    return "CANCELADO";
+  }
+
+  if (chamado.status === "ENCERRADO") {
+    return chamado.slaStatusFinal || "ENCERRADO";
+  }
+
+  if (chamado.status === "VALIDADO") {
+    return chamado.slaStatusFinal || "VALIDADO";
+  }
+
+  if (chamado.status === "CONCLUÍDO") {
+    return chamado.slaStatusFinal || "CONCLUIDO_AGUARDANDO_VALIDACAO";
+  }
+
+  const vencimento = calcularVencimentoChamado(chamado);
+  const diferencaMs = vencimento - referencia;
+  const diferencaHoras = Math.ceil(diferencaMs / (1000 * 60 * 60));
+
+  if (diferencaMs < 0) {
+    return "ATRASADO";
+  }
+
+  if (diferencaHoras <= 2) {
+    return "VENCE_EM_BREVE";
+  }
+
+  return "NO_PRAZO";
+}
+
+function obterTextoStatusSLA(statusSLA) {
+  const textos = {
+    NO_PRAZO: "No prazo",
+    VENCE_EM_BREVE: "Vence em breve",
+    ATRASADO: "Atrasado",
+    CONCLUIDO_NO_PRAZO: "Concluído no prazo",
+    CONCLUIDO_FORA_DO_PRAZO: "Concluído fora do prazo",
+    CONCLUIDO_AGUARDANDO_VALIDACAO: "Aguardando validação",
+    VALIDADO: "Validado",
+    ENCERRADO: "Encerrado",
+    CANCELADO: "Cancelado"
+  };
+
+  return textos[statusSLA] || "No prazo";
+}
+
+function obterClasseStatusSLA(statusSLA) {
+  if (["ATRASADO", "CONCLUIDO_FORA_DO_PRAZO", "CANCELADO"].includes(statusSLA)) {
+    return "sla-red";
+  }
+
+  if (statusSLA === "VENCE_EM_BREVE") {
+    return "sla-orange";
+  }
+
+  if (["CONCLUIDO_NO_PRAZO", "VALIDADO", "ENCERRADO"].includes(statusSLA)) {
+    return "sla-green";
+  }
+
+  return "sla-blue";
+}
+
+function montarCamposSLAChamado(chamado, referencia = new Date()) {
+  const prazoHoras = obterPrazoHoras(chamado && chamado.prioridade);
+  const criadoEm = obterDataBaseSLA(chamado);
+  const vencimento = new Date(criadoEm.getTime() + prazoHoras * 60 * 60 * 1000);
+  const chamadoComVencimento = {
+    ...(chamado || {}),
+    vencimentoSLAISO: vencimento.toISOString()
+  };
+
+  return {
+    prazoHoras,
+    vencimentoSLAISO: vencimento.toISOString(),
+    slaBasePrioridade: chamado && chamado.prioridade ? chamado.prioridade : "Baixa",
+    slaStatusAtual: calcularStatusSLAOperacional(chamadoComVencimento, referencia)
+  };
+}
+
+function montarCamposSLAFinalizacao(chamado, dataFinalizacao = new Date()) {
+  const camposBase = montarCamposSLAChamado(chamado, dataFinalizacao);
+  const criadoEm = obterDataBaseSLA(chamado);
+  const vencimento = new Date(camposBase.vencimentoSLAISO);
+  const tempoConclusaoHoras = Math.max(0, Number(((dataFinalizacao - criadoEm) / (1000 * 60 * 60)).toFixed(2)));
+  const concluidoNoPrazo = dataFinalizacao <= vencimento;
+
+  return {
+    ...camposBase,
+    tempoConclusaoHoras,
+    concluidoNoPrazo,
+    slaStatusAtual: concluidoNoPrazo ? "CONCLUIDO_NO_PRAZO" : "CONCLUIDO_FORA_DO_PRAZO",
+    slaStatusFinal: concluidoNoPrazo ? "CONCLUIDO_NO_PRAZO" : "CONCLUIDO_FORA_DO_PRAZO",
+    slaFinalizadoEmISO: dataFinalizacao.toISOString()
+  };
 }
 
 

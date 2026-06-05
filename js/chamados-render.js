@@ -100,9 +100,7 @@ function montarTextoBuscaChamado(chamado) {
 function criarCardChamado(chamado) {
   const statusClasse = obterClasseStatus(chamado.status);
   const sla = calcularSLA(chamado);
-  const textoSLA = chamado.prioridade === "Urgente"
-    ? sla.texto
-    : `${sla.texto} • vence em ${formatarVencimentoSLA(chamado)}`;
+  const textoSLA = formatarTextoSLAChamado(chamado, sla);
   const classePrioridade = obterClassePrioridade(chamado.prioridade);
   const classeBordaPrioridade = obterClasseBordaPrioridade(chamado.prioridade, chamado.status);
   const solicitante = chamado.criadoPorNome || chamado.solicitanteNome || "Não informado";
@@ -291,51 +289,30 @@ function ordenarChamadosPorPrioridade(lista) {
 }
 
 function calcularSLA(chamado) {
-  if (chamado.status === "ENCERRADO") {
-    return { texto: "Encerrado", classe: "sla-green" };
-  }
+  const statusSLA = calcularStatusSLAOperacional(chamado);
 
-  if (chamado.status === "VALIDADO") {
-    return { texto: "Validado", classe: "sla-green" };
-  }
-
-  if (chamado.status === "CONCLUÍDO") {
-    return { texto: "Aguardando validação", classe: "sla-blue" };
-  }
-
-  if (chamado.status === "CANCELADO") {
-    return { texto: "Cancelado", classe: "sla-red" };
-  }
-
-  if (chamado.prioridade === "Urgente" || chamado.prioridade === "Crítica") {
-    return { texto: "Atendimento imediato", classe: "sla-red" };
-  }
-
-  const vencimento = calcularVencimentoChamado(chamado);
-  const diferencaMs = vencimento - new Date();
-  const diferencaHoras = Math.ceil(diferencaMs / (1000 * 60 * 60));
-
-  if (diferencaMs < 0) {
-    return { texto: "Atrasado", classe: "sla-red" };
-  }
-
-  if (diferencaHoras <= 2) {
-    return { texto: "Vence em breve", classe: "sla-orange" };
-  }
-
-  return { texto: "No prazo", classe: "sla-blue" };
+  return {
+    texto: obterTextoStatusSLA(statusSLA),
+    classe: obterClasseStatusSLA(statusSLA),
+    status: statusSLA
+  };
 }
 
 function formatarVencimentoSLA(chamado) {
-  if (chamado.prioridade === "Urgente" || chamado.prioridade === "Crítica") {
-    return "Imediatamente";
+  const vencimento = calcularVencimentoChamado(chamado);
+  return formatarDataHoraBR(vencimento) || "Prazo não definido";
+}
+
+function formatarTextoSLAChamado(chamado, sla = calcularSLA(chamado)) {
+  if (["ENCERRADO", "VALIDADO", "CONCLUÍDO", "CANCELADO"].includes(chamado.status)) {
+    return sla.texto;
   }
 
-  return formatarDataHoraBR(calcularVencimentoChamado(chamado));
+  return `${sla.texto} • vence em ${formatarVencimentoSLA(chamado)}`;
 }
 
 function chamadoEstaAtrasado(chamado) {
-  return calcularSLA(chamado).texto === "Atrasado";
+  return calcularStatusSLAOperacional(chamado) === "ATRASADO";
 }
 
 function obterClasseStatus(status) {

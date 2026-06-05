@@ -323,11 +323,26 @@ function observarComunicadosFirebase(callback, callbackErro) {
 
 async function criarChamadoFirebase(chamado) {
   const agora = new Date();
+  const chamadoComData = {
+    ...chamado,
+    criadoEmISO: chamado.criadoEmISO || agora.toISOString()
+  };
+  const camposSLA = typeof montarCamposSLAChamado === "function"
+    ? montarCamposSLAChamado(chamadoComData, agora)
+    : {};
+  const historicoOriginal = Array.isArray(chamado.historico) ? chamado.historico : [];
+  const itemHistoricoSLA = camposSLA.vencimentoSLAISO ? {
+    data: agora.toLocaleString("pt-BR"),
+    acao: "Prazo da OS definido",
+    descricao: `Prazo inicial definido pela prioridade ${camposSLA.slaBasePrioridade || chamado.prioridade || "Baixa"}: ${camposSLA.prazoHoras}h. Vencimento: ${formatarDataHoraBR(camposSLA.vencimentoSLAISO)}.`
+  } : null;
 
   const documento = await firebaseDb.collection(COLLECTIONS.CHAMADOS).add({
-    ...chamado,
+    ...chamadoComData,
+    ...camposSLA,
+    slaCriadoEmISO: agora.toISOString(),
+    historico: itemHistoricoSLA ? [...historicoOriginal, itemHistoricoSLA] : historicoOriginal,
     criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
-    criadoEmISO: agora.toISOString(),
     atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
   });
 
@@ -346,9 +361,20 @@ function adicionarItemArrayFirebase(item) {
 }
 
 async function criarComunicadoFirebase(comunicado) {
+  const agora = new Date();
+
   await firebaseDb.collection(COLLECTIONS.COMUNICADOS).add({
     ...comunicado,
-    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+    criadoEmISO: agora.toISOString(),
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+async function atualizarComunicadoFirebase(id, dados) {
+  await firebaseDb.collection(COLLECTIONS.COMUNICADOS).doc(String(id)).update({
+    ...dados,
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
   });
 }
 
@@ -431,6 +457,28 @@ function normalizarChamadoFirebase(documento) {
     status: dados.status || "ABERTO",
     data: dados.data || criadoEm.toLocaleDateString("pt-BR"),
     criadoEm: dados.criadoEmISO || criadoEm.toISOString(),
+    criadoEmISO: dados.criadoEmISO || criadoEm.toISOString(),
+    prazoHoras: typeof dados.prazoHoras === "number" ? dados.prazoHoras : obterPrazoHoras(dados.prioridade || "Baixa"),
+    vencimentoSLAISO: dados.vencimentoSLAISO || calcularVencimentoChamado({
+      criadoEmISO: dados.criadoEmISO || criadoEm.toISOString(),
+      data: dados.data || criadoEm.toLocaleDateString("pt-BR"),
+      prioridade: dados.prioridade || "Baixa"
+    }).toISOString(),
+    slaBasePrioridade: dados.slaBasePrioridade || dados.prioridade || "Baixa",
+    slaStatusAtual: dados.slaStatusAtual || calcularStatusSLAOperacional({
+      status: dados.status || "ABERTO",
+      vencimentoSLAISO: dados.vencimentoSLAISO || calcularVencimentoChamado({
+        criadoEmISO: dados.criadoEmISO || criadoEm.toISOString(),
+        data: dados.data || criadoEm.toLocaleDateString("pt-BR"),
+        prioridade: dados.prioridade || "Baixa"
+      }).toISOString()
+    }),
+    slaStatusFinal: dados.slaStatusFinal || "",
+    slaCriadoEmISO: dados.slaCriadoEmISO || "",
+    slaRecalculadoEmISO: dados.slaRecalculadoEmISO || "",
+    slaFinalizadoEmISO: dados.slaFinalizadoEmISO || "",
+    tempoConclusaoHoras: typeof dados.tempoConclusaoHoras === "number" ? dados.tempoConclusaoHoras : null,
+    concluidoNoPrazo: typeof dados.concluidoNoPrazo === "boolean" ? dados.concluidoNoPrazo : null,
     foto: dados.foto || fotos.map(foto => foto.nome).join(", "),
     fotoNome: dados.fotoNome || (fotos[0] ? fotos[0].nome : ""),
     fotoData: dados.fotoData || (fotos[0] ? fotos[0].data : ""),
@@ -506,16 +554,24 @@ function obterEtapaFluxoPorStatus(status) {
 }
 
 function normalizarComunicadoFirebase(documento) {
-  const dados = documento.data();
-  const criadoEm = converterTimestampParaData(dados.criadoEm) || new Date();
+  const dados = documento.data() || {};
+  const criadoEm = converterTimestampParaData(dados.criadoEm) || new Date(dados.criadoEmISO || Date.now());
+  const atualizadoEm = converterTimestampParaData(dados.atualizadoEm) || criadoEm;
 
   return {
     id: documento.id,
     titulo: dados.titulo || "Sem título",
     texto: dados.texto || "",
     origem: dados.origem || "Manutenção",
+    nivel: dados.nivel || "normal",
     data: dados.data || criadoEm.toLocaleDateString("pt-BR"),
-    autor: dados.autor || "Não informado"
+    autor: dados.autor || "Não informado",
+    autorUid: dados.autorUid || "",
+    criadoEmISO: dados.criadoEmISO || criadoEm.toISOString(),
+    editadoPor: dados.editadoPor || "",
+    editadoPorUid: dados.editadoPorUid || "",
+    editadoEmISO: dados.editadoEmISO || "",
+    atualizadoEmISO: atualizadoEm.toISOString()
   };
 }
 

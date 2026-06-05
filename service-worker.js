@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-gerencia-v1";
+const CACHE_NAME = "app-manutencao-comunicados-v14-sla-final";
 
 const FILES_TO_CACHE = [
   "./",

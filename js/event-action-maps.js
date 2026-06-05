@@ -38,6 +38,10 @@
     "criar-item-diagnostico": elemento => executarAcao("criarItemDiagnostico", elemento),
     "criar-chamado": () => executarAcao("criarChamado"),
     "criar-comunicado": () => executarAcao("criarComunicado"),
+    "salvar-comunicado": () => executarAcao("salvarComunicado"),
+    "limpar-comunicado": () => executarAcao("limparFormularioComunicado"),
+    "cancelar-edicao-comunicado": () => executarAcao("cancelarEdicaoComunicado"),
+    "selecionar-nivel-comunicado": elemento => executarAcao("selecionarNivelComunicado", elemento),
     "entrar-colaborador": elemento => executarAcao("entrarComoColaborador", elemento),
     "entrar-firebase": elemento => executarAcao("entrarComFirebase", elemento),
     "limpar-filtros-painel": () => executarAcao("limparFiltrosPainel"),
@@ -59,7 +63,8 @@
     "alterar-periodo-dashboard": elemento => executarAcao("alterarPeriodoDashboard", elemento.value),
     "alterar-categoria-dashboard": elemento => executarAcao("alterarCategoriaDashboard", elemento.value),
     "filtrar-painel-status": elemento => executarAcao("filtrarPainelStatus", elemento.value),
-    "filtrar-painel-prioridade": elemento => executarAcao("filtrarPainelPrioridade", elemento.value)
+    "filtrar-painel-prioridade": elemento => executarAcao("filtrarPainelPrioridade", elemento.value),
+    "selecionar-nivel-comunicado-select": elemento => executarAcao("selecionarNivelComunicadoSelect", elemento)
   };
 
   const acoesDinamicas = {
@@ -69,7 +74,9 @@
     prepararPlanoPreventivoDoAtivo: (...argumentos) => executarAcao("prepararPlanoPreventivoDoAtivo", ...argumentos),
     excluirAtivo: (...argumentos) => executarAcao("excluirAtivo", ...argumentos),
     abrirDetalhesChamado: (...argumentos) => executarAcao("abrirDetalhesChamado", ...argumentos),
+    editarComunicado: (...argumentos) => executarAcao("editarComunicado", ...argumentos),
     excluirComunicado: (...argumentos) => executarAcao("excluirComunicado", ...argumentos),
+    filtrarComunicados: (...argumentos) => executarAcao("filtrarComunicados", ...argumentos),
     usarItemChecklistDiagnostico: (...argumentos) => executarAcao("usarItemChecklistDiagnostico", ...argumentos),
     prepararOSComDiagnostico: (...argumentos) => executarAcao("prepararOSComDiagnostico", ...argumentos),
     marcarDiagnosticoResolvido: (...argumentos) => executarAcao("marcarDiagnosticoResolvido", ...argumentos),

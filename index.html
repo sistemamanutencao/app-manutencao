@@ -85,7 +85,7 @@
             <p id="textoCardChamadosRapido">Acompanhar</p>
           </div>
 
-          <div class="quick-card" data-nav-page="comunicados">
+          <div class="quick-card manut-only" data-nav-page="comunicados">
             <div class="quick-icon orange-bg">
               <svg viewBox="0 0 24 24" fill="none">
                 <path d="M4 14h3l8 4V6L7 10H4v4Z" stroke="currentColor" stroke-linejoin="round" />
@@ -144,6 +144,17 @@
         </div>
       </section>
 
+      <section id="secaoComunicadosInicio">
+        <div class="section-header spacing">
+          <h2>Comunicados recentes</h2>
+          <a href="#" data-nav-page="comunicados">Ver todos</a>
+        </div>
+
+        <div class="notice-list" id="listaComunicadosInicio">
+          <!-- Comunicados recentes serão carregados pelo JavaScript -->
+        </div>
+      </section>
+
       <section>
         <div class="section-header spacing">
           <h2>Minhas OS</h2>
@@ -155,16 +166,6 @@
         </div>
       </section>
 
-      <section>
-        <div class="section-header spacing">
-          <h2>Comunicados recentes</h2>
-          <a href="#" data-nav-page="comunicados">Ver todos</a>
-        </div>
-
-        <div class="notice-list" id="listaComunicadosInicio">
-          <!-- Comunicados recentes serão carregados pelo JavaScript -->
-       </div>
-      </section>
     </section>
 
     <!-- ABA CHAMADOS -->
@@ -841,47 +842,129 @@
   <section class="page" id="comunicados">
     <header class="page-header">
       <h1>Comunicados</h1>
-      <p>Acompanhe os avisos da administração e da manutenção.</p>
     </header>
 
-   <div class="form-card" id="areaNovoComunicado">
-      <label>
-        Título do comunicado
-       <input 
-          id="tituloComunicado" 
-          type="text" 
-          placeholder="Ex: Interdição de corredor, manutenção preventiva..."
-        />
-     </label>
+    <div class="comunicados-admin-layout">
+      <div class="form-card comunicado-form-card" id="areaNovoComunicado">
+        <div class="comunicado-form-header">
+          <div>
+            <h2 id="tituloFormularioComunicado">Novo comunicado</h2>
+            <p id="subtituloFormularioComunicado">Publique um aviso para todos os usuários autorizados.</p>
+          </div>
+          <button type="button" class="comunicado-clear-button" id="botaoLimparComunicado" data-action="limpar-comunicado">
+            Limpar campos
+          </button>
+        </div>
 
-      <label>
-        Mensagem
-        <textarea 
-          id="textoComunicado" 
-          placeholder="Digite o aviso que será exibido para os usuários..."
-       ></textarea>
-      </label>
+        <input id="comunicadoEditandoId" type="hidden" value="" />
 
-     <label>
-        Origem do aviso
-       <select id="origemComunicado">
-          <option value="Manutenção">Manutenção</option>
-          <option value="Administração">Administração</option>
-          <option value="Coordenação">Coordenação</option>
-        </select>
-      </label>
+        <label>
+          Título do comunicado
+          <input 
+            id="tituloComunicado" 
+            type="text" 
+            placeholder="Ex: Interrupção de energia no Bloco B"
+          />
+        </label>
 
-      <button 
-        type="button" 
-        class="primary-button" 
-        data-action="criar-comunicado"
-        >
-        Publicar comunicado
-      </button>
-    </div>
+        <label>
+          Mensagem
+          <textarea 
+            id="textoComunicado" 
+            placeholder="Digite o aviso que será exibido para os usuários..."
+          ></textarea>
+        </label>
 
-   <div class="notice-list" id="listaComunicados">
-      <!-- Comunicados serão carregados pelo JavaScript -->
+        <div class="comunicado-form-row">
+          <label>
+            Origem do aviso
+            <select id="origemComunicado">
+              <option value="Manutenção">Manutenção</option>
+              <option value="Administração">Administração</option>
+              <option value="Coordenação">Coordenação</option>
+            </select>
+          </label>
+
+          <label>
+            Nível do comunicado
+            <select id="nivelComunicado" data-change-action="selecionar-nivel-comunicado-select">
+              <option value="normal">Normal</option>
+              <option value="importante">Importante</option>
+              <option value="urgente">Urgente</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="comunicado-level-grid" role="group" aria-label="Nível do comunicado">
+          <button type="button" class="comunicado-level-card is-active" data-action="selecionar-nivel-comunicado" data-nivel="normal">
+            <span class="comunicado-level-icon comunicado-level-icon-normal" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 14h3l8 4V6L7 10H4v4Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="M18 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-linecap="round" />
+              </svg>
+            </span>
+            <strong>Normal</strong>
+          </button>
+
+          <button type="button" class="comunicado-level-card" data-action="selecionar-nivel-comunicado" data-nivel="importante">
+            <span class="comunicado-level-icon comunicado-level-icon-importante" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 14h3l8 4V6L7 10H4v4Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="M18 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-linecap="round" />
+              </svg>
+            </span>
+            <strong>Importante</strong>
+          </button>
+
+          <button type="button" class="comunicado-level-card" data-action="selecionar-nivel-comunicado" data-nivel="urgente">
+            <span class="comunicado-level-icon comunicado-level-icon-urgente" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 14h3l8 4V6L7 10H4v4Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="M18 9a4 4 0 0 1 0 6M21 7a7 7 0 0 1 0 10" stroke="currentColor" stroke-linecap="round" />
+              </svg>
+            </span>
+            <strong>Urgente</strong>
+          </button>
+        </div>
+
+        <div class="comunicado-form-actions">
+          <button 
+            type="button" 
+            class="primary-button" 
+            id="botaoSalvarComunicado"
+            data-action="salvar-comunicado"
+          >
+            Publicar comunicado
+          </button>
+
+          <button 
+            type="button" 
+            class="secondary-button comunicado-cancel-edit" 
+            id="botaoCancelarEdicaoComunicado"
+            data-action="cancelar-edicao-comunicado"
+            hidden
+          >
+            Cancelar edição
+          </button>
+        </div>
+      </div>
+
+      <div class="comunicados-management-panel">
+        <section class="comunicados-summary" id="resumoComunicados">
+          <!-- Resumo dos comunicados será carregado pelo JavaScript -->
+        </section>
+
+        <div class="comunicado-filter-row" id="filtrosComunicados">
+          <button type="button" class="comunicado-filter is-active" data-dynamic-action="filtrarComunicados" data-param0="todos">Todos</button>
+          <button type="button" class="comunicado-filter" data-dynamic-action="filtrarComunicados" data-param0="urgente">Urgentes</button>
+          <button type="button" class="comunicado-filter" data-dynamic-action="filtrarComunicados" data-param0="importante">Importantes</button>
+          <button type="button" class="comunicado-filter" data-dynamic-action="filtrarComunicados" data-param0="normal">Normais</button>
+        </div>
+
+        <div class="notice-list comunicado-list" id="listaComunicados">
+          <!-- Comunicados serão carregados pelo JavaScript -->
+        </div>
+      </div>
     </div>
   </section>
 

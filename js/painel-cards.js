@@ -45,10 +45,8 @@ function montarTextoBuscaPainel(chamado) {
 function criarCardPainel(chamado) {
   const statusClasse = obterClasseStatus(chamado.status);
   const sla = calcularSLA(chamado);
-  const cardCritico = chamado.prioridade === "Urgente" || sla.texto === "Atrasado";
-  const textoSLA = chamado.prioridade === "Urgente"
-    ? sla.texto
-    : `${sla.texto} • vence em ${formatarVencimentoSLA(chamado)}`;
+  const cardCritico = chamado.prioridade === "Urgente" || sla.status === "ATRASADO";
+  const textoSLA = formatarTextoSLAChamado(chamado, sla);
   const chamadoFinalizado = statusFinalizado(chamado.status);
 
   return `
