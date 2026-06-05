@@ -185,3 +185,225 @@
   margin-top: 0;
   font-size: 13px;
 }
+
+/* =====================================================
+   v11 - VISUAL OPERACIONAL DA LISTA DE OS
+   Ajuste visual apenas nos cards renderizados em lista.
+   Não altera ações, permissões, Firebase ou regras de negócio.
+===================================================== */
+
+.tickets-card {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.ticket.ticket-operational {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 8px;
+  min-height: 0;
+  padding: 14px 13px 12px 17px;
+  background: #fff;
+  border: 1px solid #e3e8f2;
+  border-left: 5px solid var(--blue);
+  border-radius: 15px;
+  box-shadow: 0 5px 13px rgba(10, 31, 68, 0.10);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.ticket.ticket-operational:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(10, 31, 68, 0.13);
+}
+
+.ticket.ticket-operational:last-child {
+  border-bottom: 1px solid #e3e8f2;
+}
+
+.ticket-priority-high {
+  border-left-color: #df1f2d !important;
+}
+
+.ticket-priority-medium {
+  border-left-color: #ff6b00 !important;
+}
+
+.ticket-priority-low {
+  border-left-color: #1f6fe5 !important;
+}
+
+.ticket-priority-done {
+  border-left-color: #1f9d55 !important;
+}
+
+.ticket-priority-canceled {
+  border-left-color: #7a8496 !important;
+}
+
+.ticket-operational-info {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ticket-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ticket-header-row h3 {
+  margin: 0;
+  color: #10192f;
+  font-size: 16px;
+  line-height: 1.15;
+  font-weight: 900;
+  letter-spacing: -0.15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ticket-header-row .status {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1px;
+  text-transform: uppercase;
+}
+
+.ticket-detail-list {
+  display: grid;
+  gap: 4px;
+}
+
+.ticket-detail-list p {
+  margin: 0;
+  color: #25304a;
+  font-size: 13px;
+  line-height: 1.28;
+  font-weight: 650;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ticket-detail-list .ticket-description {
+  color: #1c263c;
+}
+
+.ticket-label {
+  color: #0f172a;
+  font-weight: 900;
+}
+
+.ticket-footer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #edf1f7;
+  flex-wrap: wrap;
+}
+
+.ticket-meta,
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #4d5870;
+  font-size: 12.5px;
+  line-height: 1;
+  font-weight: 750;
+}
+
+.ticket-meta svg,
+.priority-badge svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.priority-badge {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.priority-high {
+  color: #df1f2d;
+}
+
+.priority-medium {
+  color: #f06700;
+}
+
+.priority-low {
+  color: #1f6fe5;
+}
+
+.ticket-operational .sla-badge {
+  width: fit-content;
+  margin-top: 0;
+  padding: 5px 7px;
+  border-radius: 7px;
+  font-size: 10.5px;
+}
+
+.ticket-chevron {
+  color: #27324a;
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 500;
+  justify-self: end;
+}
+
+@media (max-width: 430px) {
+  .tickets-card {
+    gap: 9px;
+    padding: 8px 0;
+  }
+
+  .ticket.ticket-operational {
+    grid-template-columns: minmax(0, 1fr) 15px;
+    padding: 12px 10px 11px 14px;
+    border-radius: 14px;
+  }
+
+  .ticket-header-row h3 {
+    font-size: 15px;
+  }
+
+  .ticket-header-row .status {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+
+  .ticket-detail-list p {
+    font-size: 12.5px;
+  }
+
+  .ticket-footer-row {
+    gap: 8px;
+  }
+
+  .ticket-meta,
+  .priority-badge {
+    font-size: 12px;
+  }
+
+  .priority-badge {
+    margin-left: 0;
+  }
+}

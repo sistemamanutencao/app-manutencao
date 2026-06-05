@@ -99,38 +99,96 @@ function montarTextoBuscaChamado(chamado) {
 
 function criarCardChamado(chamado) {
   const statusClasse = obterClasseStatus(chamado.status);
-  const iconeClasse = obterClasseIcone(chamado.status);
   const sla = calcularSLA(chamado);
   const textoSLA = chamado.prioridade === "Urgente"
     ? sla.texto
     : `${sla.texto} • vence em ${formatarVencimentoSLA(chamado)}`;
+  const classePrioridade = obterClassePrioridade(chamado.prioridade);
+  const classeBordaPrioridade = obterClasseBordaPrioridade(chamado.prioridade, chamado.status);
+  const solicitante = chamado.criadoPorNome || chamado.solicitanteNome || "Não informado";
+  const setorOuLocal = chamado.setor || chamado.local || "Não informado";
+  const horario = chamado.horario || "--:--";
 
   return `
-    <div class="ticket" data-dynamic-action="abrirDetalhesChamado" data-param0="${formatarAtributoHTML(chamado.id)}">
-      <div class="ticket-icon ${iconeClasse}">
-        ${pegarIconeCategoria(chamado.categoria)}
-      </div>
+    <div class="ticket ticket-operational ${classeBordaPrioridade}" data-dynamic-action="abrirDetalhesChamado" data-param0="${formatarAtributoHTML(chamado.id)}">
+      <div class="ticket-info ticket-operational-info">
+        <div class="ticket-header-row">
+          <h3>${escaparHTML(chamado.numeroOS || "OS")}</h3>
+          <span class="status ${statusClasse}">${escaparHTML(chamado.status || "ABERTO")}</span>
+        </div>
 
-      <div class="ticket-info">
-        <h3>${escaparHTML(chamado.numeroOS || "OS")}: ${escaparHTML(chamado.descricao)}</h3>
-        <p>
-          ${escaparHTML(chamado.categoria)}${chamado.subcategoria ? ` / ${escaparHTML(chamado.subcategoria)}` : ""}
-          &nbsp;•&nbsp;
-          ${escaparHTML(chamado.tipoManutencao || "Corretiva")}
-          &nbsp;•&nbsp;
-          ${escaparHTML(chamado.local)}
-          ${chamado.equipamentoCodigo ? `&nbsp;•&nbsp; Ativo ${escaparHTML(chamado.equipamentoCodigo)}` : ""}
-          &nbsp;•&nbsp;
-          ${escaparHTML(chamado.data)}
-          ${usuarioPodeVerTodasOS() ? `&nbsp;•&nbsp; Solicitante: ${escaparHTML(chamado.criadoPorNome || "Não informado")}` : ""}
-        </p>
+        <div class="ticket-detail-list">
+          ${usuarioPodeVerTodasOS() ? `
+            <p><span class="ticket-label">Solicitante:</span> ${escaparHTML(solicitante)}</p>
+          ` : ""}
+          <p><span class="ticket-label">Setor:</span> ${escaparHTML(setorOuLocal)}</p>
+          <p class="ticket-description"><span class="ticket-label">Descrição:</span> ${escaparHTML(chamado.descricao || "Sem descrição informada.")}</p>
+        </div>
+
+        <div class="ticket-footer-row">
+          <span class="ticket-meta" aria-label="Data da OS">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" />
+              <path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-linecap="round" />
+            </svg>
+            ${escaparHTML(chamado.data || "Data não informada")}
+          </span>
+
+          <span class="ticket-meta" aria-label="Horário da OS">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="8" stroke="currentColor" />
+              <path d="M12 7v5l3 2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            ${escaparHTML(horario)}
+          </span>
+
+          <span class="priority-badge ${classePrioridade}" aria-label="Prioridade da OS">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M5 3a1 1 0 0 1 1-1h9.2c.3 0 .6.1.8.4l2.8 3.4a1 1 0 0 1 0 1.2L16 10.5l2.8 3.4a1 1 0 0 1-.8 1.6H7v5.5a1 1 0 1 1-2 0V3Z" />
+            </svg>
+            ${escaparHTML(chamado.prioridade || "Baixa")}
+          </span>
+        </div>
 
         <small class="sla-badge ${sla.classe}">${escaparHTML(textoSLA)}</small>
       </div>
 
-      <span class="status ${statusClasse}">${escaparHTML(chamado.status)}</span>
+      <span class="ticket-chevron" aria-hidden="true">›</span>
     </div>
   `;
+}
+
+
+function obterClassePrioridade(prioridade) {
+  if (prioridade === "Urgente" || prioridade === "Alta") {
+    return "priority-high";
+  }
+
+  if (prioridade === "Média") {
+    return "priority-medium";
+  }
+
+  return "priority-low";
+}
+
+function obterClasseBordaPrioridade(prioridade, status) {
+  if (status === "CANCELADO") {
+    return "ticket-priority-canceled";
+  }
+
+  if (status === "ENCERRADO" || status === "VALIDADO" || status === "CONCLUÍDO") {
+    return "ticket-priority-done";
+  }
+
+  if (prioridade === "Urgente" || prioridade === "Alta") {
+    return "ticket-priority-high";
+  }
+
+  if (prioridade === "Média") {
+    return "ticket-priority-medium";
+  }
+
+  return "ticket-priority-low";
 }
 
 function filtrarChamados(status, botao) {
