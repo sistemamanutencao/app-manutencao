@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v17-icone-instalacao";
+const CACHE_NAME = "app-manutencao-v18-perfil-manutencao-avatar-maior";
 
 const FILES_TO_CACHE = [
   "./",
@@ -61,7 +61,8 @@ const FILES_TO_CACHE = [
   "./img/senac-predio.png",
   "./img/engrenagem-painel-login.png",
   "./img/icon-192.png",
-  "./img/icon-512.png"
+  "./img/icon-512.png",
+  "./img/perfil-manutencao.png"
 ];
 
 self.addEventListener("install", event => {

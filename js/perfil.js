@@ -60,9 +60,6 @@ function aplicarPermissoesNaTela() {
 
   preencherResumoUsuarioNaTela();
 
-  if (typeof atualizarResumoPerfil === "function") {
-    atualizarResumoPerfil();
-  }
 
   if (typeof renderizarAtivos === "function") {
     renderizarAtivos();
@@ -86,13 +83,35 @@ function preencherResumoUsuarioNaTela() {
   const perfilTextoFormatado = obterNomePerfilFormatado(usuarioAtual.perfil);
 
   setTextContent("perfilAcessoTexto", perfilTextoFormatado);
-  setTextContent("perfilAvatar", gerarIniciaisUsuario(nome));
+  configurarAvatarPerfil(nome);
   setTextContent("perfilNomeTitulo", nome);
   setTextContent("perfilSubtitulo", `${perfilTextoFormatado} • ${unidade}`);
   setTextContent("perfilNomeValor", nome);
   setTextContent("perfilSetorValor", setor);
   setTextContent("perfilEmailValor", email);
   setTextContent("perfilUnidadeValor", unidade);
+}
+
+function configurarAvatarPerfil(nome) {
+  const avatar = document.getElementById("perfilAvatar");
+
+  if (!avatar) {
+    return;
+  }
+
+  avatar.classList.toggle("avatar-manutencao", usuarioEhManutencaoAutorizada());
+
+  if (usuarioEhManutencaoAutorizada()) {
+    avatar.textContent = "";
+    const imagem = document.createElement("img");
+    imagem.src = "img/perfil-manutencao.png";
+    imagem.alt = "Imagem de perfil da manutenção";
+    imagem.loading = "lazy";
+    avatar.appendChild(imagem);
+    return;
+  }
+
+  avatar.textContent = gerarIniciaisUsuario(nome);
 }
 
 
@@ -333,13 +352,6 @@ async function sairDaConta() {
 }
 
 function atualizarResumoPerfil() {
-  const totalChamados = chamados.length;
-  const meusChamados = chamados.filter(chamado => usuarioEhAutorChamado(chamado)).length;
-  const chamadosAbertos = chamados.filter(chamado => !statusFinalizado(chamado.status)).length;
-  const chamadosCancelados = chamados.filter(chamado => chamado.status === "CANCELADO").length;
-
-  setTextContent("perfilTotalChamados", totalChamados);
-  setTextContent("perfilMeusChamados", meusChamados);
-  setTextContent("perfilChamadosAbertos", chamadosAbertos);
-  setTextContent("perfilChamadosCancelados", chamadosCancelados);
+  // Mantida como função neutra para compatibilidade com chamadas existentes.
+  // A v18 removeu o bloco visual de resumo de chamados da aba Perfil.
 }

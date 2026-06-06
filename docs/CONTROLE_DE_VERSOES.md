@@ -22,7 +22,8 @@ Este arquivo registra as bases principais do processo de recuperação, limpeza 
 | v13 | `app-manutencao-v13-gerencia-prioridade-os-limpo.zip` | Gerência altera somente prioridade da OS | Aprovado |
 | v15 | `app-manutencao-v15-comunicados-sla-exportacao.zip` | Comunicados com níveis/edição, correção de prazo/SLA, filtro Encerrados e exportação ampliada de OS | Aprovado/publicável |
 | v16 | `app-manutencao-v16-limpeza-organizacao-codigo.zip` | Limpeza conservadora, documentação coerente e cache PWA revisado sem alterar regras de negócio | Base anterior |
-| v17 | `app-manutencao-v17-icone-instalacao.zip` | Atualização das imagens de ícone de instalação do PWA | Pronto para teste/publicação |
+| v17 | `app-manutencao-v17-icone-instalacao.zip` | Atualização das imagens de ícone de instalação do PWA | Base anterior |
+| v18 | `app-manutencao-v18-perfil-manutencao-avatar-maior.zip` | Remove resumo de chamados da aba Perfil, adiciona imagem exclusiva para manutenção e amplia o avatar após prévia visual aprovada | Pronto para teste/publicação |
 
 ## Como registrar próximas versões
 

@@ -13,13 +13,13 @@ app-manutencao(7).zip
 A versão funcional anterior a esta entrega é:
 
 ```txt
-app-manutencao-v16-limpeza-organizacao-codigo.zip
+app-manutencao-v17-icone-instalacao.zip
 ```
 
 A versão atual de trabalho é:
 
 ```txt
-app-manutencao-v17-icone-instalacao.zip
+app-manutencao-v18-perfil-manutencao-avatar-maior.zip
 ```
 
 ## Quando fazer rollback
