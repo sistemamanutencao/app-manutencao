@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v15-comunicados-sla-exportacao";
+const CACHE_NAME = "app-manutencao-v16-limpeza-organizacao-codigo";
 
 const FILES_TO_CACHE = [
   "./",
@@ -31,6 +31,7 @@ const FILES_TO_CACHE = [
   "./src/constants/exportacoes.js",
   "./src/constants/index.js",
   "./js/state.js",
+  "./js/ui-feedback.js",
   "./js/auth-permissions.js",
   "./js/firebase-service.js",
   "./js/utils.js",
@@ -54,7 +55,11 @@ const FILES_TO_CACHE = [
   "./js/preventivas.js",
   "./js/diagnostico.js",
   "./js/app.js",
+  "./js/event-action-maps.js",
+  "./js/event-bindings.js",
+  "./js/service-worker-register.js",
   "./img/senac-predio.png",
+  "./img/engrenagem-painel-login.png",
   "./img/icon-192.png",
   "./img/icon-512.png"
 ];

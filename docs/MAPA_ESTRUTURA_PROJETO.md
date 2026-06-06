@@ -1,8 +1,8 @@
 # Mapa técnico da estrutura do projeto
 
-Base analisada: `app-manutencao-marco0-limpeza-segura-v1.zip`.
+Base atual de referência: `app-manutencao-v16-limpeza-organizacao-codigo.zip`.
 
-Objetivo desta etapa: documentar a estrutura atual antes de qualquer refatoração, para reduzir risco de quebra em login, perfis, Firestore, OS, diagnóstico e notificações.
+Objetivo: documentar a estrutura atual do app para reduzir risco de quebra em login, perfis, Firestore, OS, diagnóstico, preventivas, comunicados, SLA e notificações.
 
 ## Visão geral
 

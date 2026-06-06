@@ -21,6 +21,7 @@ Este arquivo registra as bases principais do processo de recuperação, limpeza 
 | v12 | `app-manutencao-v12-mensagens-internas.zip` | Melhorias de mensagens internas | Aprovado |
 | v13 | `app-manutencao-v13-gerencia-prioridade-os-limpo.zip` | Gerência altera somente prioridade da OS | Aprovado |
 | v15 | `app-manutencao-v15-comunicados-sla-exportacao.zip` | Comunicados com níveis/edição, correção de prazo/SLA, filtro Encerrados e exportação ampliada de OS | Aprovado/publicável |
+| v16 | `app-manutencao-v16-limpeza-organizacao-codigo.zip` | Limpeza conservadora, documentação coerente e cache PWA revisado sem alterar regras de negócio | Pronto para teste/publicação |
 
 ## Como registrar próximas versões
 

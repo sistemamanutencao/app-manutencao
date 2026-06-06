@@ -10,16 +10,16 @@ O Marco 0 oficial do projeto é:
 app-manutencao(7).zip
 ```
 
-A base limpa aprovada para organização é:
+A versão oficial imediatamente anterior a esta entrega é:
 
 ```txt
-app-manutencao-marco0-limpeza-segura-v1.zip
+app-manutencao-v15-comunicados-sla-exportacao.zip
 ```
 
-A versão modular mais recente antes desta etapa é:
+A versão atual de trabalho após esta limpeza é:
 
 ```txt
-app-manutencao-base-limpa-modular-v8.zip
+app-manutencao-v16-limpeza-organizacao-codigo.zip
 ```
 
 ## Quando fazer rollback
