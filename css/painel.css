@@ -352,3 +352,55 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===================== V20: CADASTRO DE COLABORADORES ===================== */
+
+.cadastro-colaborador-card {
+  display: block;
+}
+
+.cadastro-colaborador-grid {
+  grid-template-columns: 1fr;
+  margin-top: 14px;
+}
+
+.cadastro-colaborador-lista {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.cadastro-colaborador-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid rgba(209, 218, 232, 0.9);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.cadastro-colaborador-item div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.cadastro-colaborador-item strong {
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.cadastro-colaborador-item span:not(.status),
+.cadastro-colaborador-item small {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.cadastro-colaborador-item .status {
+  flex: 0 0 auto;
+}

@@ -438,3 +438,51 @@
   background: #ff6a00;
   border-color: #ff6a00;
 }
+
+/* ===================== V20: PRIMEIRO ACESSO DO COLABORADOR ===================== */
+
+.login-transition-note {
+  margin: 12px 0 0;
+  padding: 11px 12px;
+  border-radius: 14px;
+  background: rgba(31, 111, 229, 0.08);
+  color: #1d4f9f;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.first-access-box {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(31, 111, 229, 0.16);
+}
+
+.first-access-box h3 {
+  margin: 0 0 6px;
+  color: var(--text-dark);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.first-access-button {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* v20 - primeiro acesso como fluxo principal do colaborador */
+.primeiro-acesso-card {
+  border: 1px solid rgba(31, 111, 229, 0.18);
+}
+
+.primeiro-acesso-card .first-access-button {
+  width: 100%;
+  background: #1d6fe8;
+  border-color: #1d6fe8;
+  color: #ffffff;
+}
+
+.primeiro-acesso-card .first-access-button:hover {
+  background: #185fc7;
+  border-color: #185fc7;
+}

@@ -124,6 +124,100 @@ service cloud.firestore {
         ]);
     }
 
+
+
+    function camposCadastroColaboradorValidos() {
+      return request.resource.data.keys().hasOnly([
+          "emailKey",
+          "codigoColaborador",
+          "nome",
+          "email",
+          "setor",
+          "perfil",
+          "ativo",
+          "status",
+          "criadoPorUid",
+          "criadoPorNome",
+          "criadoEm",
+          "atualizadoEm"
+        ])
+        && request.resource.data.emailKey is string
+        && request.resource.data.codigoColaborador is string
+        && request.resource.data.nome is string
+        && request.resource.data.email is string
+        && request.resource.data.setor is string
+        && request.resource.data.perfil == "colaborador"
+        && request.resource.data.ativo is bool
+        && request.resource.data.status in ["pendente", "inativo"];
+    }
+
+    function manutencaoPodeSalvarCadastroColaborador() {
+      return ehManutencao() && camposCadastroColaboradorValidos();
+    }
+
+    function cadastroColaboradorPendenteValido(emailKey) {
+      return estaAutenticado()
+        && request.auth.token.email is string
+        && emailKey is string
+        && exists(/databases/$(database)/documents/cadastrosColaboradores/$(emailKey))
+        && get(/databases/$(database)/documents/cadastrosColaboradores/$(emailKey)).data.email == request.auth.token.email
+        && get(/databases/$(database)/documents/cadastrosColaboradores/$(emailKey)).data.status == "pendente"
+        && get(/databases/$(database)/documents/cadastrosColaboradores/$(emailKey)).data.ativo == true
+        && get(/databases/$(database)/documents/cadastrosColaboradores/$(emailKey)).data.perfil == "colaborador";
+    }
+
+    function usuarioPrimeiroAcessoColaboradorValido(id) {
+      return estaAutenticado()
+        && id == request.auth.uid
+        && request.auth.token.email is string
+        && request.resource.data.keys().hasOnly([
+          "nome",
+          "email",
+          "setor",
+          "unidade",
+          "perfil",
+          "ativo",
+          "origem",
+          "cadastroColaboradorEmailKey",
+          "colaboradorCodigo",
+          "criadoEm",
+          "atualizadoEm"
+        ])
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.perfil == "colaborador"
+        && request.resource.data.ativo == true
+        && request.resource.data.cadastroColaboradorEmailKey is string
+        && request.resource.data.colaboradorCodigo is string
+        && cadastroColaboradorPendenteValido(request.resource.data.cadastroColaboradorEmailKey);
+    }
+
+    function colaboradorPodeConcluirCadastro() {
+      return estaAutenticado()
+        && request.auth.token.email is string
+        && request.auth.token.email == resource.data.email
+        && resource.data.status == "pendente"
+        && request.resource.data.status == "concluido"
+        && request.resource.data.uidCriado == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status",
+          "uidCriado",
+          "concluidoEm",
+          "atualizadoEm"
+        ]);
+    }
+
+    function usuarioPodeAtualizarProprioCadastroBasico(id) {
+      return estaAutenticado()
+        && id == request.auth.uid
+        && resource.data.perfil == request.resource.data.perfil
+        && resource.data.ativo == request.resource.data.ativo
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "nome",
+          "setor",
+          "atualizadoEm"
+        ]);
+    }
+
     match /chamados/{id} {
       allow read: if podeAcompanharTodosChamados() || ehAutorChamado(resource.data);
       allow create: if ehManutencao() || gerenciaPodeCriarChamado() || colaboradorPodeCriarChamado();
@@ -162,13 +256,21 @@ service cloud.firestore {
     }
 
 
+    match /cadastrosColaboradores/{id} {
+      allow read: if ehManutencao()
+        || (estaAutenticado() && request.auth.token.email is string && resource.data.email == request.auth.token.email);
+      allow create, update: if manutencaoPodeSalvarCadastroColaborador() || colaboradorPodeConcluirCadastro();
+      allow delete: if ehManutencao();
+    }
+
     match /diagnosticos/{id} {
       allow read, create, update, delete: if ehManutencao();
     }
 
     match /usuarios/{id} {
       allow read: if estaAutenticado() && (id == request.auth.uid || ehManutencao());
-      allow create, update: if estaAutenticado() && (id == request.auth.uid || ehManutencao());
+      allow create: if ehManutencao() || usuarioPrimeiroAcessoColaboradorValido(id);
+      allow update: if ehManutencao() || usuarioPodeAtualizarProprioCadastroBasico(id);
       allow delete: if ehManutencao();
     }
 

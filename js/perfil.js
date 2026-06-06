@@ -306,7 +306,7 @@ async function entrarComFirebase(botao) {
   const senha = senhaInput.value;
 
   if (!email || !senha) {
-    alert("Informe e-mail e senha para acessar como manutenção ou gerência.");
+    alert("Informe e-mail e senha para acessar sua conta autorizada.");
     return;
   }
 

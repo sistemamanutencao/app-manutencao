@@ -44,6 +44,8 @@
     "selecionar-nivel-comunicado": elemento => executarAcao("selecionarNivelComunicado", elemento),
     "entrar-colaborador": elemento => executarAcao("entrarComoColaborador", elemento),
     "entrar-firebase": elemento => executarAcao("entrarComFirebase", elemento),
+    "cadastrar-colaborador-pendente": elemento => executarAcao("cadastrarColaboradorPendente", elemento),
+    "criar-primeiro-acesso-colaborador": elemento => executarAcao("criarPrimeiroAcessoColaborador", elemento),
     "limpar-filtros-painel": () => executarAcao("limparFiltrosPainel"),
     "fechar-detalhes-chamado": () => executarAcao("fecharDetalhesChamado"),
     "cancelar-chamado-atual": elemento => executarAcao("cancelarChamadoAtual", elemento),

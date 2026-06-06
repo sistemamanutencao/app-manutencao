@@ -76,6 +76,7 @@ function prepararTelaSemSessao() {
   ativos = [];
   planosPreventivos = [];
   diagnosticos = [];
+  cadastrosColaboradores = [];
 
   preencherFormularioPerfil();
   aplicarPermissoesNaTela();
@@ -100,6 +101,10 @@ function prepararTelaSemSessao() {
 
   if (typeof renderizarDiagnosticos === "function") {
     renderizarDiagnosticos();
+  }
+
+  if (typeof limparCadastrosColaboradoresTela === "function") {
+    limparCadastrosColaboradoresTela();
   }
 
   aplicarPermissoesInterface();
@@ -145,6 +150,10 @@ async function processarEstadoAutenticacao(usuarioFirebase) {
     const perfil = await buscarPerfilFirebase(usuarioFirebase.uid);
 
     if (!perfil) {
+      if (window.APP_PRIMEIRO_ACESSO_COLABORADOR_EM_ANDAMENTO === true) {
+        return;
+      }
+
       alert("Login realizado, mas este usuário ainda não possui cadastro em usuarios/{uid}.\nCrie o documento do usuário no Firestore para liberar o acesso.");
       await encerrarSessaoFirebase();
       return;
@@ -331,6 +340,19 @@ function iniciarMonitoresDeDados() {
     });
   }
 
+  if (usuarioEhManutencaoAutorizada() && typeof observarCadastrosColaboradoresFirebase === "function") {
+    monitorCadastrosColaboradores = observarCadastrosColaboradoresFirebase(lista => {
+      cadastrosColaboradores = lista;
+
+      if (typeof renderizarCadastrosColaboradores === "function") {
+        renderizarCadastrosColaboradores();
+      }
+    }, erro => {
+      console.error("Erro ao carregar cadastros de colaboradores:", erro);
+      alert("Não foi possível carregar os cadastros de colaboradores.\nVerifique conexão, permissões e regras do Firestore.");
+    });
+  }
+
 }
 
 function encerrarMonitoresDeDados() {
@@ -362,6 +384,11 @@ function encerrarMonitoresDeDados() {
   if (typeof monitorDiagnosticos === "function") {
     monitorDiagnosticos();
     monitorDiagnosticos = null;
+  }
+
+  if (typeof monitorCadastrosColaboradores === "function") {
+    monitorCadastrosColaboradores();
+    monitorCadastrosColaboradores = null;
   }
 }
 

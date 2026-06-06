@@ -981,35 +981,46 @@
       />
     </div>
 
-    <div class="login-access-card login-access-card-colaborador">
-      <h2>Acesso do colaborador</h2>
-      <p class="form-help">Para abrir e acompanhar OS, informe seus dados.</p>
+    <div class="login-access-card login-access-card-colaborador primeiro-acesso-card">
+      <h2>Primeiro acesso do colaborador</h2>
+      <p class="form-help">Use o e-mail previamente autorizado pela manutenção para criar sua senha. O acesso antigo por nome e setor foi ocultado para incentivar o cadastro individual.</p>
 
       <label>
-        Nome do colaborador
+        E-mail autorizado
         <input
-          id="loginNomeColaborador"
-          type="text"
-          autocomplete="name"
-          placeholder="Digite seu nome"
+          id="primeiroAcessoEmailColaborador"
+          type="email"
+          autocomplete="email"
+          placeholder="seu.email@exemplo.com"
         />
       </label>
 
       <label>
-        Setor onde trabalha
+        Criar senha
         <input
-          id="loginSetorColaborador"
-          type="text"
-          placeholder="Ex: Administração, Biblioteca, Laboratório ..."
+          id="primeiroAcessoSenhaColaborador"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Mínimo de 6 caracteres"
+        />
+      </label>
+
+      <label>
+        Confirmar senha
+        <input
+          id="primeiroAcessoConfirmarSenhaColaborador"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Repita a senha"
         />
       </label>
 
       <button
         type="button"
-        class="primary-button"
-        data-action="entrar-colaborador"
+        class="primary-button first-access-button"
+        data-action="criar-primeiro-acesso-colaborador"
       >
-        Entrar como colaborador
+        Criar senha e entrar
       </button>
     </div>
 
@@ -1019,7 +1030,7 @@
 
     <div class="maintenance-login-box login-access-card login-access-card-manutencao">
       <h2>Acesso autorizado</h2>
-      <p class="form-help">Uso exclusivo da manutenção e da gerência cadastradas no Firebase.</p>
+      <p class="form-help">Uso da manutenção, gerência e colaboradores com primeiro acesso concluído.</p>
 
       <label>
         E-mail
@@ -1121,6 +1132,38 @@
         <button type="button" class="secondary-button" data-nav-page="diagnostico">
           Abrir diagnóstico inicial
         </button>
+      </div>
+
+      <div class="form-card maintenance-action-card manut-only cadastro-colaborador-card">
+        <div>
+          <h3>Cadastro de colaboradores</h3>
+          <p class="form-help">Autorize colaboradores por nome, e-mail e setor. O perfil criado será sempre colaborador.</p>
+        </div>
+
+        <div class="form-row cadastro-colaborador-grid">
+          <label>
+            Nome completo
+            <input id="cadastroColaboradorNome" type="text" autocomplete="name" placeholder="Nome do colaborador" />
+          </label>
+
+          <label>
+            E-mail
+            <input id="cadastroColaboradorEmail" type="email" autocomplete="email" placeholder="colaborador@exemplo.com" />
+          </label>
+
+          <label>
+            Setor
+            <input id="cadastroColaboradorSetor" type="text" placeholder="Ex: Biblioteca, Administrativo, Laboratório" />
+          </label>
+        </div>
+
+        <button type="button" class="primary-button" data-action="cadastrar-colaborador-pendente">
+          Autorizar colaborador
+        </button>
+
+        <div class="cadastro-colaborador-lista" id="listaCadastrosColaboradores">
+          <!-- Cadastros de colaboradores serão carregados aqui pelo JavaScript -->
+        </div>
       </div>
 
       <div class="form-card dashboard-period-card">
@@ -1532,6 +1575,7 @@
   <script src="js/leitor-qr.js"></script>
   <script src="js/preventivas.js"></script>
   <script src="js/diagnostico.js"></script>
+  <script src="js/cadastro-colaboradores.js"></script>
   <script src="js/app.js"></script>
   <script src="js/event-action-maps.js"></script>
   <script src="js/event-bindings.js"></script>
