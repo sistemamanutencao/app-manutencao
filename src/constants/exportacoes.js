@@ -2,13 +2,11 @@
    CONSTANTES - EXPORTAÇÕES
 ===================================================== */
 
-const STATUS_EXPORTACAO_OS_FINALIZADAS = Object.freeze([
-  STATUS_OS.CONCLUIDO,
-  STATUS_OS.VALIDADO,
-  STATUS_OS.ENCERRADO
-]);
+const STATUS_EXPORTACAO_OS = Object.freeze(STATUS_OS_LISTA);
 
-const COLUNAS_EXPORTACAO_OS_FINALIZADAS = Object.freeze([
+const STATUS_EXPORTACAO_OS_FINALIZADAS = STATUS_EXPORTACAO_OS;
+
+const COLUNAS_EXPORTACAO_OS = Object.freeze([
   { chave: "numeroOS", titulo: "Nº OS" },
   { chave: "status", titulo: "Status" },
   { chave: "andar", titulo: "Andar" },
@@ -24,3 +22,5 @@ const COLUNAS_EXPORTACAO_OS_FINALIZADAS = Object.freeze([
   { chave: "criadoPorNome", titulo: "Criado por" },
   { chave: "dataCriacao", titulo: "Data de abertura" }
 ]);
+
+const COLUNAS_EXPORTACAO_OS_FINALIZADAS = COLUNAS_EXPORTACAO_OS;

@@ -20,7 +20,7 @@ Este arquivo registra as bases principais do processo de recuperação, limpeza 
 | v11 | `app-manutencao-v11-visual-operacional-lista-os.zip` | Melhorias visuais da lista de OS | Aprovado |
 | v12 | `app-manutencao-v12-mensagens-internas.zip` | Melhorias de mensagens internas | Aprovado |
 | v13 | `app-manutencao-v13-gerencia-prioridade-os-limpo.zip` | Gerência altera somente prioridade da OS | Aprovado |
-| v14 | `app-manutencao-v14-comunicados-manutencao-edicao-sla-final.zip` | Comunicados com níveis/edição e correção de prazo/SLA persistente das OS | Em teste |
+| v15 | `app-manutencao-v15-comunicados-sla-exportacao.zip` | Comunicados com níveis/edição, correção de prazo/SLA, filtro Encerrados e exportação ampliada de OS | Aprovado/publicável |
 
 ## Como registrar próximas versões
 

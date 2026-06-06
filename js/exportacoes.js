@@ -1,11 +1,19 @@
 /* =====================================================
-   EXPORTAÇÕES DE OS FINALIZADAS
-   Exporta somente dados textuais/estruturados da abertura da OS.
+   EXPORTAÇÕES DE ORDENS DE SERVIÇO
+   Exporta dados textuais/estruturados das OS visíveis para a manutenção.
    Imagens, anexos e evidências visuais permanecem apenas na tela da OS.
 ===================================================== */
 
 function obterOSFinalizadasParaExportacao() {
-  let lista = chamados.filter(chamado => STATUS_EXPORTACAO_OS_FINALIZADAS.includes(chamado.status));
+  let lista = typeof obterChamadosVisiveis === "function"
+    ? obterChamadosVisiveis()
+    : [...chamados];
+
+  if (filtroStatusAtual === "ATRASADOS") {
+    lista = lista.filter(chamadoEstaAtrasado);
+  } else if (filtroStatusAtual !== "TODOS") {
+    lista = lista.filter(chamado => chamado.status === filtroStatusAtual);
+  }
 
   if (termoBuscaChamados) {
     lista = lista.filter(chamado => montarTextoBuscaChamado(chamado).includes(termoBuscaChamados));
@@ -27,14 +35,14 @@ function exportarOSFinalizadasExcel() {
   }
 
   const html = montarDocumentoTabelaExportacao({
-    titulo: "Relatório de OS finalizadas",
+    titulo: montarTituloExportacaoOS(),
     lista,
     formato: "excel"
   });
 
   baixarArquivoExportacao(
     html,
-    montarNomeArquivoExportacao("os-finalizadas", "xls"),
+    montarNomeArquivoExportacao(montarPrefixoExportacaoOS(), "xls"),
     "application/vnd.ms-excel;charset=utf-8"
   );
 }
@@ -47,14 +55,14 @@ function exportarOSFinalizadasWord() {
   }
 
   const html = montarDocumentoTabelaExportacao({
-    titulo: "Relatório de OS finalizadas",
+    titulo: montarTituloExportacaoOS(),
     lista,
     formato: "word"
   });
 
   baixarArquivoExportacao(
     html,
-    montarNomeArquivoExportacao("os-finalizadas", "doc"),
+    montarNomeArquivoExportacao(montarPrefixoExportacaoOS(), "doc"),
     "application/msword;charset=utf-8"
   );
 }
@@ -67,7 +75,7 @@ function exportarOSFinalizadasPDF() {
   }
 
   const html = montarDocumentoTabelaExportacao({
-    titulo: "Relatório de OS finalizadas",
+    titulo: montarTituloExportacaoOS(),
     lista,
     formato: "pdf"
   });
@@ -91,17 +99,57 @@ function exportarOSFinalizadasPDF() {
 
 function validarExportacaoOSFinalizadas(lista) {
   if (!Array.isArray(lista) || lista.length === 0) {
-    alert("Nenhuma OS finalizada encontrada para exportação.\nAplique outro filtro ou finalize uma OS antes de exportar.");
+    alert("Nenhuma OS encontrada para exportação.\nAjuste o filtro ou a busca e tente novamente.");
     return false;
   }
 
   return true;
 }
 
+
+function montarTituloExportacaoOS() {
+  if (filtroStatusAtual === "TODOS") {
+    return "Relatório de Ordens de Serviço";
+  }
+
+  if (filtroStatusAtual === "ATRASADOS") {
+    return "Relatório de OS atrasadas";
+  }
+
+  return `Relatório de OS - ${formatarStatusExportacaoOS(filtroStatusAtual)}`;
+}
+
+function montarPrefixoExportacaoOS() {
+  const filtro = String(filtroStatusAtual || "TODOS")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return filtro && filtro !== "todos" ? `os-${filtro}` : "ordens-servico";
+}
+
+function formatarStatusExportacaoOS(status) {
+  const mapa = {
+    TODOS: "Todos os status",
+    ATRASADOS: "Atrasadas",
+    ABERTO: "Abertas",
+    "EM ANDAMENTO": "Em andamento",
+    AGUARDANDO: "Aguardando",
+    "CONCLUÍDO": "Concluídas",
+    VALIDADO: "Validadas",
+    ENCERRADO: "Encerradas",
+    CANCELADO: "Canceladas"
+  };
+
+  return mapa[status] || status || "Todos os status";
+}
+
 function montarDocumentoTabelaExportacao({ titulo, lista, formato }) {
   const dataGeracao = new Date().toLocaleString("pt-BR");
   const linhas = lista.map(montarLinhaTabelaExportacao).join("");
-  const cabecalho = COLUNAS_EXPORTACAO_OS_FINALIZADAS
+  const cabecalho = COLUNAS_EXPORTACAO_OS
     .map(coluna => `<th>${escaparHTML(coluna.titulo)}</th>`)
     .join("");
 
@@ -153,7 +201,7 @@ function montarDocumentoTabelaExportacao({ titulo, lista, formato }) {
 function montarLinhaTabelaExportacao(chamado) {
   return `
     <tr>
-      ${COLUNAS_EXPORTACAO_OS_FINALIZADAS
+      ${COLUNAS_EXPORTACAO_OS
         .map(coluna => `<td>${escaparHTML(obterValorExportacaoChamado(chamado, coluna.chave))}</td>`)
         .join("")}
     </tr>
