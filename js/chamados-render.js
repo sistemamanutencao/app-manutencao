@@ -105,6 +105,7 @@ function criarCardChamado(chamado) {
   const classeBordaPrioridade = obterClasseBordaPrioridade(chamado.prioridade, chamado.status);
   const solicitante = chamado.criadoPorNome || chamado.solicitanteNome || "Não informado";
   const setorOuLocal = chamado.setor || chamado.local || "Não informado";
+  const localOcorrencia = formatarLocalOcorrenciaChamado(chamado);
   const horario = chamado.horario || "--:--";
 
   return `
@@ -121,6 +122,7 @@ function criarCardChamado(chamado) {
           ` : ""}
           <p><span class="ticket-label">Setor:</span> ${escaparHTML(setorOuLocal)}</p>
           <p class="ticket-description"><span class="ticket-label">Descrição:</span> ${escaparHTML(chamado.descricao || "Sem descrição informada.")}</p>
+          <p class="ticket-location"><span class="ticket-label">Local da ocorrência:</span> ${escaparHTML(localOcorrencia)}</p>
         </div>
 
         <div class="ticket-footer-row">
@@ -154,6 +156,15 @@ function criarCardChamado(chamado) {
       <span class="ticket-chevron" aria-hidden="true">›</span>
     </div>
   `;
+}
+
+
+function formatarLocalOcorrenciaChamado(chamado) {
+  const partesLocal = [chamado.andar, chamado.local]
+    .map(valor => String(valor || "").trim())
+    .filter(Boolean);
+
+  return partesLocal.length > 0 ? partesLocal.join(" / ") : "Não informado";
 }
 
 

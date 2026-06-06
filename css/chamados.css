@@ -298,7 +298,8 @@
   text-overflow: ellipsis;
 }
 
-.ticket-detail-list .ticket-description {
+.ticket-detail-list .ticket-description,
+.ticket-detail-list .ticket-location {
   color: #1c263c;
 }
 

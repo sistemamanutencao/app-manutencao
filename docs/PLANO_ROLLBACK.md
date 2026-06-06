@@ -13,7 +13,7 @@ app-manutencao(7).zip
 A versão funcional anterior a esta entrega é:
 
 ```txt
-app-manutencao-v17-icone-instalacao.zip
+app-manutencao-v18-perfil-manutencao-avatar-maior.zip
 ```
 
 A versão atual de trabalho é:
@@ -81,3 +81,24 @@ Verificar:
 ## Regra de segurança
 
 Nunca corrigir direto na versão publicada. Sempre corrigir em cópia local e testar antes.
+
+
+## Atualização v19
+
+Versão atual de trabalho:
+
+```txt
+app-manutencao-v19-local-ocorrencia-card-os.zip
+```
+
+Versão funcional anterior para rollback imediato:
+
+```txt
+app-manutencao-v18-perfil-manutencao-avatar-maior.zip
+```
+
+Critério específico de rollback da v19:
+
+- voltar para a v18 se os cards de OS deixarem de abrir detalhes;
+- voltar para a v18 se a listagem de OS não carregar para colaborador, gerência ou manutenção;
+- revisar `js/chamados-render.js` se o campo Local da ocorrência aparecer vazio em chamados que possuem local cadastrado.

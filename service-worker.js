@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v18-perfil-manutencao-avatar-maior";
+const CACHE_NAME = "app-manutencao-v19-local-ocorrencia-card-os";
 
 const FILES_TO_CACHE = [
   "./",
