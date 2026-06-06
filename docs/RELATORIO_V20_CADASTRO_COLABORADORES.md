@@ -92,3 +92,14 @@ Além de subir os arquivos no GitHub, publique o conteúdo atualizado de `firest
 
 
 Atualização visual v20: o botão de Primeiro acesso do colaborador foi definido como azul/principal para reduzir confusão e direcionar o colaborador ao fluxo correto de criação de senha.
+
+## Atualização adicional — Painel da manutenção reorganizado
+
+- A seção “Fila operacional de OS” foi movida para o topo do Painel da manutenção, logo abaixo do cabeçalho, e agora inicia recolhida para manter o painel mais limpo.
+- O card “Diagnóstico inicial da unidade” foi removido do Painel da manutenção, pois o acesso já existe no grid da aba Início.
+- O bloco “Cadastro de colaboradores” foi convertido em seção recolhível, iniciando fechado.
+- O bloco “Resumo dos indicadores” foi convertido em seção recolhível, iniciando fechado.
+- O bloco “Indicadores operacionais” foi convertido em seção recolhível, iniciando fechado.
+- A alteração é apenas visual/estrutural; os IDs usados pelos módulos JavaScript dos indicadores e da fila foram preservados.
+
+- A fila operacional de OS também foi transformada em seção recolhível no topo do painel.

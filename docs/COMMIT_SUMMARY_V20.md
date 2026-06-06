@@ -39,3 +39,18 @@ feat: adiciona cadastro de colaboradores com primeiro acesso
 
 
 Atualização visual v20: o botão de Primeiro acesso do colaborador foi definido como azul/principal para reduzir confusão e direcionar o colaborador ao fluxo correto de criação de senha.
+
+## Atualização adicional — reorganização do Painel da manutenção
+
+Commit sugerido, caso esta alteração seja enviada separadamente:
+
+```txt
+style: reorganiza painel da manutenção com seções recolhíveis
+```
+
+Resumo:
+
+- Move “Fila operacional de OS” para o topo do Painel da manutenção e mantém a seção recolhível.
+- Remove o card de Diagnóstico inicial do painel, mantendo o acesso pelo grid da aba Início.
+- Torna “Cadastro de colaboradores”, “Resumo dos indicadores” e “Indicadores operacionais” seções recolhíveis.
+- Preserva IDs e integrações JavaScript dos indicadores, filtros e lista operacional.

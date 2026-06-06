@@ -58,9 +58,11 @@
 
 ## Teste de transição
 
-1. Usar “Entrar como colaborador” por nome/setor.
-2. Confirmar que o login anônimo continua funcionando.
-3. Confirmar que a abertura de OS por colaborador anônimo continua funcionando.
+1. Abrir a aba Perfil sem estar logado.
+2. Confirmar que o acesso antigo do colaborador por nome/setor não aparece mais na interface.
+3. Confirmar que o fluxo principal exibido é “Primeiro acesso do colaborador”.
+4. Confirmar que o botão “Criar senha e entrar” está em azul/principal.
+5. Confirmar que o login anônimo permanece habilitado no Firebase apenas como compatibilidade técnica temporária, sem exposição visual ao colaborador.
 
 
 ## Atualização adicional - acesso colaborador ocultado
@@ -72,3 +74,18 @@
 
 
 Atualização visual v20: o botão de Primeiro acesso do colaborador foi definido como azul/principal para reduzir confusão e direcionar o colaborador ao fluxo correto de criação de senha.
+
+## Teste visual do Painel da manutenção reorganizado
+
+1. Entrar como manutenção.
+2. Abrir Painel da manutenção.
+3. Confirmar que “Fila operacional de OS” aparece no topo, antes de Cadastro de colaboradores e indicadores, iniciando recolhida e expandindo corretamente.
+4. Confirmar que o card “Diagnóstico inicial da unidade” não aparece mais no Painel da manutenção.
+5. Confirmar que o acesso ao Diagnóstico inicial continua disponível pelo grid da aba Início.
+6. Confirmar que “Cadastro de colaboradores” aparece recolhido e expande ao tocar/clicar.
+7. Confirmar que “Resumo dos indicadores” aparece recolhido e expande ao tocar/clicar.
+8. Confirmar que “Indicadores operacionais” aparece recolhido e expande ao tocar/clicar.
+9. Confirmar que a fila operacional continua carregando as OS e que os filtros da fila continuam funcionando.
+10. Expandir os indicadores e confirmar que os valores continuam sendo preenchidos corretamente.
+
+- Expandir a Fila operacional de OS e confirmar que busca, filtros e lista continuam funcionando.

@@ -1124,21 +1124,63 @@
         <p>Gerencie as OS recebidas com indicadores por período, categoria, prioridade, setor crítico e preventivas.</p>
       </header>
 
-      <div class="form-card maintenance-action-card manut-only">
-        <div>
-          <h3>Diagnóstico inicial da unidade</h3>
-          <p class="form-help">Mapeie pendências, riscos, preventivas e melhorias antes de abrir OS.</p>
-        </div>
-        <button type="button" class="secondary-button" data-nav-page="diagnostico">
-          Abrir diagnóstico inicial
-        </button>
-      </div>
+      <details class="form-card painel-collapsible-card painel-fila-topo painel-fila-operacional-card">
+        <summary class="painel-collapsible-summary">
+          <span>
+            <strong>Fila operacional de OS</strong>
+            <small>Busca, filtros e lista de ordens de serviço para atendimento da manutenção.</small>
+          </span>
+        </summary>
 
-      <div class="form-card maintenance-action-card manut-only cadastro-colaborador-card">
-        <div>
-          <h3>Cadastro de colaboradores</h3>
-          <p class="form-help">Autorize colaboradores por nome, e-mail e setor. O perfil criado será sempre colaborador.</p>
+        <div class="admin-controls">
+          <input 
+            type="text" 
+            id="buscaPainel" 
+            placeholder="Buscar por nº da OS, local, setor, descrição ou criador..."
+            data-input-action="pesquisar-painel"
+          />
+
+          <select id="filtroPainelStatus" data-change-action="filtrar-painel-status">
+            <option value="TODOS">Todos os status</option>
+            <option value="ABERTO">Abertos</option>
+            <option value="EM ANDAMENTO">Em andamento</option>
+            <option value="AGUARDANDO">Aguardando</option>
+            <option value="CONCLUÍDO">Concluídos / aguardando validação</option>
+            <option value="VALIDADO">Validados</option>
+            <option value="ENCERRADO">Encerrados</option>
+            <option value="CANCELADO">Cancelados</option>
+            <option value="ATRASADOS">Atrasados</option>
+          </select>
+
+          <select id="filtroPainelPrioridade" data-change-action="filtrar-painel-prioridade">
+            <option value="TODAS">Todas as prioridades</option>
+            <option value="Urgente">Urgente</option>
+            <option value="Alta">Alta</option>
+            <option value="Média">Média</option>
+            <option value="Baixa">Baixa</option>
+          </select>
+
+          <button 
+            type="button" 
+            class="secondary-button admin-clear-button" 
+            data-action="limpar-filtros-painel"
+          >
+            Limpar filtros
+          </button>
         </div>
+
+        <div class="admin-list" id="listaPainelManutencao">
+          <!-- As OS do painel serão carregadas aqui pelo JavaScript -->
+        </div>
+      </details>
+
+      <details class="form-card maintenance-action-card manut-only cadastro-colaborador-card painel-collapsible-card">
+        <summary class="painel-collapsible-summary">
+          <span>
+            <strong>Cadastro de colaboradores</strong>
+            <small>Autorize colaboradores por nome, e-mail e setor. O perfil criado será sempre colaborador.</small>
+          </span>
+        </summary>
 
         <div class="form-row cadastro-colaborador-grid">
           <label>
@@ -1164,144 +1206,111 @@
         <div class="cadastro-colaborador-lista" id="listaCadastrosColaboradores">
           <!-- Cadastros de colaboradores serão carregados aqui pelo JavaScript -->
         </div>
-      </div>
+      </details>
 
-      <div class="form-card dashboard-period-card">
-        <div class="form-row dashboard-period-grid">
-          <label>
-            Período dos indicadores
-            <select id="filtroPeriodoDashboard" data-change-action="alterar-periodo-dashboard">
-              <option value="TODOS">Todo o histórico</option>
-              <option value="7">Últimos 7 dias</option>
-              <option value="30" selected>Últimos 30 dias</option>
-              <option value="90">Últimos 90 dias</option>
-            </select>
-          </label>
-          <label>
-            Categoria
-            <select id="filtroCategoriaDashboard" data-change-action="alterar-categoria-dashboard">
-              <option value="TODAS">Todas as categorias</option>
-              <option value="Elétrica">Elétrica</option>
-              <option value="Hidráulica">Hidráulica</option>
-              <option value="Alvenaria">Alvenaria</option>
-              <option value="Pintura">Pintura</option>
-              <option value="Eletrônica">Eletrônica</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </label>
-        </div>
-        <small class="form-help">Os cards e rankings abaixo consideram o período e a categoria selecionados. A fila operacional continua usando os filtros próprios.</small>
-      </div>
+      <details class="form-card painel-collapsible-card painel-indicadores-resumo">
+        <summary class="painel-collapsible-summary">
+          <span>
+            <strong>Resumo dos indicadores</strong>
+            <small>Filtros e cards quantitativos do painel.</small>
+          </span>
+        </summary>
 
-      <div class="dashboard-grid dashboard-grid-kpi">
-        <div class="dashboard-card"><span>Total de OS</span><strong id="totalOSPainel">0</strong><small>Base operacional registrada</small></div>
-        <div class="dashboard-card"><span>Backlog ativo</span><strong id="totalBacklogPainel">0</strong><small>OS em execução ou triagem</small></div>
-        <div class="dashboard-card"><span>Atrasadas</span><strong id="totalAtrasadosPainel">0</strong><small>Fora do prazo definido</small></div>
-        <div class="dashboard-card"><span>Aguardando validação</span><strong id="totalAguardandoValidacaoPainel">0</strong><small>Execução finalizada pela manutenção</small></div>
-        <div class="dashboard-card"><span>Encerradas</span><strong id="totalEncerradasPainel">0</strong><small>OS validadas e auditadas</small></div>
-        <div class="dashboard-card"><span>Urgentes</span><strong id="totalUrgentesPainel">0</strong><small>Demandas críticas abertas</small></div>
-        <div class="dashboard-card"><span>Preventivas</span><strong id="totalPreventivasPainel">0</strong><small>Controle preventivo</small></div>
-        <div class="dashboard-card"><span>Emergenciais</span><strong id="totalEmergenciaisPainel">0</strong><small>Impacto imediato</small></div>
-        <div class="dashboard-card"><span>Tempo atendimento</span><strong id="tempoMedioAtendimentoPainel">--</strong><small>Abertura até início</small></div>
-        <div class="dashboard-card"><span>Tempo reparo</span><strong id="tempoMedioReparoPainel">--</strong><small>Início até conclusão</small></div>
-        <div class="dashboard-card"><span>Disponibilidade</span><strong id="disponibilidadePainel">--</strong><small>OS concluídas no prazo</small></div>
-        <div class="dashboard-card"><span>OS no período</span><strong id="totalOSPeriodoPainel">0</strong><small>Conforme filtro aplicado</small></div>
-        <div class="dashboard-card"><span>Planos vencidos</span><strong id="totalPreventivasVencidasPainel">0</strong><small>Preventivas fora da data</small></div>
-        <div class="dashboard-card"><span>SLA cumprido</span><strong id="slaCumpridoPainel">--</strong><small>Concluídas dentro do prazo</small></div>
-      </div>
-
-      <div class="section-header spacing">
-        <h2>Indicadores operacionais</h2>
-      </div>
-
-      <div class="insight-grid">
-        <div class="insight-card">
-          <h3>Status das OS</h3>
-          <div id="indicadorStatusOS" class="indicator-list"></div>
+        <div class="dashboard-period-card">
+          <div class="form-row dashboard-period-grid">
+            <label>
+              Período dos indicadores
+              <select id="filtroPeriodoDashboard" data-change-action="alterar-periodo-dashboard">
+                <option value="TODOS">Todo o histórico</option>
+                <option value="7">Últimos 7 dias</option>
+                <option value="30" selected>Últimos 30 dias</option>
+                <option value="90">Últimos 90 dias</option>
+              </select>
+            </label>
+            <label>
+              Categoria
+              <select id="filtroCategoriaDashboard" data-change-action="alterar-categoria-dashboard">
+                <option value="TODAS">Todas as categorias</option>
+                <option value="Elétrica">Elétrica</option>
+                <option value="Hidráulica">Hidráulica</option>
+                <option value="Alvenaria">Alvenaria</option>
+                <option value="Pintura">Pintura</option>
+                <option value="Eletrônica">Eletrônica</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </label>
+          </div>
+          <small class="form-help">Os cards e rankings abaixo consideram o período e a categoria selecionados. A fila operacional continua usando os filtros próprios.</small>
         </div>
 
-        <div class="insight-card">
-          <h3>OS por prioridade</h3>
-          <div id="indicadorPrioridadesOS" class="indicator-list"></div>
+        <div class="dashboard-grid dashboard-grid-kpi">
+          <div class="dashboard-card"><span>Total de OS</span><strong id="totalOSPainel">0</strong><small>Base operacional registrada</small></div>
+          <div class="dashboard-card"><span>Backlog ativo</span><strong id="totalBacklogPainel">0</strong><small>OS em execução ou triagem</small></div>
+          <div class="dashboard-card"><span>Atrasadas</span><strong id="totalAtrasadosPainel">0</strong><small>Fora do prazo definido</small></div>
+          <div class="dashboard-card"><span>Aguardando validação</span><strong id="totalAguardandoValidacaoPainel">0</strong><small>Execução finalizada pela manutenção</small></div>
+          <div class="dashboard-card"><span>Encerradas</span><strong id="totalEncerradasPainel">0</strong><small>OS validadas e auditadas</small></div>
+          <div class="dashboard-card"><span>Urgentes</span><strong id="totalUrgentesPainel">0</strong><small>Demandas críticas abertas</small></div>
+          <div class="dashboard-card"><span>Preventivas</span><strong id="totalPreventivasPainel">0</strong><small>Controle preventivo</small></div>
+          <div class="dashboard-card"><span>Emergenciais</span><strong id="totalEmergenciaisPainel">0</strong><small>Impacto imediato</small></div>
+          <div class="dashboard-card"><span>Tempo atendimento</span><strong id="tempoMedioAtendimentoPainel">--</strong><small>Abertura até início</small></div>
+          <div class="dashboard-card"><span>Tempo reparo</span><strong id="tempoMedioReparoPainel">--</strong><small>Início até conclusão</small></div>
+          <div class="dashboard-card"><span>Disponibilidade</span><strong id="disponibilidadePainel">--</strong><small>OS concluídas no prazo</small></div>
+          <div class="dashboard-card"><span>OS no período</span><strong id="totalOSPeriodoPainel">0</strong><small>Conforme filtro aplicado</small></div>
+          <div class="dashboard-card"><span>Planos vencidos</span><strong id="totalPreventivasVencidasPainel">0</strong><small>Preventivas fora da data</small></div>
+          <div class="dashboard-card"><span>SLA cumprido</span><strong id="slaCumpridoPainel">--</strong><small>Concluídas dentro do prazo</small></div>
         </div>
+      </details>
 
-        <div class="insight-card">
-          <h3>Setores com maior demanda</h3>
-          <div id="rankingSetoresPainel" class="ranking-list"></div>
+      <details class="form-card painel-collapsible-card painel-indicadores-operacionais">
+        <summary class="painel-collapsible-summary">
+          <span>
+            <strong>Indicadores operacionais</strong>
+            <small>Status, prioridades, setores, equipamentos, categorias, preventivas e resumo mensal.</small>
+          </span>
+        </summary>
+
+        <div class="insight-grid">
+          <div class="insight-card">
+            <h3>Status das OS</h3>
+            <div id="indicadorStatusOS" class="indicator-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>OS por prioridade</h3>
+            <div id="indicadorPrioridadesOS" class="indicator-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>Setores com maior demanda</h3>
+            <div id="rankingSetoresPainel" class="ranking-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>Equipamentos críticos</h3>
+            <div id="rankingEquipamentosPainel" class="ranking-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>OS por categoria</h3>
+            <div id="indicadorCategoriasOS" class="indicator-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>Tipo de manutenção</h3>
+            <div id="indicadorTiposManutencao" class="indicator-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>Preventivas próximas/vencidas</h3>
+            <div id="rankingPreventivasPainel" class="ranking-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>Resumo mensal</h3>
+            <div id="indicadorResumoMensal" class="indicator-list"></div>
+          </div>
         </div>
-
-        <div class="insight-card">
-          <h3>Equipamentos críticos</h3>
-          <div id="rankingEquipamentosPainel" class="ranking-list"></div>
-        </div>
-
-        <div class="insight-card">
-          <h3>OS por categoria</h3>
-          <div id="indicadorCategoriasOS" class="indicator-list"></div>
-        </div>
-
-        <div class="insight-card">
-          <h3>Tipo de manutenção</h3>
-          <div id="indicadorTiposManutencao" class="indicator-list"></div>
-        </div>
-
-        <div class="insight-card">
-          <h3>Preventivas próximas/vencidas</h3>
-          <div id="rankingPreventivasPainel" class="ranking-list"></div>
-        </div>
-
-        <div class="insight-card">
-          <h3>Resumo mensal</h3>
-          <div id="indicadorResumoMensal" class="indicator-list"></div>
-        </div>
-      </div>
-
-<div class="section-header spacing">
-  <h2>Fila operacional de OS</h2>
-</div>
-
-<div class="admin-controls">
-  <input 
-    type="text" 
-    id="buscaPainel" 
-    placeholder="Buscar por nº da OS, local, setor, descrição ou criador..."
-    data-input-action="pesquisar-painel"
-  />
-
-  <select id="filtroPainelStatus" data-change-action="filtrar-painel-status">
-    <option value="TODOS">Todos os status</option>
-    <option value="ABERTO">Abertos</option>
-    <option value="EM ANDAMENTO">Em andamento</option>
-    <option value="AGUARDANDO">Aguardando</option>
-    <option value="CONCLUÍDO">Concluídos / aguardando validação</option>
-    <option value="VALIDADO">Validados</option>
-    <option value="ENCERRADO">Encerrados</option>
-    <option value="CANCELADO">Cancelados</option>
-    <option value="ATRASADOS">Atrasados</option>
-  </select>
-
-  <select id="filtroPainelPrioridade" data-change-action="filtrar-painel-prioridade">
-    <option value="TODAS">Todas as prioridades</option>
-    <option value="Urgente">Urgente</option>
-    <option value="Alta">Alta</option>
-    <option value="Média">Média</option>
-    <option value="Baixa">Baixa</option>
-  </select>
-
-  <button 
-    type="button" 
-    class="secondary-button admin-clear-button" 
-    data-action="limpar-filtros-painel"
-  >
-    Limpar filtros
-  </button>
-</div>
-
-<div class="admin-list" id="listaPainelManutencao">
-  <!-- As OS do painel serão carregadas aqui pelo JavaScript -->
-</div>
-      
-      
+      </details>
 
       <button type="button" class="secondary-button" data-nav-page="perfil">Voltar para perfil</button>
     </section>

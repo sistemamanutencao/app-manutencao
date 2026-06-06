@@ -404,3 +404,83 @@
 .cadastro-colaborador-item .status {
   flex: 0 0 auto;
 }
+
+/* ===================== V20: PAINEL REORGANIZADO E BLOCOS RECOLHÍVEIS ===================== */
+
+.painel-fila-topo {
+  margin-top: 4px;
+}
+
+.painel-collapsible-card {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.painel-collapsible-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.painel-collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.painel-collapsible-summary::after {
+  content: "+";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: #eaf2ff;
+  color: var(--blue);
+  border: 1px solid #cfe0ff;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.painel-collapsible-card[open] > .painel-collapsible-summary {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.painel-collapsible-card[open] > .painel-collapsible-summary::after {
+  content: "−";
+}
+
+.painel-collapsible-summary span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.painel-collapsible-summary strong {
+  color: var(--text-dark);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.painel-collapsible-summary small {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.painel-indicadores-resumo .dashboard-period-card {
+  margin-bottom: 16px;
+}
+
+.painel-indicadores-resumo .dashboard-grid,
+.painel-indicadores-operacionais .insight-grid {
+  margin-bottom: 0;
+}
