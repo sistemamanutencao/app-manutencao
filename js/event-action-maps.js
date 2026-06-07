@@ -35,7 +35,9 @@
     "parar-leitura-qr": () => executarAcao("pararLeituraQRCode"),
     "processar-qr-manual": () => executarAcao("processarQRCodeManual"),
     "salvar-plano-preventivo": () => executarAcao("salvarPlanoPreventivo"),
+    "cancelar-edicao-plano-preventivo": () => executarAcao("cancelarEdicaoPlanoPreventivo"),
     "criar-item-diagnostico": elemento => executarAcao("criarItemDiagnostico", elemento),
+    "cancelar-edicao-diagnostico": () => executarAcao("cancelarEdicaoDiagnostico"),
     "criar-chamado": () => executarAcao("criarChamado"),
     "criar-comunicado": () => executarAcao("criarComunicado"),
     "salvar-comunicado": () => executarAcao("salvarComunicado"),
@@ -82,6 +84,8 @@
     usarItemChecklistDiagnostico: (...argumentos) => executarAcao("usarItemChecklistDiagnostico", ...argumentos),
     prepararOSComDiagnostico: (...argumentos) => executarAcao("prepararOSComDiagnostico", ...argumentos),
     marcarDiagnosticoResolvido: (...argumentos) => executarAcao("marcarDiagnosticoResolvido", ...argumentos),
+    editarDiagnostico: (...argumentos) => executarAcao("editarDiagnostico", ...argumentos),
+    excluirDiagnostico: (...argumentos) => executarAcao("excluirDiagnostico", ...argumentos),
     imprimirPagina: () => window.print(),
     prepararCadastroAtivoPorQR: (...argumentos) => executarAcao("prepararCadastroAtivoPorQR", ...argumentos),
     mostrarHistoricoAtivoNoLeitor: (...argumentos) => executarAcao("mostrarHistoricoAtivoNoLeitor", ...argumentos),
@@ -94,7 +98,9 @@
     encerrarOS: (...argumentos) => executarAcao("encerrarOS", ...argumentos),
     salvarStatusPainel: (...argumentos) => executarAcao("salvarStatusPainel", ...argumentos),
     gerarOSPreventiva: (...argumentos) => executarAcao("gerarOSPreventiva", ...argumentos),
-    inativarPlanoPreventivo: (...argumentos) => executarAcao("inativarPlanoPreventivo", ...argumentos)
+    editarPlanoPreventivo: (...argumentos) => executarAcao("editarPlanoPreventivo", ...argumentos),
+    inativarPlanoPreventivo: (...argumentos) => executarAcao("inativarPlanoPreventivo", ...argumentos),
+    excluirPlanoPreventivo: (...argumentos) => executarAcao("excluirPlanoPreventivo", ...argumentos)
   };
 
   const acoesEntrada = {

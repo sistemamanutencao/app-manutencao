@@ -113,3 +113,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+.diagnostic-actions .danger-button {
+  margin-top: 0;
+  height: 44px;
+  font-size: 13px;
+}

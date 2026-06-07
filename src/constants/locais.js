@@ -66,5 +66,8 @@ const LOCAIS_POR_ANDAR_MANUTENCAO = Object.freeze({
     "Sala de Bombas d'água",
     "Caixa d'água"
   ]),
-  "Telhado": LOCAIS_PRIMEIRO_ANDAR_MANUTENCAO
+  "Telhado": Object.freeze([
+    "Toda unidade",
+    ...LOCAIS_PRIMEIRO_ANDAR_MANUTENCAO
+  ])
 });

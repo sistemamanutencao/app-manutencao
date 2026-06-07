@@ -457,7 +457,7 @@
       </div>
 
       <div class="form-card" id="areaNovoPlanoPreventivo">
-        <h3>Novo plano preventivo</h3>
+        <h3 id="tituloFormularioPlanoPreventivo">Novo plano preventivo</h3>
 
         <label>
           Ativo / patrimônio / QR Code
@@ -534,8 +534,12 @@
           <textarea id="observacoesPlanoPreventivo" placeholder="Ex: verificar filtros, ruídos, vazamentos, fixação e funcionamento geral..."></textarea>
         </label>
 
-        <button type="button" class="primary-button" data-action="salvar-plano-preventivo">
+        <button type="button" class="primary-button" id="botaoSalvarPlanoPreventivo" data-action="salvar-plano-preventivo">
           Cadastrar plano preventivo
+        </button>
+
+        <button type="button" class="secondary-button" id="botaoCancelarEdicaoPlanoPreventivo" data-action="cancelar-edicao-plano-preventivo" hidden>
+          Cancelar edição
         </button>
       </div>
 
@@ -587,8 +591,8 @@
         <div class="dashboard-card"><span>Preventivas</span><strong id="totalDiagnosticoPreventivas">0</strong><small>Rotina programável</small></div>
       </div>
 
-      <div class="form-card">
-        <h3>Novo item de diagnóstico</h3>
+      <div class="form-card" id="areaNovoDiagnostico">
+        <h3 id="tituloFormularioDiagnostico">Novo item de diagnóstico</h3>
         <p class="form-help">Use este registro para mapear a situação técnica da unidade. Abra OS apenas quando a demanda estiver clara.</p>
 
         <label>
@@ -675,8 +679,12 @@
           <input id="materialDiagnostico" type="text" placeholder="Ex: tomada 10A, espelho, parafusos, reparo de torneira..." />
         </label>
 
-        <button type="button" class="primary-button" data-action="criar-item-diagnostico">
+        <button type="button" class="primary-button" id="botaoSalvarDiagnostico" data-action="criar-item-diagnostico">
           Salvar item do diagnóstico
+        </button>
+
+        <button type="button" class="secondary-button" id="botaoCancelarEdicaoDiagnostico" data-action="cancelar-edicao-diagnostico" hidden>
+          Cancelar edição
         </button>
       </div>
 

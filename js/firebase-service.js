@@ -226,6 +226,10 @@ async function atualizarPlanoPreventivoFirebase(id, dados) {
   });
 }
 
+async function excluirPlanoPreventivoFirebase(id) {
+  await firebaseDb.collection(COLLECTIONS.PREVENTIVAS).doc(String(id)).delete();
+}
+
 function normalizarPlanoPreventivoFirebase(documento) {
   const dados = documento.data();
 
@@ -280,6 +284,10 @@ async function atualizarDiagnosticoFirebase(id, dados) {
     ...dados,
     atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
   });
+}
+
+async function excluirDiagnosticoFirebase(id) {
+  await firebaseDb.collection(COLLECTIONS.DIAGNOSTICOS || "diagnosticos").doc(String(id)).delete();
 }
 
 function normalizarDiagnosticoFirebase(documento) {

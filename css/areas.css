@@ -124,3 +124,11 @@
   gap: 8px;
   margin-top: 12px;
 }
+
+.preventive-actions .primary-button,
+.preventive-actions .secondary-button,
+.preventive-actions .danger-button {
+  margin-top: 0;
+  min-width: 150px;
+  flex: 1 1 150px;
+}

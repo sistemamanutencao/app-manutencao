@@ -61,6 +61,7 @@ const CHECKLIST_DIAGNOSTICO_PADRAO = Object.freeze({
 let filtroDiagnosticoStatusAtual = "TODOS";
 let filtroDiagnosticoPrioridadeAtual = "TODAS";
 let termoBuscaDiagnostico = "";
+let diagnosticoEditandoId = "";
 
 /* =====================
    Inicialização e formulário
@@ -165,10 +166,57 @@ function lerValorDiagnostico(campo) {
 
 async function criarItemDiagnostico(botao) {
   if (!usuarioEhManutencaoAutorizada()) {
-    alert("Somente o acesso de manutenção pode registrar o diagnóstico inicial.");
+    alert("Somente o acesso de manutenção pode registrar ou editar o diagnóstico inicial.");
     return;
   }
 
+  const valores = obterDadosFormularioDiagnostico();
+
+  if (!valores) {
+    return;
+  }
+
+  const agora = new Date();
+
+  try {
+    if (botao) {
+      botao.disabled = true;
+      botao.textContent = diagnosticoEditandoId ? "Salvando alterações..." : "Salvando...";
+    }
+
+    if (diagnosticoEditandoId) {
+      await atualizarDiagnosticoFirebase(diagnosticoEditandoId, {
+        ...valores,
+        editadoEmISO: agora.toISOString(),
+        editadoPorUid: usuarioAtual.id || "",
+        editadoPorNome: usuarioAtual.nome || "Oficial de manutenção"
+      });
+      limparFormularioDiagnostico();
+      alert("Item do diagnóstico atualizado com sucesso.");
+      return;
+    }
+
+    await criarDiagnosticoFirebase({
+      ...valores,
+      data: agora.toLocaleDateString("pt-BR"),
+      criadoEmISO: agora.toISOString(),
+      criadoPorUid: usuarioAtual.id || "",
+      criadoPorNome: usuarioAtual.nome || "Oficial de manutenção",
+      unidade: usuarioAtual.unidade || "Senac Campo Mourão"
+    });
+    limparFormularioDiagnostico();
+  } catch (erro) {
+    console.error("Erro ao salvar diagnóstico:", erro);
+    alert("Não foi possível salvar o item do diagnóstico. Verifique as regras do Firestore e sua conexão.");
+  } finally {
+    if (botao) {
+      botao.disabled = false;
+      botao.textContent = diagnosticoEditandoId ? "Salvar alterações do diagnóstico" : "Salvar item do diagnóstico";
+    }
+  }
+}
+
+function obterDadosFormularioDiagnostico() {
   const campos = obterCamposDiagnostico();
   const valores = {
     local: lerValorDiagnostico(campos.local),
@@ -191,35 +239,96 @@ async function criarItemDiagnostico(botao) {
 
   if (pendentes.length) {
     alert(`Preencha antes de salvar:\n- ${pendentes.join("\n- ")}`);
+    return null;
+  }
+
+  return valores;
+}
+
+function editarDiagnostico(id) {
+  if (!usuarioEhManutencaoAutorizada()) {
+    alert("Somente a manutenção pode editar itens do diagnóstico.");
     return;
   }
 
-  const agora = new Date();
-  const diagnostico = {
-    ...valores,
-    data: agora.toLocaleDateString("pt-BR"),
-    criadoEmISO: agora.toISOString(),
-    criadoPorUid: usuarioAtual.id || "",
-    criadoPorNome: usuarioAtual.nome || "Oficial de manutenção",
-    unidade: usuarioAtual.unidade || "Senac Campo Mourão"
-  };
+  const item = encontrarDiagnosticoPorId(id);
+
+  if (!item) {
+    alert("Item do diagnóstico não encontrado.\nAtualize a lista e tente novamente.");
+    return;
+  }
+
+  diagnosticoEditandoId = String(item.id);
+  preencherFormularioDiagnostico(item);
+  atualizarEstadoFormularioDiagnostico(true);
+
+  const areaFormulario = document.getElementById("areaNovoDiagnostico");
+  if (areaFormulario) {
+    areaFormulario.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function preencherFormularioDiagnostico(item) {
+  const campos = obterCamposDiagnostico();
+
+  if (campos.local) campos.local.value = item.local || "";
+  if (campos.sistema) campos.sistema.value = item.sistema || "";
+  if (campos.tipo) campos.tipo.value = item.tipo || "";
+  if (campos.prioridade) campos.prioridade.value = item.prioridade || "";
+  if (campos.status) campos.status.value = item.status || "Pendente";
+  if (campos.descricao) campos.descricao.value = item.descricao || "";
+  if (campos.risco) campos.risco.value = item.risco || "";
+  if (campos.acao) campos.acao.value = item.acao || "";
+  if (campos.material) campos.material.value = item.material || "";
+}
+
+function atualizarEstadoFormularioDiagnostico(editando) {
+  const titulo = document.getElementById("tituloFormularioDiagnostico");
+  const botaoSalvar = document.getElementById("botaoSalvarDiagnostico");
+  const botaoCancelar = document.getElementById("botaoCancelarEdicaoDiagnostico");
+
+  if (titulo) {
+    titulo.textContent = editando ? "Editar item do diagnóstico" : "Novo item do diagnóstico";
+  }
+
+  if (botaoSalvar) {
+    botaoSalvar.textContent = editando ? "Salvar alterações do diagnóstico" : "Salvar item do diagnóstico";
+  }
+
+  if (botaoCancelar) {
+    botaoCancelar.hidden = !editando;
+  }
+}
+
+function cancelarEdicaoDiagnostico() {
+  limparFormularioDiagnostico();
+}
+
+async function excluirDiagnostico(id) {
+  if (!usuarioEhManutencaoAutorizada()) {
+    alert("Somente a manutenção pode excluir itens do diagnóstico.");
+    return;
+  }
+
+  const item = encontrarDiagnosticoPorId(id);
+  const descricao = item ? item.descricao : "este item";
+  const mensagem = `Deseja excluir permanentemente ${descricao}?\nEssa ação remove apenas o item do diagnóstico. OS já geradas não serão apagadas.`;
+
+  if (!(await appConfirm(mensagem, { titulo: "Excluir item do diagnóstico", textoConfirmar: "Excluir", textoCancelar: "Voltar" }))) {
+    return;
+  }
 
   try {
-    if (botao) {
-      botao.disabled = true;
-      botao.textContent = "Salvando...";
+    await excluirDiagnosticoFirebase(id);
+
+    if (String(diagnosticoEditandoId) === String(id)) {
+      limparFormularioDiagnostico();
     }
 
-    await criarDiagnosticoFirebase(diagnostico);
-    limparFormularioDiagnostico();
+    alert("Item do diagnóstico excluído com sucesso.");
   } catch (erro) {
-    console.error("Erro ao salvar diagnóstico:", erro);
-    alert("Não foi possível salvar o item do diagnóstico. Verifique as regras do Firestore e sua conexão.");
-  } finally {
-    if (botao) {
-      botao.disabled = false;
-      botao.textContent = "Salvar item do diagnóstico";
-    }
+    console.error("Erro ao excluir diagnóstico:", erro);
+    alert("Não foi possível excluir o item do diagnóstico. Verifique sua conexão e permissões no Firestore.");
   }
 }
 
@@ -230,6 +339,9 @@ function limparFormularioDiagnostico() {
 
   const status = document.getElementById("statusDiagnostico");
   if (status) status.value = "Pendente";
+
+  diagnosticoEditandoId = "";
+  atualizarEstadoFormularioDiagnostico(false);
 }
 
 /* =====================
@@ -303,6 +415,8 @@ function criarCardDiagnostico(item) {
       <div class="diagnostic-actions">
         <button type="button" class="secondary-button" data-dynamic-action="prepararOSComDiagnostico" data-param0="${formatarAtributoHTML(item.id)}">Gerar OS a partir do item</button>
         <button type="button" class="secondary-button" data-dynamic-action="marcarDiagnosticoResolvido" data-param0="${formatarAtributoHTML(item.id)}">Marcar resolvido</button>
+        <button type="button" class="secondary-button" data-dynamic-action="editarDiagnostico" data-param0="${formatarAtributoHTML(item.id)}">Editar</button>
+        <button type="button" class="danger-button" data-dynamic-action="excluirDiagnostico" data-param0="${formatarAtributoHTML(item.id)}">Excluir</button>
       </div>
     </article>
   `;

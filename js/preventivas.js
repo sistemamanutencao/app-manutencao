@@ -11,6 +11,8 @@
    - funcionalidade restrita; validar perfil manutenção após qualquer ajuste.
 ===================================================== */
 
+let planoPreventivoEditandoId = "";
+
 /* =====================
    Renderização e resumo
 ===================== */
@@ -62,8 +64,9 @@ function atualizarResumoPreventivas() {
 function criarCardPlanoPreventivo(plano) {
   const dataExecucao = obterDataPlanoPreventivo(plano.proximaExecucaoISO);
   const situacao = obterSituacaoPlanoPreventivo(plano);
-  const podeGerarOS = usuarioEhManutencaoAutorizada() && plano.ativo !== false;
-  const podeInativar = usuarioEhManutencaoAutorizada() && plano.ativo !== false;
+  const podeGerenciar = usuarioEhManutencaoAutorizada();
+  const podeGerarOS = podeGerenciar && plano.ativo !== false;
+  const podeInativar = podeGerenciar && plano.ativo !== false;
 
   return `
     <div class="preventive-card ${situacao.classe}">
@@ -94,9 +97,21 @@ function criarCardPlanoPreventivo(plano) {
           </button>
         ` : ""}
 
+        ${podeGerenciar ? `
+          <button type="button" class="secondary-button" data-dynamic-action="editarPlanoPreventivo" data-param0="${formatarAtributoHTML(plano.id)}">
+            Editar
+          </button>
+        ` : ""}
+
         ${podeInativar ? `
           <button type="button" class="secondary-button" data-dynamic-action="inativarPlanoPreventivo" data-param0="${formatarAtributoHTML(plano.id)}">
             Inativar plano
+          </button>
+        ` : ""}
+
+        ${podeGerenciar ? `
+          <button type="button" class="danger-button" data-dynamic-action="excluirPlanoPreventivo" data-param0="${formatarAtributoHTML(plano.id)}">
+            Excluir
           </button>
         ` : ""}
       </div>
@@ -110,10 +125,44 @@ function criarCardPlanoPreventivo(plano) {
 
 async function salvarPlanoPreventivo() {
   if (!usuarioEhManutencaoAutorizada()) {
-    alert("Apenas a manutenção pode cadastrar planos preventivos.");
+    alert("Apenas a manutenção pode cadastrar ou editar planos preventivos.");
     return;
   }
 
+  const dadosPlano = obterDadosFormularioPlanoPreventivo();
+
+  if (!dadosPlano) {
+    return;
+  }
+
+  try {
+    if (planoPreventivoEditandoId) {
+      await atualizarPlanoPreventivoFirebase(planoPreventivoEditandoId, {
+        ...dadosPlano,
+        editadoPorUid: usuarioAtual.id,
+        editadoPorNome: usuarioAtual.nome
+      });
+      limparFormularioPlanoPreventivo();
+      alert("Plano preventivo atualizado com sucesso.");
+      return;
+    }
+
+    await criarPlanoPreventivoFirebase({
+      ...dadosPlano,
+      ativo: true,
+      ultimaOS: "",
+      criadoPorUid: usuarioAtual.id,
+      criadoPorNome: usuarioAtual.nome
+    });
+    limparFormularioPlanoPreventivo();
+    alert("Plano preventivo cadastrado com sucesso.\nA rotina já aparece na lista de preventivas.");
+  } catch (erro) {
+    console.error("Erro ao salvar plano preventivo:", erro);
+    alert("Não foi possível salvar o plano preventivo.\nVerifique sua conexão e permissões no Firestore.");
+  }
+}
+
+function obterDadosFormularioPlanoPreventivo() {
   const ativoInput = document.getElementById("ativoPlanoPreventivo");
   const nomeInput = document.getElementById("nomePlanoPreventivo");
   const localInput = document.getElementById("localPlanoPreventivo");
@@ -141,22 +190,22 @@ async function salvarPlanoPreventivo() {
 
   if (!ativoCodigo || !nome || !localizacao || !categoria || !subcategoria || !proximaExecucao) {
     alert("Informe ativo, nome da rotina, categoria, subcategoria, local e próxima execução.");
-    return;
+    return null;
   }
 
   if (!Number.isFinite(quantidadeFrequencia) || quantidadeFrequencia <= 0 || !frequenciaDias) {
     alert("Informe uma frequência válida para a preventiva.\nUse um número maior que zero.");
-    return;
+    return null;
   }
 
   const dataExecucao = new Date(`${proximaExecucao}T09:00:00`);
 
   if (Number.isNaN(dataExecucao.getTime())) {
     alert("Informe uma data válida para a próxima execução da preventiva.");
-    return;
+    return null;
   }
 
-  const plano = {
+  return {
     ativoCodigo,
     nome,
     localizacao,
@@ -168,21 +217,115 @@ async function salvarPlanoPreventivo() {
     unidadeFrequencia,
     frequenciaDias,
     proximaExecucaoISO: dataExecucao.toISOString(),
-    observacoes,
-    ativo: true,
-    ultimaOS: "",
-    criadoPorUid: usuarioAtual.id,
-    criadoPorNome: usuarioAtual.nome
+    observacoes
+  };
+}
+
+function editarPlanoPreventivo(planoId) {
+  if (!usuarioEhManutencaoAutorizada()) {
+    alert("Apenas a manutenção pode editar planos preventivos.");
+    return;
+  }
+
+  const plano = planosPreventivos.find(item => idsIguais(item.id, planoId));
+
+  if (!plano) {
+    alert("Plano preventivo não encontrado.\nAtualize a lista e tente novamente.");
+    return;
+  }
+
+  planoPreventivoEditandoId = String(plano.id);
+  preencherFormularioPlanoPreventivo(plano);
+  atualizarEstadoFormularioPlanoPreventivo(true);
+
+  const areaFormulario = document.getElementById("areaNovoPlanoPreventivo");
+  if (areaFormulario) {
+    areaFormulario.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function preencherFormularioPlanoPreventivo(plano) {
+  const campos = {
+    ativo: document.getElementById("ativoPlanoPreventivo"),
+    nome: document.getElementById("nomePlanoPreventivo"),
+    local: document.getElementById("localPlanoPreventivo"),
+    categoria: document.getElementById("categoriaPlanoPreventivo"),
+    subcategoria: document.getElementById("subcategoriaPlanoPreventivo"),
+    checklist: document.getElementById("checklistPlanoPreventivo"),
+    responsavel: document.getElementById("responsavelPlanoPreventivo"),
+    quantidade: document.getElementById("quantidadeFrequenciaPlanoPreventivo"),
+    unidade: document.getElementById("unidadeFrequenciaPlanoPreventivo"),
+    proxima: document.getElementById("proximaExecucaoPlanoPreventivo"),
+    observacoes: document.getElementById("observacoesPlanoPreventivo")
   };
 
-  try {
-    await criarPlanoPreventivoFirebase(plano);
-    limparFormularioPlanoPreventivo();
-    alert("Plano preventivo cadastrado com sucesso.\nA rotina já aparece na lista de preventivas.");
-  } catch (erro) {
-    console.error("Erro ao cadastrar plano preventivo:", erro);
-    alert("Não foi possível cadastrar o plano preventivo.\nVerifique sua conexão e permissões no Firestore.");
+  if (campos.ativo) campos.ativo.value = plano.ativoCodigo || "";
+  if (campos.nome) campos.nome.value = plano.nome || "";
+  if (campos.local) campos.local.value = plano.localizacao || "";
+  if (campos.categoria) campos.categoria.value = plano.categoria || "";
+  atualizarSubcategoriasPlanoPreventivo();
+  if (campos.subcategoria) campos.subcategoria.value = plano.subcategoria || "";
+  if (campos.checklist) campos.checklist.value = Array.isArray(plano.checklist) ? plano.checklist.join("\n") : "";
+  if (campos.responsavel) campos.responsavel.value = plano.responsavelPadrao || "";
+  if (campos.quantidade) campos.quantidade.value = plano.quantidadeFrequencia || "";
+  if (campos.unidade) campos.unidade.value = plano.unidadeFrequencia || "dias";
+  if (campos.proxima) campos.proxima.value = formatarDataInputPreventiva(plano.proximaExecucaoISO);
+  if (campos.observacoes) campos.observacoes.value = plano.observacoes || "";
+}
+
+function atualizarEstadoFormularioPlanoPreventivo(editando) {
+  const titulo = document.getElementById("tituloFormularioPlanoPreventivo");
+  const botaoSalvar = document.getElementById("botaoSalvarPlanoPreventivo");
+  const botaoCancelar = document.getElementById("botaoCancelarEdicaoPlanoPreventivo");
+
+  if (titulo) {
+    titulo.textContent = editando ? "Editar plano preventivo" : "Novo plano preventivo";
   }
+
+  if (botaoSalvar) {
+    botaoSalvar.textContent = editando ? "Salvar alterações" : "Cadastrar plano preventivo";
+  }
+
+  if (botaoCancelar) {
+    botaoCancelar.hidden = !editando;
+  }
+}
+
+function cancelarEdicaoPlanoPreventivo() {
+  limparFormularioPlanoPreventivo();
+}
+
+async function excluirPlanoPreventivo(planoId) {
+  if (!usuarioEhManutencaoAutorizada()) {
+    alert("Apenas a manutenção pode excluir planos preventivos.");
+    return;
+  }
+
+  const plano = planosPreventivos.find(item => idsIguais(item.id, planoId));
+  const nomePlano = plano ? plano.nome : "este plano";
+  const mensagem = `Deseja excluir permanentemente ${nomePlano}?\nEssa ação remove apenas o cadastro da preventiva. OS já geradas não serão apagadas.`;
+
+  if (!(await appConfirm(mensagem, { titulo: "Excluir plano preventivo", textoConfirmar: "Excluir", textoCancelar: "Voltar" }))) {
+    return;
+  }
+
+  try {
+    await excluirPlanoPreventivoFirebase(planoId);
+
+    if (idsIguais(planoPreventivoEditandoId, planoId)) {
+      limparFormularioPlanoPreventivo();
+    }
+
+    alert("Plano preventivo excluído com sucesso.");
+  } catch (erro) {
+    console.error("Erro ao excluir plano preventivo:", erro);
+    alert("Não foi possível excluir o plano preventivo.\nVerifique sua conexão e permissões no Firestore.");
+  }
+}
+
+function formatarDataInputPreventiva(valor) {
+  const data = obterDataPlanoPreventivo(valor);
+  return data.toISOString().slice(0, 10);
 }
 
 /* =====================
@@ -309,6 +452,9 @@ function limparFormularioPlanoPreventivo() {
   if (unidadeFrequenciaInput) {
     unidadeFrequenciaInput.value = "dias";
   }
+
+  planoPreventivoEditandoId = "";
+  atualizarEstadoFormularioPlanoPreventivo(false);
 }
 
 function prepararPlanoPreventivoDoAtivo(codigo) {

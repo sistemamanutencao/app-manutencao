@@ -102,3 +102,26 @@ Critério específico de rollback da v19:
 - voltar para a v18 se os cards de OS deixarem de abrir detalhes;
 - voltar para a v18 se a listagem de OS não carregar para colaborador, gerência ou manutenção;
 - revisar `js/chamados-render.js` se o campo Local da ocorrência aparecer vazio em chamados que possuem local cadastrado.
+
+
+## Atualização v21
+
+Versão atual de trabalho:
+
+```txt
+app-manutencao-v21-edicao-exclusao-preventivas-diagnostico.zip
+```
+
+Versão funcional anterior para rollback imediato:
+
+```txt
+app-manutencao-v20-cadastro-colaboradores(5)(1).zip
+```
+
+Critério específico de rollback da v21:
+
+- voltar para a v20 se a lista de Preventivas deixar de carregar;
+- voltar para a v20 se a lista de Diagnóstico inicial deixar de carregar;
+- voltar para a v20 se editar ou excluir preventiva/diagnóstico gerar erro de permissão inesperado;
+- revisar `js/event-action-maps.js` e `js/event-bindings.js` se os novos botões não responderem;
+- revisar `src/constants/locais.js` e `js/categorias.js` se o andar Telhado não mostrar o local Toda unidade.

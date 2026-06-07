@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v19-local-ocorrencia-card-os";
+const CACHE_NAME = "app-manutencao-v21-edicao-exclusao-preventivas-diagnostico-r2";
 
 const FILES_TO_CACHE = [
   "./",
@@ -54,6 +54,7 @@ const FILES_TO_CACHE = [
   "./js/leitor-qr.js",
   "./js/preventivas.js",
   "./js/diagnostico.js",
+  "./js/cadastro-colaboradores.js",
   "./js/app.js",
   "./js/event-action-maps.js",
   "./js/event-bindings.js",
