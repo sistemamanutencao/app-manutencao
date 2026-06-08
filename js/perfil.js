@@ -329,6 +329,41 @@ async function entrarComFirebase(botao) {
   }
 }
 
+async function solicitarRedefinicaoSenha(botao) {
+  const emailInput = document.getElementById("loginEmailUsuario");
+
+  if (!emailInput) {
+    alert("Campo de e-mail não encontrado na tela.\nAtualize a página e tente novamente.");
+    return;
+  }
+
+  const email = emailInput.value.trim();
+
+  if (!email) {
+    alert("Informe o e-mail da conta autorizada antes de solicitar a redefinição de senha.");
+    emailInput.focus();
+    return;
+  }
+
+  try {
+    if (botao) {
+      botao.disabled = true;
+      botao.textContent = "Enviando...";
+    }
+
+    await solicitarRedefinicaoSenhaUsuario(email);
+    alert("E-mail de redefinição enviado.\nVerifique a caixa de entrada, spam ou quarentena do e-mail informado.");
+  } catch (erro) {
+    console.error("Erro ao solicitar redefinição de senha:", erro);
+    alert("Não foi possível enviar o e-mail de redefinição.\nConfira se o e-mail existe no Firebase Authentication e tente novamente.");
+  } finally {
+    if (botao) {
+      botao.disabled = false;
+      botao.textContent = "Esqueci minha senha";
+    }
+  }
+}
+
 async function sairDaConta() {
   try {
     if (usuarioEhManutencaoAutorizada() || (typeof usuarioEhGerencia === "function" && usuarioEhGerencia())) {

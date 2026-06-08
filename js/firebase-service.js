@@ -52,6 +52,10 @@ function autenticarUsuario(email, senha) {
   return firebaseAuth.signInWithEmailAndPassword(email, senha);
 }
 
+function solicitarRedefinicaoSenhaUsuario(email) {
+  return firebaseAuth.sendPasswordResetEmail(email);
+}
+
 function autenticarColaboradorAnonimo() {
   return firebaseAuth.signInAnonymously();
 }

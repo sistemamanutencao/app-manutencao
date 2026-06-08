@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v22-url-sistemamanutencao";
+const CACHE_NAME = "app-manutencao-v23-redefinicao-senha";
 
 const FILES_TO_CACHE = [
   "./",

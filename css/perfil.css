@@ -439,6 +439,24 @@
   border-color: #ff6a00;
 }
 
+.password-reset-button {
+  width: 100%;
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+  color: #1d4f9f;
+  font-size: 13px;
+  font-weight: 850;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.password-reset-button:disabled {
+  color: var(--text-muted);
+  cursor: wait;
+  text-decoration: none;
+}
+
 /* ===================== V20: PRIMEIRO ACESSO DO COLABORADOR ===================== */
 
 .login-transition-note {
