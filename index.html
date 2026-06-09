@@ -984,8 +984,8 @@
     <div class="login-header">
       <img
         class="login-brand-logo"
-        src="img/engrenagem-painel-login.png"
-        alt="Central de Manutenção - Acesso ao sistema"
+        src="img/engrenagem-painel-login-v25.png"
+        alt="Central de Manutenção"
       />
     </div>
 
@@ -1032,9 +1032,6 @@
       </button>
     </div>
 
-    <div class="login-divider" aria-hidden="true">
-      <span>ou</span>
-    </div>
 
     <div class="maintenance-login-box login-access-card login-access-card-manutencao">
       <h2>Acesso autorizado</h2>
@@ -1075,6 +1072,67 @@
       >
         Esqueci minha senha
       </button>
+    </div>
+
+    <div class="password-recovery-experience" id="experienciaRedefinicaoSenha" hidden>
+      <div class="password-recovery-hero">
+        <img
+          class="password-recovery-avatar"
+          src="img/avatar-redefinicao-senha.png"
+          alt="Assistente visual preocupado com senha esquecida"
+        />
+      </div>
+
+      <div class="password-recovery-card">
+        <div class="password-recovery-title-row">
+          <span class="password-recovery-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <rect x="5" y="10" width="14" height="10" rx="3" stroke="currentColor" stroke-width="2" />
+              <path d="M12 14v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </span>
+          <div>
+            <h2>Esqueceu sua senha?</h2>
+            <p>Informe o e-mail cadastrado e enviaremos um link seguro para você redefinir sua senha.</p>
+          </div>
+        </div>
+
+        <label>
+          E-mail cadastrado
+          <input
+            id="resetEmailUsuario"
+            type="email"
+            autocomplete="email"
+            placeholder="seu@email.com"
+          />
+        </label>
+
+        <button
+          type="button"
+          class="primary-button password-recovery-send-button"
+          data-action="enviar-redefinicao-senha-visual"
+        >
+          Enviar link de redefinição
+        </button>
+
+        <p class="password-recovery-helper">Verifique também spam ou quarentena após o envio.</p>
+
+        <div class="password-recovery-info">
+          <strong>Link seguro enviado pelo Firebase</strong>
+          <span>Após redefinir a senha, volte ao app e entre normalmente no sistema.</span>
+        </div>
+
+        <p class="password-recovery-feedback" id="feedbackRedefinicaoSenha" role="status" aria-live="polite"></p>
+
+        <button
+          type="button"
+          class="password-recovery-back"
+          data-action="voltar-login-redefinicao"
+        >
+          Voltar para o login
+        </button>
+      </div>
     </div>
 
     <p class="login-secure-note">Acesso seguro e monitorado</p>

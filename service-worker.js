@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v23-redefinicao-senha";
+const CACHE_NAME = "app-manutencao-v24-ajuste-tela-redefinicao";
 
 const FILES_TO_CACHE = [
   "./",
@@ -61,6 +61,7 @@ const FILES_TO_CACHE = [
   "./js/service-worker-register.js",
   "./img/senac-predio.png",
   "./img/engrenagem-painel-login.png",
+  "./img/avatar-redefinicao-senha.png",
   "./img/icon-192.png",
   "./img/icon-512.png",
   "./img/perfil-manutencao.png"

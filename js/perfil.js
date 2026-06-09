@@ -329,8 +329,71 @@ async function entrarComFirebase(botao) {
   }
 }
 
+function abrirExperienciaRedefinicaoSenha() {
+  const experiencia = document.getElementById("experienciaRedefinicaoSenha");
+  const primeiroAcesso = document.querySelector(".primeiro-acesso-card");
+  const divisor = document.querySelector(".login-divider");
+  const loginAutorizado = document.querySelector(".login-access-card-manutencao");
+  const notaSeguranca = document.querySelector(".login-secure-note");
+  const emailLogin = document.getElementById("loginEmailUsuario");
+  const emailReset = document.getElementById("resetEmailUsuario");
+  const feedback = document.getElementById("feedbackRedefinicaoSenha");
+
+  if (!experiencia || !emailReset) {
+    alert("Tela de redefinição não encontrada.\nAtualize a página e tente novamente.");
+    return;
+  }
+
+  if (emailLogin && emailLogin.value.trim()) {
+    emailReset.value = emailLogin.value.trim();
+  }
+
+  if (feedback) {
+    feedback.textContent = "";
+    feedback.className = "password-recovery-feedback";
+  }
+
+  [primeiroAcesso, divisor, loginAutorizado, notaSeguranca].forEach(elemento => {
+    if (elemento) {
+      elemento.hidden = true;
+    }
+  });
+
+  experiencia.hidden = false;
+  emailReset.focus();
+}
+
+function fecharExperienciaRedefinicaoSenha() {
+  const experiencia = document.getElementById("experienciaRedefinicaoSenha");
+  const primeiroAcesso = document.querySelector(".primeiro-acesso-card");
+  const divisor = document.querySelector(".login-divider");
+  const loginAutorizado = document.querySelector(".login-access-card-manutencao");
+  const notaSeguranca = document.querySelector(".login-secure-note");
+  const feedback = document.getElementById("feedbackRedefinicaoSenha");
+
+  if (experiencia) {
+    experiencia.hidden = true;
+  }
+
+  [primeiroAcesso, divisor, loginAutorizado, notaSeguranca].forEach(elemento => {
+    if (elemento) {
+      elemento.hidden = false;
+    }
+  });
+
+  if (feedback) {
+    feedback.textContent = "";
+    feedback.className = "password-recovery-feedback";
+  }
+}
+
 async function solicitarRedefinicaoSenha(botao) {
-  const emailInput = document.getElementById("loginEmailUsuario");
+  return enviarLinkRedefinicaoSenhaVisual(botao);
+}
+
+async function enviarLinkRedefinicaoSenhaVisual(botao) {
+  const emailInput = document.getElementById("resetEmailUsuario") || document.getElementById("loginEmailUsuario");
+  const feedback = document.getElementById("feedbackRedefinicaoSenha");
 
   if (!emailInput) {
     alert("Campo de e-mail não encontrado na tela.\nAtualize a página e tente novamente.");
@@ -340,7 +403,12 @@ async function solicitarRedefinicaoSenha(botao) {
   const email = emailInput.value.trim();
 
   if (!email) {
-    alert("Informe o e-mail da conta autorizada antes de solicitar a redefinição de senha.");
+    if (feedback) {
+      feedback.textContent = "Informe o e-mail cadastrado antes de solicitar a redefinição.";
+      feedback.className = "password-recovery-feedback is-error";
+    } else {
+      alert("Informe o e-mail da conta autorizada antes de solicitar a redefinição de senha.");
+    }
     emailInput.focus();
     return;
   }
@@ -352,14 +420,26 @@ async function solicitarRedefinicaoSenha(botao) {
     }
 
     await solicitarRedefinicaoSenhaUsuario(email);
-    alert("E-mail de redefinição enviado.\nVerifique a caixa de entrada, spam ou quarentena do e-mail informado.");
+
+    if (feedback) {
+      feedback.textContent = "Link enviado. Verifique a caixa de entrada, spam ou quarentena do e-mail informado.";
+      feedback.className = "password-recovery-feedback is-success";
+    } else {
+      alert("E-mail de redefinição enviado.\nVerifique a caixa de entrada, spam ou quarentena do e-mail informado.");
+    }
   } catch (erro) {
     console.error("Erro ao solicitar redefinição de senha:", erro);
-    alert("Não foi possível enviar o e-mail de redefinição.\nConfira se o e-mail existe no Firebase Authentication e tente novamente.");
+
+    if (feedback) {
+      feedback.textContent = "Não foi possível enviar o link. Confira se o e-mail existe no Firebase Authentication e tente novamente.";
+      feedback.className = "password-recovery-feedback is-error";
+    } else {
+      alert("Não foi possível enviar o e-mail de redefinição.\nConfira se o e-mail existe no Firebase Authentication e tente novamente.");
+    }
   } finally {
     if (botao) {
       botao.disabled = false;
-      botao.textContent = "Esqueci minha senha";
+      botao.textContent = "Enviar link de redefinição";
     }
   }
 }

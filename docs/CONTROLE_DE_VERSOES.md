@@ -57,3 +57,4 @@ corrigido.zip
 final.zip
 final2.zip
 ```
+| v24 | `app-manutencao-v24-experiencia-redefinicao-senha.zip` | Experiência visual de solicitação de redefinição de senha com avatar, feedback interno e envio pelo Firebase Auth | Pronto para teste/publicação |
