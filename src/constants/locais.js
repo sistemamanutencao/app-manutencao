@@ -6,6 +6,14 @@ const LOCAIS_PRIMEIRO_ANDAR_MANUTENCAO = Object.freeze([
   "banheiro masculino",
   "banheiro feminino",
   "SABES",
+  "Sala manicure",
+  "Espaço Salão",
+  "Banheiro feminino SABES",
+  "Banheiro masculino SABES",
+  "Depósito",
+  "Esterilização",
+  "Expurgo",
+  "Depósito inbel",
   "Sala Instrutores",
   "Sala-01",
   "Sala-02",
@@ -21,19 +29,23 @@ const LOCAIS_PRIMEIRO_ANDAR_MANUTENCAO = Object.freeze([
   "Sala-12",
   "Sala-13 Laboratório de Hardware",
   "Sala-14 Enfermagem",
-  "Escadaria"
+  "Escadaria",
+  "Escadaria de emergência"
 ]);
 
 const LOCAIS_POR_ANDAR_MANUTENCAO = Object.freeze({
   "1º ANDAR": LOCAIS_PRIMEIRO_ANDAR_MANUTENCAO,
   "SL ANDAR": Object.freeze([
     "BIBLIOTECA",
-    "TC-TI",
-    "Área de convivência 01 e 02",
-    "banheiro masculino",
-    "banheiro feminino",
-    "banheiro PCD",
-    "Escadaria"
+    "Banheiro Biblioteca",
+    "Área de convivência 1",
+    "Área de convivência 2",
+    "Banheiro feminino",
+    "Banheiro masculino",
+    "Banheiro PCD",
+    "Sala TI",
+    "Escadaria",
+    "Escadaria de emergência"
   ]),
   "0º ANDAR": Object.freeze([
     "banheiro masculino",
@@ -51,19 +63,25 @@ const LOCAIS_POR_ANDAR_MANUTENCAO = Object.freeze({
     "Sala Financeiro",
     "Banheiro administração",
     "Área externa fundos",
-    "Área externa frente"
+    "Área externa frente",
+    "Banheiro camarim",
+    "Sala de controle",
+    "Escadaria"
   ]),
   "-1º ANDAR": Object.freeze([
     "Estacionamento",
+    "Cozinha Colaborador",
+    "Vestuário feminino",
+    "Vestuário masculino",
+    "Almoxarifado 2",
+    "Almoxarifado de bebidas",
+    "Almoxarifado de alimentos",
+    "Recebimento",
     "Lavanderia",
-    "Almoxarifados",
-    "banheiro masculino",
-    "banheiro feminino",
-    "Cozinha pedagógica",
     "Espaço transformador",
-    "Espaço caldeira",
-    "Espaço esgoto",
-    "Sala de Bombas d'água",
+    "Espaço Caldeira",
+    "Esgoto",
+    "Sala bombas d'água",
     "Caixa d'água"
   ]),
   "Telhado": Object.freeze([

@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-preventivas-visual-padronizado";
+const CACHE_NAME = "app-manutencao-v24-local-escadaria-emergencia-1-andar";
 
 const FILES_TO_CACHE = [
   "./",

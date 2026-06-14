@@ -119,3 +119,147 @@
   height: 44px;
   font-size: 13px;
 }
+
+
+/* Blocos recolhíveis e leitura rápida de status */
+.diagnostic-collapsible {
+  padding: 0;
+  overflow: hidden;
+}
+
+.diagnostic-collapsible-summary {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.diagnostic-collapsible-summary::-webkit-details-marker { display: none; }
+
+.diagnostic-collapsible-summary > span:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.diagnostic-collapsible-summary strong {
+  color: var(--text-dark);
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 850;
+}
+
+.diagnostic-collapsible-summary small {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.diagnostic-collapsible-indicator {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #f6f8fc;
+  color: var(--primary);
+  font-size: 20px;
+  font-weight: 800;
+  transition: transform .2s ease, background .2s ease;
+}
+
+.diagnostic-collapsible[open] .diagnostic-collapsible-indicator {
+  transform: rotate(180deg);
+  background: #eef4ff;
+}
+
+.diagnostic-collapsible[open] .diagnostic-collapsible-summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.diagnostic-collapsible-content {
+  padding: 16px;
+}
+
+.diagnostic-collapsible-summary:focus-visible {
+  outline: 3px solid rgba(36, 102, 214, .22);
+  outline-offset: -3px;
+}
+
+.diagnostic-card {
+  position: relative;
+  overflow: hidden;
+  border-left-width: 5px;
+}
+
+.diagnostic-card.diagnostic-status-pending { border-left-color: #e3a008; }
+.diagnostic-card.diagnostic-status-inspection { border-left-color: #2878d0; }
+.diagnostic-card.diagnostic-status-waiting { border-left-color: #d97706; }
+.diagnostic-card.diagnostic-status-action { border-left-color: #c2413b; }
+.diagnostic-card.diagnostic-status-resolved { border-left-color: #2f8f57; }
+
+.diagnostic-current-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  min-width: 150px;
+  margin: -2px 0 14px;
+  padding: 8px 11px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+}
+
+.diagnostic-current-status > span:last-child {
+  display: grid;
+  gap: 1px;
+}
+
+.diagnostic-current-status small {
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+  opacity: .76;
+}
+
+.diagnostic-current-status strong {
+  font-size: 13.5px;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.diagnostic-current-status-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .72);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.diagnostic-status-pending .diagnostic-current-status { background: #fff8e3; border-color: #f0d58c; color: #805b00; }
+.diagnostic-status-inspection .diagnostic-current-status { background: #edf5ff; border-color: #bdd7f5; color: #155a9d; }
+.diagnostic-status-waiting .diagnostic-current-status { background: #fff3e6; border-color: #f1c48f; color: #8b4b00; }
+.diagnostic-status-action .diagnostic-current-status { background: #fff0ef; border-color: #efb8b4; color: #982f2a; }
+.diagnostic-status-resolved .diagnostic-current-status { background: #ecf8f0; border-color: #b9dfc7; color: #216b40; }
+
+.diagnostic-status-resolved {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fcf9 100%);
+}
+
+@media (max-width: 480px) {
+  .diagnostic-collapsible-summary { padding: 14px; }
+  .diagnostic-collapsible-content { padding: 14px; }
+  .diagnostic-current-status { width: 100%; }
+  .diagnostic-card-header { flex-direction: column; }
+}

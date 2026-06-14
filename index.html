@@ -611,8 +611,15 @@
         <div class="dashboard-card"><span>Preventivas</span><strong id="totalDiagnosticoPreventivas">0</strong><small>Rotina programável</small></div>
       </div>
 
-      <div class="form-card" id="areaNovoDiagnostico">
-        <h3 id="tituloFormularioDiagnostico">Novo item de diagnóstico</h3>
+      <details class="form-card diagnostic-collapsible" id="areaNovoDiagnostico">
+        <summary class="diagnostic-collapsible-summary">
+          <span>
+            <strong id="tituloFormularioDiagnostico">Novo item de diagnóstico</strong>
+            <small>Abra para registrar ou editar uma inspeção</small>
+          </span>
+          <span class="diagnostic-collapsible-indicator" aria-hidden="true">⌄</span>
+        </summary>
+        <div class="diagnostic-collapsible-content">
         <p class="form-help">Use este registro para mapear a situação técnica da unidade. Abra OS apenas quando a demanda estiver clara.</p>
 
         <label>
@@ -706,13 +713,22 @@
         <button type="button" class="secondary-button" id="botaoCancelarEdicaoDiagnostico" data-action="cancelar-edicao-diagnostico" hidden>
           Cancelar edição
         </button>
-      </div>
+        </div>
+      </details>
 
-      <div class="form-card">
-        <h3>Checklist rápido de inspeção</h3>
-        <p class="form-help">Clique em um item para preencher a descrição e sugerir o sistema técnico.</p>
-        <div id="checklistDiagnosticoPadrao"></div>
-      </div>
+      <details class="form-card diagnostic-collapsible" id="areaChecklistDiagnostico">
+        <summary class="diagnostic-collapsible-summary">
+          <span>
+            <strong>Checklist rápido de inspeção</strong>
+            <small>Abra para consultar itens comuns da vistoria</small>
+          </span>
+          <span class="diagnostic-collapsible-indicator" aria-hidden="true">⌄</span>
+        </summary>
+        <div class="diagnostic-collapsible-content">
+          <p class="form-help">Clique em um item para preencher a descrição e sugerir o sistema técnico.</p>
+          <div id="checklistDiagnosticoPadrao"></div>
+        </div>
+      </details>
 
       <div class="section-header spacing">
         <h2>Itens do diagnóstico</h2>

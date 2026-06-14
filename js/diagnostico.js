@@ -125,8 +125,11 @@ function usarItemChecklistDiagnostico(grupo, item) {
     descricao.value = descricao.value
       ? `${descricao.value}\n- ${item}`
       : item;
-    descricao.focus();
   }
+
+  const areaFormulario = document.getElementById("areaNovoDiagnostico");
+  if (areaFormulario) areaFormulario.open = true;
+  if (descricao) descricao.focus();
 }
 
 function sugerirSistemaPorGrupoDiagnostico(grupo) {
@@ -264,6 +267,7 @@ function editarDiagnostico(id) {
 
   const areaFormulario = document.getElementById("areaNovoDiagnostico");
   if (areaFormulario) {
+    areaFormulario.open = true;
     areaFormulario.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
@@ -395,9 +399,24 @@ function criarCardDiagnostico(item) {
     : item.prioridade && item.prioridade.startsWith("P2") ? "status-orange"
     : item.prioridade && item.prioridade.startsWith("P5") ? "status-green"
     : "status-blue";
+  const statusAtual = String(item.status || "Pendente");
+  const classeStatus = statusAtual === "Resolvido" ? "diagnostic-status-resolved"
+    : statusAtual === "Gerar OS" ? "diagnostic-status-action"
+    : statusAtual === "Aguardando material" ? "diagnostic-status-waiting"
+    : statusAtual === "Em inspeção" ? "diagnostic-status-inspection"
+    : "diagnostic-status-pending";
+  const iconeStatus = statusAtual === "Resolvido" ? "✓"
+    : statusAtual === "Gerar OS" ? "!"
+    : statusAtual === "Aguardando material" ? "…"
+    : statusAtual === "Em inspeção" ? "⌕"
+    : "•";
 
   return `
-    <article class="diagnostic-card">
+    <article class="diagnostic-card ${classeStatus}">
+      <div class="diagnostic-current-status" role="status">
+        <span class="diagnostic-current-status-icon" aria-hidden="true">${iconeStatus}</span>
+        <span><small>Status atual</small><strong>${escaparHTML(statusAtual)}</strong></span>
+      </div>
       <div class="diagnostic-card-header">
         <div>
           <h3>${escaparHTML(item.descricao)}</h3>
@@ -406,7 +425,6 @@ function criarCardDiagnostico(item) {
         <span class="status ${classePrioridade}">${escaparHTML(item.prioridade)}</span>
       </div>
       <div class="diagnostic-meta">
-        <span>Status: <strong>${escaparHTML(item.status)}</strong></span>
         <span>Registro: ${escaparHTML(item.data || "")}</span>
       </div>
       ${item.risco ? `<p class="diagnostic-detail"><strong>Risco/impacto:</strong> ${escaparHTML(item.risco)}</p>` : ""}
