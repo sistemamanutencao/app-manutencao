@@ -105,6 +105,7 @@
     encerrarOS: (...argumentos) => executarAcao("encerrarOS", ...argumentos),
     salvarStatusPainel: (...argumentos) => executarAcao("salvarStatusPainel", ...argumentos),
     executarAcaoRapidaOS: (...argumentos) => executarAcao("executarAcaoRapidaOS", ...argumentos),
+    marcarPreventivaRealizada: (...argumentos) => executarAcao("marcarPreventivaRealizada", ...argumentos),
     gerarOSPreventiva: (...argumentos) => executarAcao("gerarOSPreventiva", ...argumentos),
     editarPlanoPreventivo: (...argumentos) => executarAcao("editarPlanoPreventivo", ...argumentos),
     inativarPlanoPreventivo: (...argumentos) => executarAcao("inativarPlanoPreventivo", ...argumentos),

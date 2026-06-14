@@ -89,9 +89,21 @@ function criarCardPlanoPreventivo(plano) {
       ${criarChecklistPreventiva(plano)}
       <p><strong>Observações:</strong> ${escaparHTML(plano.observacoes || "Sem observações")}</p>
       ${plano.ultimaOS ? `<p><strong>Última OS gerada:</strong> ${escaparHTML(plano.ultimaOS)}</p>` : ""}
+      ${plano.ultimaExecucaoISO ? `
+        <div class="preventive-last-completion">
+          <strong>Última realização:</strong>
+          <span>${escaparHTML(formatarDataPreventiva(obterDataPlanoPreventivo(plano.ultimaExecucaoISO)))}</span>
+          <small>${escaparHTML(plano.ultimaRealizacaoPorNome || plano.responsavelPadrao || "Manutenção")}${plano.ultimaRealizacaoTipo === "SEM_OS" ? " • sem geração de OS" : ""}</small>
+          ${plano.ultimaRealizacaoObservacao ? `<p>${escaparHTML(plano.ultimaRealizacaoObservacao)}</p>` : ""}
+        </div>
+      ` : ""}
 
       <div class="preventive-actions">
         ${podeGerarOS ? `
+          <button type="button" class="primary-button button-success preventive-complete-button" data-dynamic-action="marcarPreventivaRealizada" data-param0="${formatarAtributoHTML(plano.id)}">
+            Marcar como realizada
+          </button>
+
           <button type="button" class="primary-button" data-dynamic-action="gerarOSPreventiva" data-param0="${formatarAtributoHTML(plano.id)}">
             Gerar OS preventiva
           </button>
@@ -331,6 +343,78 @@ function formatarDataInputPreventiva(valor) {
 /* =====================
    Geração de OS preventiva
 ===================== */
+
+async function marcarPreventivaRealizada(planoId) {
+  if (!usuarioEhManutencaoAutorizada()) {
+    alert("Apenas a manutenção pode registrar a realização de preventivas.");
+    return;
+  }
+
+  const plano = planosPreventivos.find(item => idsIguais(item.id, planoId));
+
+  if (!plano) {
+    alert("Plano preventivo não encontrado.\nAtualize a lista e tente novamente.");
+    return;
+  }
+
+  if (plano.ativo === false) {
+    alert("Este plano está inativo e não pode ser marcado como realizado.");
+    return;
+  }
+
+  const confirmado = await appConfirm(
+    `Confirma que a preventiva “${plano.nome}” foi realizada sem necessidade de gerar uma OS?`,
+    {
+      titulo: "Registrar preventiva realizada",
+      textoConfirmar: "Confirmar realização",
+      textoCancelar: "Voltar"
+    }
+  );
+
+  if (!confirmado) {
+    return;
+  }
+
+  const observacaoInformada = window.prompt(
+    "Observação da realização (opcional):",
+    "Preventiva executada conforme checklist. Não foi identificada necessidade de abrir OS."
+  );
+
+  if (observacaoInformada === null) {
+    return;
+  }
+
+  const agora = new Date();
+  const proximaExecucao = calcularProximaExecucaoPreventiva(plano, agora);
+  const observacao = String(observacaoInformada || "").trim();
+  const historicoAtual = Array.isArray(plano.historicoRealizacoes) ? plano.historicoRealizacoes : [];
+  const registro = {
+    dataISO: agora.toISOString(),
+    tipo: "SEM_OS",
+    responsavelUid: usuarioAtual.id || "",
+    responsavelNome: usuarioAtual.nome || "Manutenção",
+    observacao
+  };
+
+  try {
+    await atualizarPlanoPreventivoFirebase(plano.id, {
+      ultimaExecucaoISO: agora.toISOString(),
+      proximaExecucaoISO: proximaExecucao.toISOString(),
+      ultimaRealizacaoTipo: "SEM_OS",
+      ultimaRealizacaoPorUid: usuarioAtual.id || "",
+      ultimaRealizacaoPorNome: usuarioAtual.nome || "Manutenção",
+      ultimaRealizacaoObservacao: observacao,
+      historicoRealizacoes: [...historicoAtual, registro].slice(-24)
+    });
+
+    alert(
+      `Preventiva registrada como realizada.\nPróxima execução: ${formatarDataPreventiva(proximaExecucao)}.`
+    );
+  } catch (erro) {
+    console.error("Erro ao registrar preventiva realizada:", erro);
+    alert("Não foi possível registrar a realização da preventiva.\nVerifique sua conexão e permissões no Firestore.");
+  }
+}
 
 async function gerarOSPreventiva(planoId) {
   if (!usuarioEhManutencaoAutorizada()) {

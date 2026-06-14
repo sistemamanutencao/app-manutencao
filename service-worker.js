@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-correcao-recolhimento-layout";
+const CACHE_NAME = "app-manutencao-v24-preventivas-visual-padronizado";
 
 const FILES_TO_CACHE = [
   "./",
