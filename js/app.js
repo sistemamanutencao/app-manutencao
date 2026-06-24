@@ -77,6 +77,7 @@ function prepararTelaSemSessao() {
   planosPreventivos = [];
   diagnosticos = [];
   cadastrosColaboradores = [];
+  inventarioItensRemotos = {};
 
   preencherFormularioPerfil();
   aplicarPermissoesNaTela();
@@ -353,6 +354,22 @@ function iniciarMonitoresDeDados() {
     });
   }
 
+  if (usuarioEhManutencaoAutorizada() && typeof observarInventarioItensFirebase === "function") {
+    monitorInventarioItens = observarInventarioItensFirebase(itens => {
+      inventarioItensRemotos = itens || {};
+
+      if (typeof receberInventarioItensFirebase === "function") {
+        receberInventarioItensFirebase(inventarioItensRemotos);
+      }
+    }, erro => {
+      console.error("Erro ao sincronizar o inventário:", erro);
+
+      if (typeof informarErroSincronizacaoInventario === "function") {
+        informarErroSincronizacaoInventario(erro);
+      }
+    });
+  }
+
 }
 
 function encerrarMonitoresDeDados() {
@@ -389,6 +406,11 @@ function encerrarMonitoresDeDados() {
   if (typeof monitorCadastrosColaboradores === "function") {
     monitorCadastrosColaboradores();
     monitorCadastrosColaboradores = null;
+  }
+
+  if (typeof monitorInventarioItens === "function") {
+    monitorInventarioItens();
+    monitorInventarioItens = null;
   }
 }
 

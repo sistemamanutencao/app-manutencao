@@ -62,3 +62,6 @@ final2.zip
 
 | v26 | `app-manutencao-v26-ajuste-layout-inventario.zip` | Ajuste responsivo da tela de inventário, cabeçalho, botão Voltar e legibilidade dos textos | Pronto para teste/publicação |
 | v27 | `app-manutencao-v27-torneira-blukit-unificada.zip` | Unifica todas as torneiras temporizadas no cadastro “Torneira temporizada (de mesa) Blukit” | Pronto para teste/publicação |
+| v28 | `app-manutencao-v28-gerenciamento-andares-ambientes.zip` | Inclusão e exclusão de andares, ambientes e áreas internas no inventário | Pronto para teste/publicação |
+
+| v29 | `app-manutencao-v29-inventario-firebase.zip` | Imagem e saldo do inventário sincronizados pelo Firestore | Pronto para teste/publicação |

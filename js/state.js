@@ -30,6 +30,7 @@ let ativos = [];
 let planosPreventivos = [];
 let diagnosticos = [];
 let cadastrosColaboradores = [];
+let inventarioItensRemotos = {};
 
 let filtroStatusAtual = "TODOS";
 let abaChamadosAtual = "ATIVAS";
@@ -50,3 +51,4 @@ let monitorAtivos = null;
 let monitorPlanosPreventivos = null;
 let monitorDiagnosticos = null;
 let monitorCadastrosColaboradores = null;
+let monitorInventarioItens = null;

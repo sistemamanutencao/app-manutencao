@@ -105,7 +105,7 @@ Catálogo inicial, andares, ambientes, áreas internas e quantidades instaladas 
 ```txt
 js/inventario.js
 ```
-Navegação do inventário, consulta do estoque e persistência local de imagem e saldo por item. Módulo exclusivo da manutenção.
+Navegação do inventário, consulta do estoque e sincronização de imagem e saldo por item no Firestore. A estrutura personalizada de andares e ambientes permanece local. Módulo exclusivo da manutenção.
 
 ```txt
 js/diagnostico.js

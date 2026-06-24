@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v27-torneira-blukit-unificada";
+const CACHE_NAME = "app-manutencao-v29-inventario-firebase";
 
 const FILES_TO_CACHE = [
   "./",

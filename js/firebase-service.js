@@ -96,6 +96,59 @@ async function buscarPerfilFirebase(uid) {
 }
 
 /* =====================
+   Inventário da unidade
+===================== */
+
+function observarInventarioItensFirebase(callback, callbackErro) {
+  return firebaseDb
+    .collection(COLLECTIONS.INVENTARIO_ITENS || "inventarioItens")
+    .onSnapshot(snapshot => {
+      const itens = {};
+
+      snapshot.docs.forEach(documento => {
+        const dados = documento.data() || {};
+        itens[documento.id] = {
+          estoque: dados.estoque === null || dados.estoque === undefined
+            ? null
+            : Math.max(0, Number(dados.estoque) || 0),
+          imagem: typeof dados.imagem === "string" && dados.imagem.startsWith("data:image/")
+            ? dados.imagem
+            : "",
+          atualizadoEm: dados.atualizadoEm || null,
+          atualizadoPorUid: dados.atualizadoPorUid || "",
+          atualizadoPorNome: dados.atualizadoPorNome || ""
+        };
+      });
+
+      callback(itens);
+    }, callbackErro);
+}
+
+async function salvarItemInventarioFirebase(itemId, dados = {}) {
+  if (!firebaseAuth.currentUser) {
+    throw new Error("Sessão não autenticada. Entre novamente para salvar o inventário.");
+  }
+
+  const estoque = dados.estoque === null || dados.estoque === undefined || dados.estoque === ""
+    ? null
+    : Math.max(0, Number.parseInt(dados.estoque, 10) || 0);
+  const imagem = typeof dados.imagem === "string" && dados.imagem.startsWith("data:image/")
+    ? dados.imagem
+    : "";
+
+  await firebaseDb
+    .collection(COLLECTIONS.INVENTARIO_ITENS || "inventarioItens")
+    .doc(String(itemId))
+    .set({
+      estoque,
+      imagem,
+      atualizadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+      atualizadoPorUid: firebaseAuth.currentUser.uid,
+      atualizadoPorNome: usuarioAtual && usuarioAtual.nome ? usuarioAtual.nome : "Manutenção"
+    }, { merge: true });
+}
+
+/* =====================
    Chamados
 ===================== */
 
