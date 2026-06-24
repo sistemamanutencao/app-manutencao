@@ -3,7 +3,7 @@
 
    Recursos:
    - consulta por andar, ambiente e área interna;
-   - inclusão e exclusão de andares e ambientes;
+   - inclusão, edição e exclusão de andares e ambientes;
    - imagem de referência por item;
    - quantidade disponível em estoque;
    - imagem e saldo sincronizados pelo Firestore;
@@ -467,6 +467,9 @@
         <button class="inventario-excluir" type="button" data-inventario-delete="${tipoExclusao}" data-inventario-delete-id="${registro.id}" aria-label="Excluir ${escaparHtmlInventario(registro.nome)}">
           Excluir
         </button>
+        <button class="inventario-editar" type="button" data-inventario-edit="${tipoExclusao}" data-inventario-edit-id="${registro.id}" aria-label="Editar ${escaparHtmlInventario(registro.nome)}">
+          Editar
+        </button>
       </article>
     `;
   }
@@ -601,6 +604,13 @@
       botao.addEventListener("click", () => excluirEstruturaInventario(
         botao.dataset.inventarioDelete,
         botao.dataset.inventarioDeleteId
+      ));
+    });
+
+    document.querySelectorAll("[data-inventario-edit]").forEach(botao => {
+      botao.addEventListener("click", () => abrirDialogoEditarEstruturaInventario(
+        botao.dataset.inventarioEdit,
+        botao.dataset.inventarioEditId
       ));
     });
   }
@@ -806,6 +816,143 @@
     } catch (erro) {
       console.error("Erro ao salvar estrutura do inventário:", erro);
       exibirErroEstruturaInventario(erro.message || "Não foi possível salvar o novo local no Firebase.");
+    } finally {
+      if (botaoSalvar) {
+        botaoSalvar.disabled = false;
+      }
+    }
+  }
+
+  function localizarRegistroEstruturaInventario(andares, tipo, id) {
+    if (tipo === "andar") {
+      const lista = andares;
+      return {
+        registro: lista.find(andar => andar.id === id) || null,
+        lista,
+        tipoLocal: "andar"
+      };
+    }
+
+    const pai = obterNoPorCaminhoInventario(andares, estadoInventario.caminho);
+    const lista = pai ? (pai.ambientes || pai.subareas || []) : [];
+    const tipoLocal = Array.isArray(pai?.subareas) ? "subarea" : "ambiente";
+
+    return {
+      registro: lista.find(filho => filho.id === id) || null,
+      lista,
+      tipoLocal
+    };
+  }
+
+  function abrirDialogoEditarEstruturaInventario(tipo, id) {
+    const dados = obterDadosInventario();
+    const localizado = localizarRegistroEstruturaInventario(dados.andares, tipo, id);
+    const registro = localizado.registro;
+    const dialogo = document.getElementById("dialogoEstruturaInventario");
+    const conteudo = document.getElementById("dialogoEstruturaInventarioConteudo");
+
+    if (!registro || !dialogo || !conteudo) {
+      alert("O local selecionado não foi encontrado.");
+      renderizarInventario();
+      return;
+    }
+
+    const rotulos = {
+      andar: ["Editar andar", "Nome do andar"],
+      ambiente: ["Editar ambiente", "Nome do ambiente"],
+      subarea: ["Editar área interna", "Nome da área interna"]
+    };
+    const [titulo, rotulo] = rotulos[localizado.tipoLocal] || rotulos.ambiente;
+
+    conteudo.innerHTML = `
+      <h2 class="inventario-dialog-titulo">${titulo}</h2>
+      <p class="inventario-dialog-meta">Altere o nome do local. A mudança será salva no Firebase e sincronizada entre dispositivos.</p>
+      <div class="inventario-campo">
+        <label for="nomeEstruturaInventario">${rotulo}</label>
+        <input id="nomeEstruturaInventario" type="text" maxlength="80" autocomplete="off" value="${escaparHtmlInventario(registro.nome)}">
+      </div>
+      <div id="erroEstruturaInventario" class="inventario-erro" role="alert" hidden></div>
+      <div class="inventario-dialog-acoes inventario-dialog-acoes-duplas">
+        <button id="salvarEstruturaInventario" class="primary-button" type="button">Salvar alteração</button>
+        <button id="cancelarEstruturaInventario" class="secondary-button" type="button">Cancelar</button>
+      </div>
+    `;
+
+    const campoNome = document.getElementById("nomeEstruturaInventario");
+    const botaoSalvar = document.getElementById("salvarEstruturaInventario");
+    const botaoCancelar = document.getElementById("cancelarEstruturaInventario");
+
+    botaoSalvar.addEventListener("click", () => editarEstruturaInventario(tipo, id));
+    botaoCancelar.addEventListener("click", () => dialogo.close());
+    campoNome.addEventListener("keydown", evento => {
+      if (evento.key === "Enter") {
+        evento.preventDefault();
+        editarEstruturaInventario(tipo, id);
+      }
+    });
+
+    if (typeof dialogo.showModal === "function") {
+      dialogo.showModal();
+    } else {
+      dialogo.setAttribute("open", "");
+    }
+
+    window.setTimeout(() => {
+      campoNome.focus();
+      campoNome.select();
+    }, 0);
+  }
+
+  async function editarEstruturaInventario(tipo, id) {
+    const campoNome = document.getElementById("nomeEstruturaInventario");
+    const dialogo = document.getElementById("dialogoEstruturaInventario");
+    const nome = String(campoNome?.value || "").trim().replace(/\s+/g, " ");
+
+    if (nome.length < 2) {
+      exibirErroEstruturaInventario("Informe um nome com pelo menos 2 caracteres.");
+      campoNome?.focus();
+      return;
+    }
+
+    const andares = garantirEstruturaEditavelInventario();
+    const localizado = localizarRegistroEstruturaInventario(andares, tipo, id);
+    const registro = localizado.registro;
+
+    if (!registro || !Array.isArray(localizado.lista)) {
+      exibirErroEstruturaInventario("Não foi possível localizar o local para edição.");
+      return;
+    }
+
+    const nomeComparacao = normalizarNomeComparacaoInventario(nome);
+    const duplicado = localizado.lista.some(outro =>
+      outro.id !== id && normalizarNomeComparacaoInventario(outro.nome) === nomeComparacao
+    );
+
+    if (duplicado) {
+      exibirErroEstruturaInventario("Já existe um local com esse nome neste nível.");
+      campoNome?.focus();
+      return;
+    }
+
+    if (normalizarNomeComparacaoInventario(registro.nome) === nomeComparacao && registro.nome === nome) {
+      dialogo?.close();
+      return;
+    }
+
+    registro.nome = nome;
+    const botaoSalvar = document.getElementById("salvarEstruturaInventario");
+
+    if (botaoSalvar) {
+      botaoSalvar.disabled = true;
+    }
+
+    try {
+      await persistirEstruturaInventario(andares);
+      dialogo?.close();
+      renderizarInventario();
+    } catch (erro) {
+      console.error("Erro ao editar estrutura do inventário:", erro);
+      exibirErroEstruturaInventario(erro.message || "Não foi possível salvar a alteração no Firebase.");
     } finally {
       if (botaoSalvar) {
         botaoSalvar.disabled = false;

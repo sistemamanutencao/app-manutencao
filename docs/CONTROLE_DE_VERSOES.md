@@ -67,3 +67,4 @@ final2.zip
 | v29 | `app-manutencao-v29-inventario-firebase.zip` | Imagem e saldo do inventário sincronizados pelo Firestore | Pronto para teste/publicação |
 
 | v30 | `app-manutencao-v30-estrutura-inventario-firebase.zip` | Andares, ambientes e áreas internas sincronizados pelo Firestore | Pronto para teste/publicação |
+| v31 | `app-manutencao-v31-edicao-andares-ambientes.zip` | Botão Editar abaixo de Excluir para renomear andares, ambientes e áreas internas com sincronização no Firestore | Pronto para teste/publicação |

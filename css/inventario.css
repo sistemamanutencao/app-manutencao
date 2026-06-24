@@ -468,7 +468,7 @@
 .inventario-estrutura-card {
   min-width: 0;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr auto auto;
   overflow: hidden;
   border: 1px solid #dce5ef;
   border-radius: 14px;
@@ -515,6 +515,25 @@
 .inventario-excluir:focus-visible {
   color: #8f1520;
   background: #ffecee;
+}
+
+.inventario-editar {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 0;
+  border-top: 1px solid #d8e5f2;
+  color: #135faa;
+  background: #f5f9fd;
+  font-size: 0.8rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.inventario-editar:hover,
+.inventario-editar:focus-visible {
+  color: #0b4c8d;
+  background: #eaf3fb;
 }
 
 .inventario-campo input[type="text"],
