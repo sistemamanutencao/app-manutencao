@@ -11,7 +11,7 @@ function openPage(pageId, navElement) {
     itemNavegacao = null;
   }
 
-  const paginasRestritasManutencao = ["painel", "ativos", "preventivas"];
+  const paginasRestritasManutencao = ["painel", "ativos", "preventivas", "inventario"];
 
   if (paginasRestritasManutencao.includes(paginaDestino) && !usuarioEhManutencaoAutorizada()) {
     alert("Acesso restrito à manutenção autorizada.\nSeu perfil não possui permissão para abrir esta área.");
@@ -98,6 +98,10 @@ function executarRenderizacaoDaPagina(pageId) {
   if (pageId === "diagnostico" && typeof renderizarDiagnosticos === "function") {
     inicializarFormularioDiagnostico();
     renderizarDiagnosticos();
+  }
+
+  if (pageId === "inventario" && typeof renderizarInventario === "function") {
+    renderizarInventario();
   }
 
   if (pageId === "perfil") {

@@ -58,3 +58,7 @@ final.zip
 final2.zip
 ```
 | v24 | `app-manutencao-v24-experiencia-redefinicao-senha.zip` | Experiência visual de solicitação de redefinição de senha com avatar, feedback interno e envio pelo Firebase Auth | Pronto para teste/publicação |
+| v25 | `app-manutencao-v25-inventario-unidade.zip` | Inventário simples por andar e ambiente, imagem de referência e saldo local de estoque | Pronto para teste/publicação |
+
+| v26 | `app-manutencao-v26-ajuste-layout-inventario.zip` | Ajuste responsivo da tela de inventário, cabeçalho, botão Voltar e legibilidade dos textos | Pronto para teste/publicação |
+| v27 | `app-manutencao-v27-torneira-blukit-unificada.zip` | Unifica todas as torneiras temporizadas no cadastro “Torneira temporizada (de mesa) Blukit” | Pronto para teste/publicação |

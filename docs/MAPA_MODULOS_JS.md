@@ -98,6 +98,16 @@ Fluxo de status técnico da OS.
 ## Módulos operacionais
 
 ```txt
+js/inventario-data.js
+```
+Catálogo inicial, andares, ambientes, áreas internas e quantidades instaladas do inventário.
+
+```txt
+js/inventario.js
+```
+Navegação do inventário, consulta do estoque e persistência local de imagem e saldo por item. Módulo exclusivo da manutenção.
+
+```txt
 js/diagnostico.js
 ```
 Diagnóstico Inicial da Unidade. Módulo exclusivo da manutenção.
