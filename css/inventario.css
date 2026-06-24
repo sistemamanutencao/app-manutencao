@@ -600,3 +600,56 @@
 .inventario-sync-status.is-ok { color: #14733b; background: #eaf7ef; }
 .inventario-sync-status.is-error { color: #a02929; background: #fff0f0; }
 .inventario-sync-status.is-loading { color: #465a73; }
+
+/* Gerenciamento de itens por ambiente */
+.inventario-item-registro {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #dce5ef;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 3px 10px rgba(16, 24, 40, 0.04);
+}
+
+.inventario-item-registro .inventario-item-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.inventario-item-registro .inventario-item-card:hover,
+.inventario-item-registro .inventario-item-card:focus-visible {
+  background: #fbfdff;
+}
+
+.inventario-excluir-item {
+  border-top-color: #f2d3d6;
+}
+
+.inventario-campos-duplos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.inventario-campo textarea {
+  width: 100%;
+  min-height: 82px;
+  padding: 11px 12px;
+  resize: vertical;
+  border: 1px solid #cfd9e5;
+  border-radius: 10px;
+  color: #1f2937;
+  background: #ffffff;
+  font: inherit;
+}
+
+#camposNovoItemInventario[hidden] {
+  display: none;
+}
+
+@media (max-width: 699px) {
+  .inventario-campos-duplos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

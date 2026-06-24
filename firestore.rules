@@ -224,6 +224,7 @@ service cloud.firestore {
     function estruturaInventarioValida() {
       return request.resource.data.keys().hasOnly([
           "andares",
+          "catalogoPersonalizado",
           "versao",
           "atualizadoEm",
           "atualizadoPorUid",
@@ -231,6 +232,8 @@ service cloud.firestore {
         ])
         && request.resource.data.andares is list
         && request.resource.data.andares.size() <= 100
+        && request.resource.data.catalogoPersonalizado is list
+        && request.resource.data.catalogoPersonalizado.size() <= 500
         && request.resource.data.versao is int
         && request.resource.data.versao >= 1
         && request.resource.data.atualizadoPorUid == request.auth.uid

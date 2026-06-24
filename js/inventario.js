@@ -4,10 +4,12 @@
    Recursos:
    - consulta por andar, ambiente e área interna;
    - inclusão, edição e exclusão de andares e ambientes;
+   - inclusão, edição de quantidade e exclusão de itens por ambiente;
+   - cadastro de novos modelos no catálogo;
    - imagem de referência por item;
    - quantidade disponível em estoque;
    - imagem e saldo sincronizados pelo Firestore;
-   - andares, ambientes e áreas internas sincronizados pelo Firestore.
+   - andares, ambientes, áreas internas e catálogo sincronizados pelo Firestore.
 ===================================================== */
 
 (function inicializarModuloInventario() {
@@ -35,9 +37,24 @@
   function obterDadosInventario() {
     const base = obterDadosBaseInventario();
     const andaresPersonalizados = estadoInventario.local?.estrutura?.andares;
+    const catalogoPersonalizado = estadoInventario.local?.estrutura?.catalogoPersonalizado;
+    const catalogoPorId = new Map();
+
+    (base.catalogo || []).forEach(item => {
+      if (item && item.id) {
+        catalogoPorId.set(item.id, { ...item, personalizado: false });
+      }
+    });
+
+    (Array.isArray(catalogoPersonalizado) ? catalogoPersonalizado : []).forEach(item => {
+      if (item && item.id && item.nome) {
+        catalogoPorId.set(item.id, { ...item, personalizado: true });
+      }
+    });
 
     return {
       ...base,
+      catalogo: Array.from(catalogoPorId.values()),
       andares: Array.isArray(andaresPersonalizados) ? andaresPersonalizados : base.andares
     };
   }
@@ -51,6 +68,11 @@
     return clonarValorInventario(Array.isArray(origem) ? origem : (obterDadosBaseInventario().andares || []));
   }
 
+  function garantirCatalogoPersonalizadoEditavelInventario() {
+    const origem = estadoInventario.local?.estrutura?.catalogoPersonalizado;
+    return clonarValorInventario(Array.isArray(origem) ? origem : []);
+  }
+
   function atualizarStatusSincronizacaoInventario() {
     if (estadoInventario.sincronizacao === "erro") {
       return;
@@ -61,14 +83,15 @@
       : "aguardando";
   }
 
-  function atualizarCacheLocalEstruturaInventario(andares) {
+  function atualizarCacheLocalEstruturaInventario(andares, catalogoPersonalizado = garantirCatalogoPersonalizadoEditavelInventario()) {
     estadoInventario.local.estrutura = {
-      andares: clonarValorInventario(Array.isArray(andares) ? andares : [])
+      andares: clonarValorInventario(Array.isArray(andares) ? andares : []),
+      catalogoPersonalizado: clonarValorInventario(Array.isArray(catalogoPersonalizado) ? catalogoPersonalizado : [])
     };
     salvarEstadoLocalInventario();
   }
 
-  async function persistirEstruturaInventario(andares) {
+  async function persistirEstruturaInventario(andares, catalogoPersonalizado = garantirCatalogoPersonalizadoEditavelInventario()) {
     if (!estadoInventario.estruturaRemotaCarregada || !estadoInventario.estruturaSincronizada) {
       throw new Error("Aguarde a sincronização inicial dos andares e ambientes antes de alterar a estrutura.");
     }
@@ -80,8 +103,8 @@
     estadoInventario.salvandoEstrutura = true;
 
     try {
-      await salvarInventarioEstruturaFirebase(andares);
-      atualizarCacheLocalEstruturaInventario(andares);
+      await salvarInventarioEstruturaFirebase(andares, catalogoPersonalizado);
+      atualizarCacheLocalEstruturaInventario(andares, catalogoPersonalizado);
       estadoInventario.estruturaSincronizada = true;
       estadoInventario.sincronizacao = "aguardando";
       atualizarStatusSincronizacaoInventario();
@@ -102,6 +125,8 @@
 
       if (normalizado.estrutura && !Array.isArray(normalizado.estrutura.andares)) {
         delete normalizado.estrutura;
+      } else if (normalizado.estrutura && !Array.isArray(normalizado.estrutura.catalogoPersonalizado)) {
+        normalizado.estrutura.catalogoPersonalizado = [];
       }
 
       const cadastroAntigo = normalizado.itens["torneira-temporizada"];
@@ -211,10 +236,11 @@
 
     estadoInventario.migracaoEstruturaExecutada = true;
     const andares = garantirEstruturaEditavelInventario();
+    const catalogoPersonalizado = garantirCatalogoPersonalizadoEditavelInventario();
 
     try {
-      await salvarInventarioEstruturaFirebase(andares);
-      atualizarCacheLocalEstruturaInventario(andares);
+      await salvarInventarioEstruturaFirebase(andares, catalogoPersonalizado);
+      atualizarCacheLocalEstruturaInventario(andares, catalogoPersonalizado);
       estadoInventario.estruturaSincronizada = true;
       estadoInventario.sincronizacao = "aguardando";
       atualizarStatusSincronizacaoInventario();
@@ -232,7 +258,10 @@
     estadoInventario.estruturaRemotaCarregada = true;
 
     if (estrutura && Array.isArray(estrutura.andares)) {
-      atualizarCacheLocalEstruturaInventario(estrutura.andares);
+      atualizarCacheLocalEstruturaInventario(
+        estrutura.andares,
+        Array.isArray(estrutura.catalogoPersonalizado) ? estrutura.catalogoPersonalizado : []
+      );
       estadoInventario.estruturaSincronizada = true;
       estadoInventario.sincronizacao = "aguardando";
       atualizarStatusSincronizacaoInventario();
@@ -476,14 +505,20 @@
 
   function renderizarItensDoAmbienteInventario(area) {
     const conteudo = document.getElementById("inventarioConteudo");
+    const itensArea = Array.isArray(area.itens) ? area.itens : [];
 
     conteudo.innerHTML = `
       ${criarBreadcrumbInventario()}
-      <h2 class="inventario-titulo">${escaparHtmlInventario(area.nome)}</h2>
-      <p class="inventario-subtitulo">${area.itens.length} tipos de item · ${somarItensAreaInventario(area)} unidades instaladas</p>
-      ${area.itens.length ? `
+      ${criarCabecalhoGerenciamentoInventario(
+        area.nome,
+        `${itensArea.length} tipos de item · ${somarItensAreaInventario(area)} unidades instaladas`,
+        "Adicionar item",
+        "item"
+      )}
+      ${criarStatusSincronizacaoInventario()}
+      ${itensArea.length ? `
         <div class="inventario-lista-itens">
-          ${area.itens.map(entrada => {
+          ${itensArea.map(entrada => {
             const item = obterItemCatalogoInventario(entrada.itemId);
 
             if (!item) {
@@ -495,21 +530,27 @@
             const observacao = entrada.observacao ? `<p class="inventario-item-meta">${escaparHtmlInventario(entrada.observacao)}</p>` : "";
 
             return `
-              <button class="inventario-item-card" type="button" data-inventario-item="${entrada.itemId}" aria-label="Abrir ${escaparHtmlInventario(item.nome)}">
-                ${criarImagemInventario(entrada.itemId)}
-                <div>
-                  <p class="inventario-item-nome">${escaparHtmlInventario(item.nome)}</p>
-                  <p class="inventario-item-meta">${marca}Estoque: ${estoque === null ? "não informado" : estoque}</p>
-                  ${observacao}
-                </div>
-                <div class="inventario-quantidade"><strong>${entrada.quantidade}</strong><span>no ambiente</span></div>
-              </button>
+              <article class="inventario-item-registro">
+                <button class="inventario-item-card" type="button" data-inventario-item="${entrada.itemId}" aria-label="Abrir ${escaparHtmlInventario(item.nome)}">
+                  ${criarImagemInventario(entrada.itemId)}
+                  <div>
+                    <p class="inventario-item-nome">${escaparHtmlInventario(item.nome)}</p>
+                    <p class="inventario-item-meta">${marca}Estoque: ${estoque === null ? "não informado" : estoque}</p>
+                    ${observacao}
+                  </div>
+                  <div class="inventario-quantidade"><strong>${entrada.quantidade}</strong><span>no ambiente</span></div>
+                </button>
+                <button class="inventario-excluir inventario-excluir-item" type="button" data-inventario-delete-item="${entrada.itemId}" aria-label="Excluir ${escaparHtmlInventario(item.nome)} deste ambiente">
+                  Excluir
+                </button>
+              </article>
             `;
           }).join("")}
         </div>
-      ` : '<div class="inventario-vazio">Este ambiente ainda não possui itens cadastrados.</div>'}
+      ` : '<div class="inventario-vazio">Este ambiente ainda não possui itens cadastrados. Use “Adicionar item” para iniciar.</div>'}
     `;
 
+    vincularBotoesEstruturaInventario();
     vincularBotoesItemInventario();
   }
 
@@ -537,7 +578,7 @@
   function criarStatusSincronizacaoInventario() {
     const estados = {
       aguardando: ["Sincronizando inventário com o Firebase…", "is-loading"],
-      sincronizado: ["Itens, saldos e estrutura sincronizados entre dispositivos", "is-ok"],
+      sincronizado: ["Itens, saldos, catálogo e estrutura sincronizados entre dispositivos", "is-ok"],
       erro: ["Sem sincronização: verifique a conexão e publique as regras atualizadas do Firestore", "is-error"]
     };
     const [texto, classe] = estados[estadoInventario.sincronizacao] || estados.aguardando;
@@ -556,7 +597,7 @@
 
     conteudo.innerHTML = `
       <h2 class="inventario-titulo">Estoque</h2>
-      <p class="inventario-subtitulo">Imagem, saldo e estrutura do inventário são sincronizados pelo Firebase entre dispositivos.</p>
+      <p class="inventario-subtitulo">Imagem, saldo, catálogo e estrutura do inventário são sincronizados pelo Firebase entre dispositivos.</p>
       ${criarStatusSincronizacaoInventario()}
       <input id="buscaEstoqueInventario" class="inventario-busca" type="search" value="${escaparHtmlInventario(filtro)}" placeholder="Pesquisar item, marca ou modelo" aria-label="Pesquisar estoque">
       ${itens.length ? `
@@ -597,7 +638,14 @@
     });
 
     document.querySelectorAll("[data-inventario-add]").forEach(botao => {
-      botao.addEventListener("click", () => abrirDialogoAdicionarEstruturaInventario(botao.dataset.inventarioAdd));
+      botao.addEventListener("click", () => {
+        if (botao.dataset.inventarioAdd === "item") {
+          abrirDialogoAdicionarItemInventario();
+          return;
+        }
+
+        abrirDialogoAdicionarEstruturaInventario(botao.dataset.inventarioAdd);
+      });
     });
 
     document.querySelectorAll("[data-inventario-delete]").forEach(botao => {
@@ -618,6 +666,10 @@
   function vincularBotoesItemInventario() {
     document.querySelectorAll("[data-inventario-item]").forEach(botao => {
       botao.addEventListener("click", () => abrirItemInventario(botao.dataset.inventarioItem));
+    });
+
+    document.querySelectorAll("[data-inventario-delete-item]").forEach(botao => {
+      botao.addEventListener("click", () => excluirItemDoAmbienteInventario(botao.dataset.inventarioDeleteItem));
     });
   }
 
@@ -653,6 +705,258 @@
       : `${Date.now()}-${Math.random().toString(16).slice(2, 7)}`;
 
     return `${prefixo}-${slug}-${sufixo}`;
+  }
+
+  function obterAreaAtualInventario(andares = obterDadosInventario().andares) {
+    const area = obterNoPorCaminhoInventario(andares, estadoInventario.caminho);
+    return area && Array.isArray(area.itens) ? area : null;
+  }
+
+  function abrirDialogoAdicionarItemInventario() {
+    const dados = obterDadosInventario();
+    const area = obterAreaAtualInventario(dados.andares);
+    const dialogo = document.getElementById("dialogoEstruturaInventario");
+    const conteudo = document.getElementById("dialogoEstruturaInventarioConteudo");
+
+    if (!area || !dialogo || !conteudo) {
+      alert("Não foi possível localizar o ambiente para adicionar o item.");
+      return;
+    }
+
+    const itensJaCadastrados = new Set((area.itens || []).map(entrada => entrada.itemId));
+    const itensDisponiveis = dados.catalogo
+      .filter(item => !itensJaCadastrados.has(item.id))
+      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+    const selecionarNovo = itensDisponiveis.length === 0;
+
+    conteudo.innerHTML = `
+      <h2 class="inventario-dialog-titulo">Adicionar item</h2>
+      <p class="inventario-dialog-meta">Selecione um item já existente no catálogo ou cadastre um novo modelo. A inclusão será salva no Firebase.</p>
+      <div class="inventario-campo">
+        <label for="itemCatalogoInventario">Item</label>
+        <select id="itemCatalogoInventario">
+          ${itensDisponiveis.length ? '<option value="">Selecione um item</option>' : ""}
+          ${itensDisponiveis.map(item => `<option value="${escaparHtmlInventario(item.id)}">${escaparHtmlInventario(item.nome)}</option>`).join("")}
+          <option value="__novo__" ${selecionarNovo ? "selected" : ""}>+ Cadastrar novo item</option>
+        </select>
+      </div>
+      <div id="camposNovoItemInventario" ${selecionarNovo ? "" : "hidden"}>
+        <div class="inventario-campo">
+          <label for="nomeNovoItemInventario">Nome do item</label>
+          <input id="nomeNovoItemInventario" type="text" maxlength="120" autocomplete="off" placeholder="Ex.: Torneira temporizada de parede">
+        </div>
+        <div class="inventario-campos-duplos">
+          <div class="inventario-campo">
+            <label for="marcaNovoItemInventario">Marca</label>
+            <input id="marcaNovoItemInventario" type="text" maxlength="80" autocomplete="off" placeholder="Não informada">
+          </div>
+          <div class="inventario-campo">
+            <label for="modeloNovoItemInventario">Modelo/referência</label>
+            <input id="modeloNovoItemInventario" type="text" maxlength="100" autocomplete="off" placeholder="Não informado">
+          </div>
+        </div>
+        <div class="inventario-campo">
+          <label for="observacaoNovoItemInventario">Observação</label>
+          <textarea id="observacaoNovoItemInventario" maxlength="300" rows="3" placeholder="Detalhe de acabamento, medida ou padrão do produto"></textarea>
+        </div>
+      </div>
+      <div class="inventario-campo">
+        <label for="quantidadeNovoItemInventario">Quantidade instalada neste ambiente</label>
+        <input id="quantidadeNovoItemInventario" type="number" min="1" step="1" value="1">
+      </div>
+      <div id="erroEstruturaInventario" class="inventario-erro" role="alert" hidden></div>
+      <div class="inventario-dialog-acoes inventario-dialog-acoes-duplas">
+        <button id="salvarEstruturaInventario" class="primary-button" type="button">Adicionar item</button>
+        <button id="cancelarEstruturaInventario" class="secondary-button" type="button">Cancelar</button>
+      </div>
+    `;
+
+    const seletor = document.getElementById("itemCatalogoInventario");
+    const camposNovo = document.getElementById("camposNovoItemInventario");
+    const botaoSalvar = document.getElementById("salvarEstruturaInventario");
+    const botaoCancelar = document.getElementById("cancelarEstruturaInventario");
+
+    const atualizarCamposNovo = () => {
+      const novo = seletor.value === "__novo__";
+      camposNovo.hidden = !novo;
+
+      if (novo) {
+        window.setTimeout(() => document.getElementById("nomeNovoItemInventario")?.focus(), 0);
+      }
+    };
+
+    seletor.addEventListener("change", atualizarCamposNovo);
+    botaoSalvar.addEventListener("click", adicionarItemAoAmbienteInventario);
+    botaoCancelar.addEventListener("click", () => dialogo.close());
+
+    if (typeof dialogo.showModal === "function") {
+      dialogo.showModal();
+    } else {
+      dialogo.setAttribute("open", "");
+    }
+
+    window.setTimeout(() => {
+      if (selecionarNovo) {
+        document.getElementById("nomeNovoItemInventario")?.focus();
+      } else {
+        seletor.focus();
+      }
+    }, 0);
+  }
+
+  async function adicionarItemAoAmbienteInventario() {
+    const seletor = document.getElementById("itemCatalogoInventario");
+    const campoQuantidade = document.getElementById("quantidadeNovoItemInventario");
+    const dialogo = document.getElementById("dialogoEstruturaInventario");
+    const escolha = String(seletor?.value || "");
+    const quantidade = Number.parseInt(campoQuantidade?.value, 10);
+
+    if (!Number.isInteger(quantidade) || quantidade < 1) {
+      exibirErroEstruturaInventario("Informe uma quantidade instalada maior que zero.");
+      campoQuantidade?.focus();
+      return;
+    }
+
+    if (!escolha) {
+      exibirErroEstruturaInventario("Selecione um item do catálogo ou escolha cadastrar um novo item.");
+      seletor?.focus();
+      return;
+    }
+
+    const andares = garantirEstruturaEditavelInventario();
+    const catalogoPersonalizado = garantirCatalogoPersonalizadoEditavelInventario();
+    const area = obterAreaAtualInventario(andares);
+
+    if (!area) {
+      exibirErroEstruturaInventario("Não foi possível localizar o ambiente de destino.");
+      return;
+    }
+
+    let itemId = escolha;
+
+    if (escolha === "__novo__") {
+      const nome = String(document.getElementById("nomeNovoItemInventario")?.value || "").trim().replace(/\s+/g, " ");
+      const marca = String(document.getElementById("marcaNovoItemInventario")?.value || "").trim().replace(/\s+/g, " ") || "Não informada";
+      const modelo = String(document.getElementById("modeloNovoItemInventario")?.value || "").trim().replace(/\s+/g, " ") || "Não informado";
+      const observacao = String(document.getElementById("observacaoNovoItemInventario")?.value || "").trim().replace(/\s+/g, " ");
+
+      if (nome.length < 2) {
+        exibirErroEstruturaInventario("Informe o nome do novo item com pelo menos 2 caracteres.");
+        document.getElementById("nomeNovoItemInventario")?.focus();
+        return;
+      }
+
+      const dadosAtuais = obterDadosInventario();
+      const nomeNormalizado = normalizarNomeComparacaoInventario(nome);
+      const marcaNormalizada = normalizarNomeComparacaoInventario(marca);
+      const modeloNormalizado = normalizarNomeComparacaoInventario(modelo);
+      const equivalente = dadosAtuais.catalogo.find(item =>
+        normalizarNomeComparacaoInventario(item.nome) === nomeNormalizado
+        && normalizarNomeComparacaoInventario(item.marca) === marcaNormalizada
+        && normalizarNomeComparacaoInventario(item.modelo) === modeloNormalizado
+      );
+
+      if (equivalente) {
+        const jaEstaNoAmbiente = (area.itens || []).some(entrada => entrada.itemId === equivalente.id);
+        exibirErroEstruturaInventario(jaEstaNoAmbiente
+          ? "Esse item já está cadastrado neste ambiente. Abra-o para alterar a quantidade."
+          : "Esse item já existe no catálogo. Selecione-o na lista para evitar duplicidade.");
+        seletor?.focus();
+        return;
+      }
+
+      itemId = gerarIdInventario("item", nome);
+      catalogoPersonalizado.push({
+        id: itemId,
+        nome,
+        marca,
+        modelo,
+        observacao,
+        personalizado: true
+      });
+    }
+
+    const itemCatalogo = escolha === "__novo__"
+      ? catalogoPersonalizado.find(item => item.id === itemId)
+      : obterItemCatalogoInventario(itemId);
+
+    if (!itemCatalogo) {
+      exibirErroEstruturaInventario("O item selecionado não foi encontrado no catálogo.");
+      return;
+    }
+
+    if ((area.itens || []).some(entrada => entrada.itemId === itemId)) {
+      exibirErroEstruturaInventario("Este item já está cadastrado no ambiente. Abra o item para alterar a quantidade.");
+      return;
+    }
+
+    area.itens.push({ itemId, quantidade });
+    const botaoSalvar = document.getElementById("salvarEstruturaInventario");
+
+    if (botaoSalvar) {
+      botaoSalvar.disabled = true;
+    }
+
+    try {
+      await persistirEstruturaInventario(andares, catalogoPersonalizado);
+      dialogo?.close();
+      renderizarInventario();
+    } catch (erro) {
+      console.error("Erro ao adicionar item ao ambiente:", erro);
+      exibirErroEstruturaInventario(erro.message || "Não foi possível adicionar o item no Firebase.");
+    } finally {
+      if (botaoSalvar) {
+        botaoSalvar.disabled = false;
+      }
+    }
+  }
+
+  async function excluirItemDoAmbienteInventario(itemId) {
+    const dados = obterDadosInventario();
+    const areaAtual = obterAreaAtualInventario(dados.andares);
+    const entradaAtual = areaAtual?.itens?.find(entrada => entrada.itemId === itemId);
+    const item = obterItemCatalogoInventario(itemId);
+
+    if (!areaAtual || !entradaAtual || !item) {
+      alert("O item selecionado não foi encontrado neste ambiente.");
+      renderizarInventario();
+      return;
+    }
+
+    const confirmado = window.confirm(
+      `Excluir “${item.nome}” deste ambiente?\n\n`
+      + `${entradaAtual.quantidade} ${entradaAtual.quantidade === 1 ? "unidade instalada será removida" : "unidades instaladas serão removidas"}. `
+      + "A imagem e o saldo permanecerão no catálogo para uso em outros ambientes."
+    );
+
+    if (!confirmado) {
+      return;
+    }
+
+    const andares = garantirEstruturaEditavelInventario();
+    const areaEditavel = obterAreaAtualInventario(andares);
+
+    if (!areaEditavel) {
+      alert("Não foi possível localizar o ambiente para exclusão.");
+      return;
+    }
+
+    const indice = areaEditavel.itens.findIndex(entrada => entrada.itemId === itemId);
+
+    if (indice < 0) {
+      alert("O item selecionado não foi encontrado neste ambiente.");
+      return;
+    }
+
+    areaEditavel.itens.splice(indice, 1);
+
+    try {
+      await persistirEstruturaInventario(andares);
+      renderizarInventario();
+    } catch (erro) {
+      console.error("Erro ao excluir item do ambiente:", erro);
+      alert(erro.message || "Não foi possível excluir o item no Firebase.");
+    }
   }
 
   function abrirDialogoAdicionarEstruturaInventario(tipo) {
@@ -1036,6 +1340,9 @@
   function abrirItemInventario(itemId) {
     const item = obterItemCatalogoInventario(itemId);
     const local = obterEstadoItemInventario(itemId);
+    const dados = obterDadosInventario();
+    const areaAtual = obterAreaAtualInventario(dados.andares);
+    const entradaAtual = areaAtual?.itens?.find(entrada => entrada.itemId === itemId) || null;
     const dialogo = document.getElementById("dialogoItemInventario");
     const conteudo = document.getElementById("dialogoItemInventarioConteudo");
 
@@ -1049,6 +1356,12 @@
       ${local.imagem
         ? `<img class="inventario-dialog-imagem" src="${local.imagem}" alt="Imagem de referência do item">`
         : '<div class="inventario-dialog-imagem inventario-sem-foto">SEM FOTO DE REFERÊNCIA</div>'}
+      ${entradaAtual ? `
+        <div class="inventario-campo">
+          <label for="quantidadeAmbienteItemInventario">Quantidade instalada neste ambiente</label>
+          <input id="quantidadeAmbienteItemInventario" type="number" min="1" step="1" value="${entradaAtual.quantidade}">
+        </div>
+      ` : ""}
       <div class="inventario-campo">
         <label for="imagemItemInventario">Imagem de referência</label>
         <input id="imagemItemInventario" type="file" accept="image/*">
@@ -1062,12 +1375,23 @@
         <button id="salvarItemInventario" class="primary-button" type="button">Salvar item</button>
         ${local.imagem ? '<button id="removerImagemItemInventario" class="secondary-button" type="button">Remover imagem</button>' : ""}
       </div>
-      <p class="inventario-aviso-local">Imagem, saldo, andares, ambientes e áreas internas são salvos no Firebase e sincronizados entre dispositivos.</p>
+      <p class="inventario-aviso-local">Imagem, saldo, quantidade instalada, catálogo e estrutura são salvos no Firebase e sincronizados entre dispositivos.</p>
     `;
 
     const botaoSalvar = document.getElementById("salvarItemInventario");
 
     botaoSalvar.addEventListener("click", async () => {
+      const campoQuantidadeAmbiente = document.getElementById("quantidadeAmbienteItemInventario");
+      const quantidadeAmbiente = campoQuantidadeAmbiente
+        ? Number.parseInt(campoQuantidadeAmbiente.value, 10)
+        : null;
+
+      if (campoQuantidadeAmbiente && (!Number.isInteger(quantidadeAmbiente) || quantidadeAmbiente < 1)) {
+        alert("Informe uma quantidade instalada maior que zero.");
+        campoQuantidadeAmbiente.focus();
+        return;
+      }
+
       botaoSalvar.disabled = true;
 
       try {
@@ -1087,7 +1411,22 @@
           throw new Error("O serviço de sincronização do inventário não foi carregado.");
         }
 
-        await salvarItemInventarioFirebase(itemId, novoEstado);
+        const operacoes = [salvarItemInventarioFirebase(itemId, novoEstado)];
+
+        if (entradaAtual && quantidadeAmbiente !== entradaAtual.quantidade) {
+          const andares = garantirEstruturaEditavelInventario();
+          const areaEditavel = obterAreaAtualInventario(andares);
+          const entradaEditavel = areaEditavel?.itens?.find(entrada => entrada.itemId === itemId);
+
+          if (!entradaEditavel) {
+            throw new Error("Não foi possível localizar o item no ambiente para atualizar a quantidade.");
+          }
+
+          entradaEditavel.quantidade = quantidadeAmbiente;
+          operacoes.push(persistirEstruturaInventario(andares));
+        }
+
+        await Promise.all(operacoes);
         estadoInventario.remoto[itemId] = normalizarEstadoItemInventario(novoEstado);
         atualizarCacheLocalItemInventario(itemId, novoEstado);
         estadoInventario.itensSincronizados = true;
@@ -1098,7 +1437,7 @@
         renderizarInventario();
       } catch (erro) {
         console.error("Erro ao salvar item do inventário:", erro);
-        alert(erro.message || "Não foi possível processar a imagem selecionada.");
+        alert(erro.message || "Não foi possível salvar o item no Firebase.");
       } finally {
         botaoSalvar.disabled = false;
       }

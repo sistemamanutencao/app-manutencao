@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v31-edicao-estrutura-inventario";
+const CACHE_NAME = "app-manutencao-v32-gerenciamento-itens-inventario";
 
 const FILES_TO_CACHE = [
   "./",
