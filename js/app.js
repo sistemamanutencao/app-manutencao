@@ -370,6 +370,20 @@ function iniciarMonitoresDeDados() {
     });
   }
 
+  if (usuarioEhManutencaoAutorizada() && typeof observarInventarioEstruturaFirebase === "function") {
+    monitorInventarioEstrutura = observarInventarioEstruturaFirebase(estrutura => {
+      if (typeof receberInventarioEstruturaFirebase === "function") {
+        receberInventarioEstruturaFirebase(estrutura);
+      }
+    }, erro => {
+      console.error("Erro ao sincronizar andares e ambientes do inventário:", erro);
+
+      if (typeof informarErroSincronizacaoEstruturaInventario === "function") {
+        informarErroSincronizacaoEstruturaInventario(erro);
+      }
+    });
+  }
+
 }
 
 function encerrarMonitoresDeDados() {
@@ -411,6 +425,11 @@ function encerrarMonitoresDeDados() {
   if (typeof monitorInventarioItens === "function") {
     monitorInventarioItens();
     monitorInventarioItens = null;
+  }
+
+  if (typeof monitorInventarioEstrutura === "function") {
+    monitorInventarioEstrutura();
+    monitorInventarioEstrutura = null;
   }
 }
 

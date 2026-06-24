@@ -52,3 +52,4 @@ let monitorPlanosPreventivos = null;
 let monitorDiagnosticos = null;
 let monitorCadastrosColaboradores = null;
 let monitorInventarioItens = null;
+let monitorInventarioEstrutura = null;

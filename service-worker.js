@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v29-inventario-firebase";
+const CACHE_NAME = "app-manutencao-v30-inventario-estrutura-firebase";
 
 const FILES_TO_CACHE = [
   "./",

@@ -221,6 +221,22 @@ service cloud.firestore {
         && request.resource.data.atualizadoPorNome is string;
     }
 
+    function estruturaInventarioValida() {
+      return request.resource.data.keys().hasOnly([
+          "andares",
+          "versao",
+          "atualizadoEm",
+          "atualizadoPorUid",
+          "atualizadoPorNome"
+        ])
+        && request.resource.data.andares is list
+        && request.resource.data.andares.size() <= 100
+        && request.resource.data.versao is int
+        && request.resource.data.versao >= 1
+        && request.resource.data.atualizadoPorUid == request.auth.uid
+        && request.resource.data.atualizadoPorNome is string;
+    }
+
     function usuarioPodeAtualizarProprioCadastroBasico(id) {
       return estaAutenticado()
         && id == request.auth.uid
@@ -286,6 +302,12 @@ service cloud.firestore {
       allow read: if ehManutencao();
       allow create, update: if ehManutencao() && itemInventarioValido();
       allow delete: if ehManutencao();
+    }
+
+    match /inventarioEstrutura/{id} {
+      allow read: if ehManutencao() && id == "principal";
+      allow create, update: if ehManutencao() && id == "principal" && estruturaInventarioValida();
+      allow delete: if ehManutencao() && id == "principal";
     }
 
     match /usuarios/{id} {

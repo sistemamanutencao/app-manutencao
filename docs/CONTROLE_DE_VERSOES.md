@@ -65,3 +65,5 @@ final2.zip
 | v28 | `app-manutencao-v28-gerenciamento-andares-ambientes.zip` | Inclusão e exclusão de andares, ambientes e áreas internas no inventário | Pronto para teste/publicação |
 
 | v29 | `app-manutencao-v29-inventario-firebase.zip` | Imagem e saldo do inventário sincronizados pelo Firestore | Pronto para teste/publicação |
+
+| v30 | `app-manutencao-v30-estrutura-inventario-firebase.zip` | Andares, ambientes e áreas internas sincronizados pelo Firestore | Pronto para teste/publicação |

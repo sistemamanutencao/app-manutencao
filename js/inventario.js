@@ -7,7 +7,7 @@
    - imagem de referência por item;
    - quantidade disponível em estoque;
    - imagem e saldo sincronizados pelo Firestore;
-   - estrutura de andares e ambientes mantida localmente.
+   - andares, ambientes e áreas internas sincronizados pelo Firestore.
 ===================================================== */
 
 (function inicializarModuloInventario() {
@@ -20,7 +20,12 @@
     local: carregarEstadoLocalInventario(),
     remoto: {},
     sincronizacao: "aguardando",
-    migracaoLocalExecutada: false
+    itensSincronizados: false,
+    estruturaSincronizada: false,
+    estruturaRemotaCarregada: false,
+    migracaoLocalExecutada: false,
+    migracaoEstruturaExecutada: false,
+    salvandoEstrutura: false
   };
 
   function obterDadosBaseInventario() {
@@ -42,13 +47,47 @@
   }
 
   function garantirEstruturaEditavelInventario() {
-    if (!estadoInventario.local.estrutura || !Array.isArray(estadoInventario.local.estrutura.andares)) {
-      estadoInventario.local.estrutura = {
-        andares: clonarValorInventario(obterDadosBaseInventario().andares || [])
-      };
+    const origem = estadoInventario.local?.estrutura?.andares;
+    return clonarValorInventario(Array.isArray(origem) ? origem : (obterDadosBaseInventario().andares || []));
+  }
+
+  function atualizarStatusSincronizacaoInventario() {
+    if (estadoInventario.sincronizacao === "erro") {
+      return;
     }
 
-    return estadoInventario.local.estrutura.andares;
+    estadoInventario.sincronizacao = estadoInventario.itensSincronizados && estadoInventario.estruturaSincronizada
+      ? "sincronizado"
+      : "aguardando";
+  }
+
+  function atualizarCacheLocalEstruturaInventario(andares) {
+    estadoInventario.local.estrutura = {
+      andares: clonarValorInventario(Array.isArray(andares) ? andares : [])
+    };
+    salvarEstadoLocalInventario();
+  }
+
+  async function persistirEstruturaInventario(andares) {
+    if (!estadoInventario.estruturaRemotaCarregada || !estadoInventario.estruturaSincronizada) {
+      throw new Error("Aguarde a sincronização inicial dos andares e ambientes antes de alterar a estrutura.");
+    }
+
+    if (typeof salvarInventarioEstruturaFirebase !== "function") {
+      throw new Error("O serviço de sincronização da estrutura do inventário não foi carregado.");
+    }
+
+    estadoInventario.salvandoEstrutura = true;
+
+    try {
+      await salvarInventarioEstruturaFirebase(andares);
+      atualizarCacheLocalEstruturaInventario(andares);
+      estadoInventario.estruturaSincronizada = true;
+      estadoInventario.sincronizacao = "aguardando";
+      atualizarStatusSincronizacaoInventario();
+    } finally {
+      estadoInventario.salvandoEstrutura = false;
+    }
   }
 
   function carregarEstadoLocalInventario() {
@@ -89,8 +128,7 @@
       localStorage.setItem(CHAVE_ARMAZENAMENTO_INVENTARIO, JSON.stringify(estadoInventario.local));
       return true;
     } catch (erro) {
-      console.error("Não foi possível salvar o inventário local:", erro);
-      alert("Não foi possível salvar os dados do inventário neste navegador. Remova imagens antigas ou libere espaço e tente novamente.");
+      console.warn("Não foi possível atualizar o cache local do inventário. Os dados remotos permanecem no Firebase:", erro);
       return false;
     }
   }
@@ -156,8 +194,51 @@
       atualizarCacheLocalItemInventario(itemId, dados);
     });
 
-    estadoInventario.sincronizacao = "sincronizado";
+    estadoInventario.itensSincronizados = true;
+    estadoInventario.sincronizacao = "aguardando";
+    atualizarStatusSincronizacaoInventario();
     migrarDadosLocaisInventarioParaFirebase();
+
+    if (document.getElementById("inventarioConteudo")) {
+      renderizarInventario();
+    }
+  };
+
+  async function migrarEstruturaLocalInventarioParaFirebase() {
+    if (estadoInventario.migracaoEstruturaExecutada) {
+      return;
+    }
+
+    estadoInventario.migracaoEstruturaExecutada = true;
+    const andares = garantirEstruturaEditavelInventario();
+
+    try {
+      await salvarInventarioEstruturaFirebase(andares);
+      atualizarCacheLocalEstruturaInventario(andares);
+      estadoInventario.estruturaSincronizada = true;
+      estadoInventario.sincronizacao = "aguardando";
+      atualizarStatusSincronizacaoInventario();
+    } catch (erro) {
+      estadoInventario.sincronizacao = "erro";
+      console.error("Não foi possível migrar a estrutura local do inventário:", erro);
+    }
+
+    if (document.getElementById("inventarioConteudo")) {
+      renderizarInventario();
+    }
+  }
+
+  window.receberInventarioEstruturaFirebase = function receberInventarioEstruturaFirebase(estrutura) {
+    estadoInventario.estruturaRemotaCarregada = true;
+
+    if (estrutura && Array.isArray(estrutura.andares)) {
+      atualizarCacheLocalEstruturaInventario(estrutura.andares);
+      estadoInventario.estruturaSincronizada = true;
+      estadoInventario.sincronizacao = "aguardando";
+      atualizarStatusSincronizacaoInventario();
+    } else {
+      migrarEstruturaLocalInventarioParaFirebase();
+    }
 
     if (document.getElementById("inventarioConteudo")) {
       renderizarInventario();
@@ -166,6 +247,15 @@
 
   window.informarErroSincronizacaoInventario = function informarErroSincronizacaoInventario() {
     estadoInventario.sincronizacao = "erro";
+
+    if (document.getElementById("inventarioConteudo")) {
+      renderizarInventario();
+    }
+  };
+
+  window.informarErroSincronizacaoEstruturaInventario = function informarErroSincronizacaoEstruturaInventario() {
+    estadoInventario.sincronizacao = "erro";
+    estadoInventario.estruturaRemotaCarregada = false;
 
     if (document.getElementById("inventarioConteudo")) {
       renderizarInventario();
@@ -318,6 +408,7 @@
         "Adicionar andar",
         "andar"
       )}
+      ${criarStatusSincronizacaoInventario()}
       <div class="inventario-resumo">
         <div class="inventario-resumo-card"><strong>${dados.andares.length}</strong><span>andares cadastrados</span></div>
         <div class="inventario-resumo-card"><strong>${totalAreas}</strong><span>áreas com inventário</span></div>
@@ -349,6 +440,7 @@
         tipoNovo === "subarea" ? "Adicionar área interna" : "Adicionar ambiente",
         tipoNovo
       )}
+      ${criarStatusSincronizacaoInventario()}
       ${filhos.length ? `
         <div class="inventario-grade">
           ${filhos.map(filho => criarCardEstruturaInventario(
@@ -441,9 +533,9 @@
 
   function criarStatusSincronizacaoInventario() {
     const estados = {
-      aguardando: ["Sincronizando com o Firebase…", "is-loading"],
-      sincronizado: ["Dados sincronizados entre dispositivos", "is-ok"],
-      erro: ["Sem sincronização: verifique a conexão e as regras do Firestore", "is-error"]
+      aguardando: ["Sincronizando inventário com o Firebase…", "is-loading"],
+      sincronizado: ["Itens, saldos e estrutura sincronizados entre dispositivos", "is-ok"],
+      erro: ["Sem sincronização: verifique a conexão e publique as regras atualizadas do Firestore", "is-error"]
     };
     const [texto, classe] = estados[estadoInventario.sincronizacao] || estados.aguardando;
 
@@ -461,7 +553,7 @@
 
     conteudo.innerHTML = `
       <h2 class="inventario-titulo">Estoque</h2>
-      <p class="inventario-subtitulo">A imagem e o saldo pertencem ao cadastro único do item e são sincronizados pelo Firebase entre dispositivos.</p>
+      <p class="inventario-subtitulo">Imagem, saldo e estrutura do inventário são sincronizados pelo Firebase entre dispositivos.</p>
       ${criarStatusSincronizacaoInventario()}
       <input id="buscaEstoqueInventario" class="inventario-busca" type="search" value="${escaparHtmlInventario(filtro)}" placeholder="Pesquisar item, marca ou modelo" aria-label="Pesquisar estoque">
       ${itens.length ? `
@@ -588,7 +680,7 @@
 
     conteudo.innerHTML = `
       <h2 class="inventario-dialog-titulo">${configuracao.titulo}</h2>
-      <p class="inventario-dialog-meta">O novo local ficará salvo neste navegador.</p>
+      <p class="inventario-dialog-meta">O novo local será salvo no Firebase e ficará disponível em todos os dispositivos.</p>
       <div class="inventario-campo">
         <label for="nomeEstruturaInventario">${configuracao.rotulo}</label>
         <input id="nomeEstruturaInventario" type="text" maxlength="80" autocomplete="off" placeholder="${configuracao.placeholder}">
@@ -640,7 +732,7 @@
     }
   }
 
-  function adicionarEstruturaInventario(tipo) {
+  async function adicionarEstruturaInventario(tipo) {
     const campoNome = document.getElementById("nomeEstruturaInventario");
     const dialogo = document.getElementById("dialogoEstruturaInventario");
     const nome = String(campoNome?.value || "").trim().replace(/\s+/g, " ");
@@ -701,17 +793,27 @@
     }
 
     listaDestino.push(novoRegistro);
+    const botaoSalvar = document.getElementById("salvarEstruturaInventario");
 
-    if (!salvarEstadoLocalInventario()) {
-      listaDestino.pop();
-      return;
+    if (botaoSalvar) {
+      botaoSalvar.disabled = true;
     }
 
-    dialogo?.close();
-    renderizarInventario();
+    try {
+      await persistirEstruturaInventario(andares);
+      dialogo?.close();
+      renderizarInventario();
+    } catch (erro) {
+      console.error("Erro ao salvar estrutura do inventário:", erro);
+      exibirErroEstruturaInventario(erro.message || "Não foi possível salvar o novo local no Firebase.");
+    } finally {
+      if (botaoSalvar) {
+        botaoSalvar.disabled = false;
+      }
+    }
   }
 
-  function excluirEstruturaInventario(tipo, id) {
+  async function excluirEstruturaInventario(tipo, id) {
     const dados = obterDadosInventario();
     let registro;
 
@@ -772,14 +874,16 @@
       return;
     }
 
-    const removido = listaDestino.splice(indice, 1)[0];
+    listaDestino.splice(indice, 1);
 
-    if (!salvarEstadoLocalInventario()) {
-      listaDestino.splice(indice, 0, removido);
-      return;
+    try {
+      await persistirEstruturaInventario(andares);
+      estadoInventario.caminho = estadoInventario.caminho.filter(caminhoId => caminhoId !== id);
+      renderizarInventario();
+    } catch (erro) {
+      console.error("Erro ao excluir estrutura do inventário:", erro);
+      alert(erro.message || "Não foi possível excluir o local no Firebase.");
     }
-
-    renderizarInventario();
   }
 
   function abrirItemInventario(itemId) {
@@ -811,7 +915,7 @@
         <button id="salvarItemInventario" class="primary-button" type="button">Salvar item</button>
         ${local.imagem ? '<button id="removerImagemItemInventario" class="secondary-button" type="button">Remover imagem</button>' : ""}
       </div>
-      <p class="inventario-aviso-local">Imagem e saldo são salvos no Firebase e sincronizados entre dispositivos. A estrutura de andares e ambientes permanece armazenada neste navegador.</p>
+      <p class="inventario-aviso-local">Imagem, saldo, andares, ambientes e áreas internas são salvos no Firebase e sincronizados entre dispositivos.</p>
     `;
 
     const botaoSalvar = document.getElementById("salvarItemInventario");
@@ -839,7 +943,9 @@
         await salvarItemInventarioFirebase(itemId, novoEstado);
         estadoInventario.remoto[itemId] = normalizarEstadoItemInventario(novoEstado);
         atualizarCacheLocalItemInventario(itemId, novoEstado);
-        estadoInventario.sincronizacao = "sincronizado";
+        estadoInventario.itensSincronizados = true;
+        estadoInventario.sincronizacao = "aguardando";
+        atualizarStatusSincronizacaoInventario();
 
         dialogo.close();
         renderizarInventario();
@@ -867,7 +973,9 @@
           await salvarItemInventarioFirebase(itemId, novoEstado);
           estadoInventario.remoto[itemId] = normalizarEstadoItemInventario(novoEstado);
           atualizarCacheLocalItemInventario(itemId, novoEstado);
-          estadoInventario.sincronizacao = "sincronizado";
+          estadoInventario.itensSincronizados = true;
+          estadoInventario.sincronizacao = "aguardando";
+          atualizarStatusSincronizacaoInventario();
           dialogo.close();
           renderizarInventario();
         } catch (erro) {

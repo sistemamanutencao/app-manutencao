@@ -148,6 +148,50 @@ async function salvarItemInventarioFirebase(itemId, dados = {}) {
     }, { merge: true });
 }
 
+function observarInventarioEstruturaFirebase(callback, callbackErro) {
+  return firebaseDb
+    .collection(COLLECTIONS.INVENTARIO_ESTRUTURA || "inventarioEstrutura")
+    .doc("principal")
+    .onSnapshot(documento => {
+      if (!documento.exists) {
+        callback(null);
+        return;
+      }
+
+      const dados = documento.data() || {};
+      callback({
+        andares: Array.isArray(dados.andares) ? dados.andares : [],
+        versao: Number(dados.versao) || 1,
+        atualizadoEm: dados.atualizadoEm || null,
+        atualizadoPorUid: dados.atualizadoPorUid || "",
+        atualizadoPorNome: dados.atualizadoPorNome || ""
+      });
+    }, callbackErro);
+}
+
+async function salvarInventarioEstruturaFirebase(andares = []) {
+  if (!firebaseAuth.currentUser) {
+    throw new Error("Sessão não autenticada. Entre novamente para salvar a estrutura do inventário.");
+  }
+
+  if (!Array.isArray(andares)) {
+    throw new Error("A estrutura do inventário é inválida.");
+  }
+
+  const estruturaSegura = JSON.parse(JSON.stringify(andares));
+
+  await firebaseDb
+    .collection(COLLECTIONS.INVENTARIO_ESTRUTURA || "inventarioEstrutura")
+    .doc("principal")
+    .set({
+      andares: estruturaSegura,
+      versao: 1,
+      atualizadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+      atualizadoPorUid: firebaseAuth.currentUser.uid,
+      atualizadoPorNome: usuarioAtual && usuarioAtual.nome ? usuarioAtual.nome : "Manutenção"
+    });
+}
+
 /* =====================
    Chamados
 ===================== */
