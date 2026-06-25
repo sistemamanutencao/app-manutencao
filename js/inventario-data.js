@@ -1,5 +1,5 @@
 window.INVENTARIO_DATA = {
-  "versao": "1.3.0",
+  "versao": "1.4.0",
   "catalogo": [
     {
       "id": "bellplus-sabonete",

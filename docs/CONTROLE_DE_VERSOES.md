@@ -69,3 +69,4 @@ final2.zip
 | v30 | `app-manutencao-v30-estrutura-inventario-firebase.zip` | Andares, ambientes e áreas internas sincronizados pelo Firestore | Pronto para teste/publicação |
 | v31 | `app-manutencao-v31-edicao-andares-ambientes.zip` | Botão Editar abaixo de Excluir para renomear andares, ambientes e áreas internas com sincronização no Firestore | Pronto para teste/publicação |
 | v32 | `app-manutencao-v32-gerenciamento-itens-inventario.zip` | Inclusão e exclusão de itens por ambiente, cadastro de novos modelos e edição da quantidade instalada com sincronização no Firestore | Pronto para teste/publicação |
+| v33 | `app-manutencao-v33-edicao-exclusao-produtos-estoque.zip` | Edição e exclusão de produtos diretamente no estoque, com proteção para itens vinculados e limpeza do documento no Firestore | Pronto para teste/publicação |

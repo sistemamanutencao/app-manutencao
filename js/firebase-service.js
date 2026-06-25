@@ -148,6 +148,38 @@ async function salvarItemInventarioFirebase(itemId, dados = {}) {
     }, { merge: true });
 }
 
+async function excluirProdutoEstoqueInventarioFirebase(itemId, andares = [], catalogoPersonalizado = []) {
+  if (!firebaseAuth.currentUser) {
+    throw new Error("Sessão não autenticada. Entre novamente para excluir o produto.");
+  }
+
+  if (!Array.isArray(andares) || !Array.isArray(catalogoPersonalizado)) {
+    throw new Error("A estrutura do inventário é inválida.");
+  }
+
+  const estruturaSegura = JSON.parse(JSON.stringify(andares));
+  const catalogoSeguro = JSON.parse(JSON.stringify(catalogoPersonalizado));
+  const lote = firebaseDb.batch();
+  const referenciaEstrutura = firebaseDb
+    .collection(COLLECTIONS.INVENTARIO_ESTRUTURA || "inventarioEstrutura")
+    .doc("principal");
+  const referenciaItem = firebaseDb
+    .collection(COLLECTIONS.INVENTARIO_ITENS || "inventarioItens")
+    .doc(String(itemId));
+
+  lote.set(referenciaEstrutura, {
+    andares: estruturaSegura,
+    catalogoPersonalizado: catalogoSeguro,
+    versao: 3,
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+    atualizadoPorUid: firebaseAuth.currentUser.uid,
+    atualizadoPorNome: usuarioAtual && usuarioAtual.nome ? usuarioAtual.nome : "Manutenção"
+  });
+  lote.delete(referenciaItem);
+
+  await lote.commit();
+}
+
 function observarInventarioEstruturaFirebase(callback, callbackErro) {
   return firebaseDb
     .collection(COLLECTIONS.INVENTARIO_ESTRUTURA || "inventarioEstrutura")
@@ -188,7 +220,7 @@ async function salvarInventarioEstruturaFirebase(andares = [], catalogoPersonali
     .set({
       andares: estruturaSegura,
       catalogoPersonalizado: catalogoSeguro,
-      versao: 2,
+      versao: 3,
       atualizadoEm: firebase.firestore.FieldValue.serverTimestamp(),
       atualizadoPorUid: firebaseAuth.currentUser.uid,
       atualizadoPorNome: usuarioAtual && usuarioAtual.nome ? usuarioAtual.nome : "Manutenção"

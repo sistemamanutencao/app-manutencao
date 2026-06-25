@@ -5,6 +5,7 @@
    - consulta por andar, ambiente e área interna;
    - inclusão, edição e exclusão de andares e ambientes;
    - inclusão, edição de quantidade e exclusão de itens por ambiente;
+   - edição e exclusão de produtos diretamente no estoque;
    - cadastro de novos modelos no catálogo;
    - imagem de referência por item;
    - quantidade disponível em estoque;
@@ -47,8 +48,20 @@
     });
 
     (Array.isArray(catalogoPersonalizado) ? catalogoPersonalizado : []).forEach(item => {
-      if (item && item.id && item.nome) {
-        catalogoPorId.set(item.id, { ...item, personalizado: true });
+      if (!item || !item.id) {
+        return;
+      }
+
+      if (item.excluido === true) {
+        catalogoPorId.delete(item.id);
+        return;
+      }
+
+      if (item.nome) {
+        catalogoPorId.set(item.id, {
+          ...item,
+          personalizado: item.origemBase === true ? false : true
+        });
       }
     });
 
@@ -606,14 +619,22 @@
             const local = obterEstadoItemInventario(item.id);
 
             return `
-              <button class="inventario-estoque-card" type="button" data-inventario-item="${item.id}">
-                ${criarImagemInventario(item.id)}
-                <div>
-                  <p class="inventario-item-nome">${escaparHtmlInventario(item.nome)}</p>
-                  <p class="inventario-item-meta">${contarInstaladosInventario(item.id)} instalados na unidade</p>
-                </div>
-                <div class="inventario-saldo"><strong>${local.estoque === null ? "—" : local.estoque}</strong><small>em estoque</small></div>
-              </button>
+              <article class="inventario-estoque-registro">
+                <button class="inventario-estoque-card" type="button" data-inventario-item="${item.id}">
+                  ${criarImagemInventario(item.id)}
+                  <div>
+                    <p class="inventario-item-nome">${escaparHtmlInventario(item.nome)}</p>
+                    <p class="inventario-item-meta">${contarInstaladosInventario(item.id)} instalados na unidade</p>
+                  </div>
+                  <div class="inventario-saldo"><strong>${local.estoque === null ? "—" : local.estoque}</strong><small>em estoque</small></div>
+                </button>
+                <button class="inventario-excluir inventario-excluir-produto" type="button" data-inventario-delete-stock="${item.id}" aria-label="Excluir ${escaparHtmlInventario(item.nome)} do estoque">
+                  Excluir
+                </button>
+                <button class="inventario-editar inventario-editar-produto" type="button" data-inventario-edit-stock="${item.id}" aria-label="Editar ${escaparHtmlInventario(item.nome)}">
+                  Editar
+                </button>
+              </article>
             `;
           }).join("")}
         </div>
@@ -671,6 +692,14 @@
     document.querySelectorAll("[data-inventario-delete-item]").forEach(botao => {
       botao.addEventListener("click", () => excluirItemDoAmbienteInventario(botao.dataset.inventarioDeleteItem));
     });
+
+    document.querySelectorAll("[data-inventario-edit-stock]").forEach(botao => {
+      botao.addEventListener("click", () => abrirDialogoEditarProdutoEstoqueInventario(botao.dataset.inventarioEditStock));
+    });
+
+    document.querySelectorAll("[data-inventario-delete-stock]").forEach(botao => {
+      botao.addEventListener("click", () => excluirProdutoEstoqueInventario(botao.dataset.inventarioDeleteStock));
+    });
   }
 
   function obterNoPorCaminhoInventario(andares, caminho) {
@@ -710,6 +739,294 @@
   function obterAreaAtualInventario(andares = obterDadosInventario().andares) {
     const area = obterNoPorCaminhoInventario(andares, estadoInventario.caminho);
     return area && Array.isArray(area.itens) ? area : null;
+  }
+
+  function obterItemBaseInventario(itemId) {
+    return (obterDadosBaseInventario().catalogo || []).find(item => item.id === itemId) || null;
+  }
+
+  function listarVinculosItemInventario(itemId) {
+    const vinculos = [];
+
+    function visitar(no, caminho = []) {
+      const caminhoAtual = no && no.nome ? [...caminho, no.nome] : caminho;
+      const entrada = (no?.itens || []).find(item => item.itemId === itemId);
+
+      if (entrada) {
+        vinculos.push({
+          local: caminhoAtual.join(" › "),
+          quantidade: Number(entrada.quantidade) || 0
+        });
+      }
+
+      (no?.ambientes || []).forEach(filho => visitar(filho, caminhoAtual));
+      (no?.subareas || []).forEach(filho => visitar(filho, caminhoAtual));
+    }
+
+    obterDadosInventario().andares.forEach(andar => visitar(andar));
+    return vinculos;
+  }
+
+  function abrirDialogoEditarProdutoEstoqueInventario(itemId) {
+    const item = obterItemCatalogoInventario(itemId);
+    const estadoItem = obterEstadoItemInventario(itemId);
+    const dialogo = document.getElementById("dialogoEstruturaInventario");
+    const conteudo = document.getElementById("dialogoEstruturaInventarioConteudo");
+
+    if (!item || !dialogo || !conteudo) {
+      alert("Não foi possível localizar o produto selecionado.");
+      return;
+    }
+
+    let imagemAtual = estadoItem.imagem || "";
+
+    conteudo.innerHTML = `
+      <h2 class="inventario-dialog-titulo">Editar produto</h2>
+      <p class="inventario-dialog-meta">Altere os dados do produto. As mudanças serão aplicadas em todos os ambientes que utilizam este cadastro.</p>
+      <div id="previewImagemProdutoInventario">
+        ${imagemAtual
+          ? `<img class="inventario-dialog-imagem" src="${imagemAtual}" alt="Imagem de referência do produto">`
+          : '<div class="inventario-dialog-imagem inventario-sem-foto">SEM FOTO DE REFERÊNCIA</div>'}
+      </div>
+      <div class="inventario-campo">
+        <label for="nomeProdutoEstoqueInventario">Nome do produto</label>
+        <input id="nomeProdutoEstoqueInventario" type="text" maxlength="120" autocomplete="off" value="${escaparHtmlInventario(item.nome)}">
+      </div>
+      <div class="inventario-campos-duplos">
+        <div class="inventario-campo">
+          <label for="marcaProdutoEstoqueInventario">Marca</label>
+          <input id="marcaProdutoEstoqueInventario" type="text" maxlength="80" autocomplete="off" value="${escaparHtmlInventario(item.marca || "Não informada")}">
+        </div>
+        <div class="inventario-campo">
+          <label for="modeloProdutoEstoqueInventario">Modelo/referência</label>
+          <input id="modeloProdutoEstoqueInventario" type="text" maxlength="100" autocomplete="off" value="${escaparHtmlInventario(item.modelo || "Não informado")}">
+        </div>
+      </div>
+      <div class="inventario-campo">
+        <label for="observacaoProdutoEstoqueInventario">Observação</label>
+        <textarea id="observacaoProdutoEstoqueInventario" maxlength="300" rows="3" placeholder="Detalhe de acabamento, medida ou padrão do produto">${escaparHtmlInventario(item.observacao || "")}</textarea>
+      </div>
+      <div class="inventario-campo">
+        <label for="saldoProdutoEstoqueInventario">Quantidade disponível em estoque</label>
+        <input id="saldoProdutoEstoqueInventario" type="number" min="0" step="1" value="${estadoItem.estoque ?? ""}" placeholder="Não informado">
+      </div>
+      <div class="inventario-campo">
+        <label for="imagemProdutoEstoqueInventario">Substituir imagem de referência</label>
+        <input id="imagemProdutoEstoqueInventario" type="file" accept="image/*">
+      </div>
+      <div id="erroEstruturaInventario" class="inventario-erro" role="alert" hidden></div>
+      <div class="inventario-dialog-acoes">
+        <button id="salvarProdutoEstoqueInventario" class="primary-button" type="button">Salvar alterações</button>
+        ${imagemAtual ? '<button id="removerImagemProdutoEstoqueInventario" class="secondary-button" type="button">Remover imagem</button>' : ""}
+        <button id="cancelarProdutoEstoqueInventario" class="secondary-button" type="button">Cancelar</button>
+      </div>
+      <p class="inventario-aviso-local">A nova imagem substitui a anterior no mesmo documento do Firebase; imagens antigas não ficam acumuladas.</p>
+    `;
+
+    const botaoSalvar = document.getElementById("salvarProdutoEstoqueInventario");
+    const botaoCancelar = document.getElementById("cancelarProdutoEstoqueInventario");
+    const botaoRemoverImagem = document.getElementById("removerImagemProdutoEstoqueInventario");
+    const campoImagem = document.getElementById("imagemProdutoEstoqueInventario");
+
+    botaoCancelar?.addEventListener("click", () => dialogo.close());
+
+    botaoRemoverImagem?.addEventListener("click", () => {
+      imagemAtual = "";
+      const preview = document.getElementById("previewImagemProdutoInventario");
+
+      if (preview) {
+        preview.innerHTML = '<div class="inventario-dialog-imagem inventario-sem-foto">SEM FOTO DE REFERÊNCIA</div>';
+      }
+
+      botaoRemoverImagem.hidden = true;
+      if (campoImagem) {
+        campoImagem.value = "";
+      }
+    });
+
+    campoImagem?.addEventListener("change", () => {
+      const arquivo = campoImagem.files?.[0];
+
+      if (!arquivo) {
+        return;
+      }
+
+      const urlTemporaria = URL.createObjectURL(arquivo);
+      const preview = document.getElementById("previewImagemProdutoInventario");
+
+      if (preview) {
+        preview.innerHTML = `<img class="inventario-dialog-imagem" src="${urlTemporaria}" alt="Prévia da nova imagem">`;
+      }
+    });
+
+    botaoSalvar?.addEventListener("click", async () => {
+      const nome = String(document.getElementById("nomeProdutoEstoqueInventario")?.value || "").trim().replace(/\s+/g, " ");
+      const marca = String(document.getElementById("marcaProdutoEstoqueInventario")?.value || "").trim().replace(/\s+/g, " ") || "Não informada";
+      const modelo = String(document.getElementById("modeloProdutoEstoqueInventario")?.value || "").trim().replace(/\s+/g, " ") || "Não informado";
+      const observacao = String(document.getElementById("observacaoProdutoEstoqueInventario")?.value || "").trim().replace(/\s+/g, " ");
+      const saldoBruto = String(document.getElementById("saldoProdutoEstoqueInventario")?.value || "").trim();
+      const estoque = saldoBruto === "" ? null : Number.parseInt(saldoBruto, 10);
+
+      if (nome.length < 2) {
+        exibirErroEstruturaInventario("Informe um nome com pelo menos 2 caracteres.");
+        document.getElementById("nomeProdutoEstoqueInventario")?.focus();
+        return;
+      }
+
+      if (estoque !== null && (!Number.isInteger(estoque) || estoque < 0)) {
+        exibirErroEstruturaInventario("Informe um saldo de estoque igual ou maior que zero.");
+        document.getElementById("saldoProdutoEstoqueInventario")?.focus();
+        return;
+      }
+
+      const duplicado = obterDadosInventario().catalogo.some(outro =>
+        outro.id !== itemId
+        && normalizarNomeComparacaoInventario(outro.nome) === normalizarNomeComparacaoInventario(nome)
+        && normalizarNomeComparacaoInventario(outro.marca) === normalizarNomeComparacaoInventario(marca)
+        && normalizarNomeComparacaoInventario(outro.modelo) === normalizarNomeComparacaoInventario(modelo)
+      );
+
+      if (duplicado) {
+        exibirErroEstruturaInventario("Já existe outro produto com o mesmo nome, marca e modelo.");
+        return;
+      }
+
+      botaoSalvar.disabled = true;
+
+      try {
+        if (campoImagem?.files?.[0]) {
+          imagemAtual = await redimensionarImagemInventario(campoImagem.files[0]);
+        }
+
+        const andares = garantirEstruturaEditavelInventario();
+        const catalogoPersonalizado = garantirCatalogoPersonalizadoEditavelInventario();
+        const itemBase = obterItemBaseInventario(itemId);
+        const indice = catalogoPersonalizado.findIndex(registro => registro.id === itemId);
+        const registroAtualizado = {
+          id: itemId,
+          nome,
+          marca,
+          modelo,
+          observacao,
+          ...(itemBase ? { origemBase: true } : { personalizado: true })
+        };
+
+        if (indice >= 0) {
+          catalogoPersonalizado[indice] = registroAtualizado;
+        } else {
+          catalogoPersonalizado.push(registroAtualizado);
+        }
+
+        const novoEstado = { estoque, imagem: imagemAtual };
+
+        await Promise.all([
+          persistirEstruturaInventario(andares, catalogoPersonalizado),
+          salvarItemInventarioFirebase(itemId, novoEstado)
+        ]);
+
+        estadoInventario.remoto[itemId] = normalizarEstadoItemInventario(novoEstado);
+        atualizarCacheLocalItemInventario(itemId, novoEstado);
+        estadoInventario.itensSincronizados = true;
+        estadoInventario.sincronizacao = "aguardando";
+        atualizarStatusSincronizacaoInventario();
+
+        dialogo.close();
+        renderizarInventario();
+      } catch (erro) {
+        console.error("Erro ao editar produto do estoque:", erro);
+        exibirErroEstruturaInventario(erro.message || "Não foi possível salvar as alterações no Firebase.");
+      } finally {
+        botaoSalvar.disabled = false;
+      }
+    });
+
+    if (typeof dialogo.showModal === "function") {
+      dialogo.showModal();
+    } else {
+      dialogo.setAttribute("open", "");
+    }
+
+    window.setTimeout(() => document.getElementById("nomeProdutoEstoqueInventario")?.focus(), 0);
+  }
+
+  async function excluirProdutoEstoqueInventario(itemId) {
+    const item = obterItemCatalogoInventario(itemId);
+
+    if (!item) {
+      alert("O produto selecionado não foi encontrado.");
+      renderizarInventario();
+      return;
+    }
+
+    const vinculos = listarVinculosItemInventario(itemId);
+
+    if (vinculos.length) {
+      const locais = vinculos
+        .slice(0, 6)
+        .map(vinculo => `• ${vinculo.local}: ${vinculo.quantidade}`)
+        .join("\n");
+      const restante = vinculos.length > 6 ? `\n• e mais ${vinculos.length - 6} ambiente(s)` : "";
+
+      alert(
+        `Não é possível excluir “${item.nome}” porque ele ainda está vinculado a ${vinculos.length} ambiente(s).\n\n`
+        + `${locais}${restante}\n\nRemova o item desses ambientes antes de excluí-lo definitivamente do estoque.`
+      );
+      return;
+    }
+
+    const confirmado = window.confirm(
+      `Excluir definitivamente “${item.nome}” do estoque?\n\n`
+      + "O cadastro, o saldo e a imagem serão removidos do Firebase. Esta ação não pode ser desfeita."
+    );
+
+    if (!confirmado) {
+      return;
+    }
+
+    const andares = garantirEstruturaEditavelInventario();
+    const catalogoPersonalizado = garantirCatalogoPersonalizadoEditavelInventario();
+    const itemBase = obterItemBaseInventario(itemId);
+    const indice = catalogoPersonalizado.findIndex(registro => registro.id === itemId);
+
+    if (itemBase) {
+      const marcadorExclusao = {
+        id: itemId,
+        nome: itemBase.nome,
+        origemBase: true,
+        excluido: true
+      };
+
+      if (indice >= 0) {
+        catalogoPersonalizado[indice] = marcadorExclusao;
+      } else {
+        catalogoPersonalizado.push(marcadorExclusao);
+      }
+    } else if (indice >= 0) {
+      catalogoPersonalizado.splice(indice, 1);
+    } else {
+      alert("Não foi possível localizar o produto no catálogo personalizado.");
+      return;
+    }
+
+    try {
+      if (typeof excluirProdutoEstoqueInventarioFirebase !== "function") {
+        throw new Error("O serviço de exclusão do inventário não foi carregado.");
+      }
+
+      await excluirProdutoEstoqueInventarioFirebase(itemId, andares, catalogoPersonalizado);
+      atualizarCacheLocalEstruturaInventario(andares, catalogoPersonalizado);
+      delete estadoInventario.remoto[itemId];
+      delete estadoInventario.local.itens[itemId];
+      salvarEstadoLocalInventario();
+      estadoInventario.estruturaSincronizada = true;
+      estadoInventario.itensSincronizados = true;
+      estadoInventario.sincronizacao = "aguardando";
+      atualizarStatusSincronizacaoInventario();
+      renderizarInventario();
+    } catch (erro) {
+      console.error("Erro ao excluir produto do estoque:", erro);
+      alert(erro.message || "Não foi possível excluir o produto do Firebase.");
+    }
   }
 
   function abrirDialogoAdicionarItemInventario() {

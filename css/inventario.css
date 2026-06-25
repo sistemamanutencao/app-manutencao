@@ -653,3 +653,29 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Gerenciamento de produtos no estoque */
+.inventario-estoque-registro {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #dce5ef;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 3px 10px rgba(16, 24, 40, 0.04);
+}
+
+.inventario-estoque-registro .inventario-estoque-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.inventario-estoque-registro .inventario-estoque-card:hover,
+.inventario-estoque-registro .inventario-estoque-card:focus-visible {
+  background: #fbfdff;
+}
+
+.inventario-excluir-produto,
+.inventario-editar-produto {
+  display: block;
+}
