@@ -657,3 +657,69 @@
   background: #eaf2ff;
   color: var(--blue);
 }
+
+/* Limpeza de OS encerradas */
+.painel-delete-closed-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 14px 0;
+  padding: 14px;
+  border: 1px solid #ffd1d1;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff7f7 0%, #ffffff 100%);
+  box-shadow: 0 7px 16px rgba(20, 40, 80, 0.07);
+}
+
+.painel-delete-closed-card[hidden] {
+  display: none !important;
+}
+
+.painel-delete-closed-card strong {
+  display: block;
+  font-size: 14px;
+  line-height: 1.25;
+  color: #982f2a;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.painel-delete-closed-card p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #6f3b38;
+  font-weight: 700;
+}
+
+.painel-delete-closed-button {
+  width: auto;
+  min-width: 180px;
+  margin-top: 0;
+  padding: 0 14px;
+  flex-shrink: 0;
+}
+
+.painel-danger-action {
+  background: #fff2f2;
+  border-color: #ffd1d1;
+  color: #d93030;
+}
+
+.painel-danger-action:hover,
+.painel-delete-closed-button:hover {
+  filter: brightness(0.98);
+  box-shadow: 0 8px 18px rgba(217, 48, 48, 0.14);
+}
+
+@media (max-width: 520px) {
+  .painel-delete-closed-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .painel-delete-closed-button {
+    width: 100%;
+  }
+}

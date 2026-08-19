@@ -373,6 +373,10 @@ async function atualizarChamadoFirebase(id, dados) {
   });
 }
 
+async function excluirChamadoFirebase(id) {
+  await firebaseDb.collection(COLLECTIONS.CHAMADOS).doc(String(id)).delete();
+}
+
 function adicionarItemArrayFirebase(item) {
   return firebase.firestore.FieldValue.arrayUnion(item);
 }

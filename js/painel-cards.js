@@ -106,6 +106,12 @@ function criarCardPainel(chamado) {
               Encerrar OS
             </button>
           ` : ""}
+
+          ${chamado.status === "ENCERRADO" && usuarioEhManutencaoAutorizada() ? `
+            <button type="button" class="admin-action-button painel-danger-action" data-dynamic-action="excluirChamadoEncerrado" data-param0="${formatarAtributoHTML(chamado.id)}" data-pass-element="true">
+              Excluir OS
+            </button>
+          ` : ""}
         </div>
       </div>
     </details>

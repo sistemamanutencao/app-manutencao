@@ -96,6 +96,7 @@ function renderizarPainelManutencao() {
 
   atualizarResumoPainel();
   atualizarAbasFilaPainel();
+  atualizarPainelExclusaoEncerradas();
 
   const filaFiltrada = obterFilaPainelFiltrada();
   const tituloVazio = abaFilaPainelAtual === "ENCERRADAS"
@@ -119,3 +120,96 @@ function renderizarPainelManutencao() {
 
 
 /* Indicadores, cards e fluxo de status foram separados em módulos dedicados. */
+
+function atualizarPainelExclusaoEncerradas() {
+  const painelExclusao = document.getElementById("painelExcluirEncerradas");
+
+  if (!painelExclusao) {
+    return;
+  }
+
+  painelExclusao.hidden = !(abaFilaPainelAtual === "ENCERRADAS" && usuarioEhManutencaoAutorizada());
+}
+
+async function excluirChamadoEncerrado(id, botao) {
+  if (!usuarioEhManutencaoAutorizada()) {
+    alert("Somente a manutenção autorizada pode excluir OS encerradas.");
+    return;
+  }
+
+  const chamado = chamados.find(item => String(item.id) === String(id));
+
+  if (!chamado) {
+    alert("OS não encontrada. Atualize a tela e tente novamente.");
+    return;
+  }
+
+  if (chamado.status !== "ENCERRADO") {
+    alert("Apenas OS com status ENCERRADO podem ser excluídas por esta opção.");
+    return;
+  }
+
+  const numero = chamado.numeroOS || chamado.id;
+  const confirmado = await appConfirm(
+    `Deseja excluir definitivamente a OS ${numero}?
+
+Antes de confirmar, verifique se ela já foi exportada. Essa ação remove o registro do Firebase e não pode ser desfeita pelo app.`,
+    { titulo: "Excluir OS encerrada", textoConfirmar: "Excluir definitivamente", textoCancelar: "Voltar" }
+  );
+
+  if (!confirmado) {
+    return;
+  }
+
+  try {
+    if (botao) aplicarFeedbackCarregando(botao, "Excluindo...");
+    await excluirChamadoFirebase(id);
+    if (botao) aplicarFeedbackSucesso(botao, "Excluída", "Excluir OS");
+    alert("OS encerrada excluída com sucesso.");
+  } catch (erro) {
+    console.error("Erro ao excluir OS encerrada:", erro);
+    if (botao) aplicarFeedbackErro(botao, "Erro", "Excluir OS");
+    alert("Não foi possível excluir a OS encerrada. Verifique sua conexão e permissões no Firestore.");
+  }
+}
+
+async function excluirOSEncerradasFiltradas(botao) {
+  if (!usuarioEhManutencaoAutorizada()) {
+    alert("Somente a manutenção autorizada pode excluir OS encerradas.");
+    return;
+  }
+
+  if (abaFilaPainelAtual !== "ENCERRADAS") {
+    alert("Entre na aba OS encerradas antes de executar a limpeza.");
+    return;
+  }
+
+  const lista = obterFilaPainelFiltrada().filter(chamado => chamado.status === "ENCERRADO");
+
+  if (!lista.length) {
+    alert("Nenhuma OS encerrada encontrada para exclusão com os filtros atuais.");
+    return;
+  }
+
+  const confirmado = await appConfirm(
+    `Deseja excluir definitivamente ${lista.length} OS encerrada(s) filtrada(s)?
+
+Use esta opção somente depois de exportar o relatório. A exclusão remove os registros do Firebase e não pode ser desfeita pelo app.`,
+    { titulo: "Excluir OS encerradas", textoConfirmar: "Excluir definitivamente", textoCancelar: "Voltar" }
+  );
+
+  if (!confirmado) {
+    return;
+  }
+
+  try {
+    if (botao) aplicarFeedbackCarregando(botao, "Excluindo...");
+    await Promise.all(lista.map(chamado => excluirChamadoFirebase(chamado.id)));
+    if (botao) aplicarFeedbackSucesso(botao, "Excluídas", "Excluir encerradas filtradas");
+    alert(`${lista.length} OS encerrada(s) excluída(s) com sucesso.`);
+  } catch (erro) {
+    console.error("Erro ao excluir OS encerradas filtradas:", erro);
+    if (botao) aplicarFeedbackErro(botao, "Erro", "Excluir encerradas filtradas");
+    alert("Não foi possível concluir a exclusão das OS encerradas. Verifique sua conexão e permissões no Firestore.");
+  }
+}
