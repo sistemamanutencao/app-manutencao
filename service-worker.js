@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-logo-dourado-manutencao-splash";
+const CACHE_NAME = "app-manutencao-v24-fundo-abas-escuro";
 
 const FILES_TO_CACHE = [
   "./",

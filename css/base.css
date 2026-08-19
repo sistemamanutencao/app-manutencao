@@ -12,7 +12,9 @@
       --text-dark: #151f3a;
       --text-muted: #737d96;
       --bg: #f5f7fc;
-      --app-shell-bg: radial-gradient(circle at 50% 0%, #4a3118 0%, #24180f 38%, #120d09 100%);
+      --app-shell-bg: radial-gradient(circle at 50% -8%, rgba(214, 160, 57, 0.28) 0%, rgba(74, 49, 24, 0.82) 30%, #1b140e 62%, #100c08 100%);
+      --app-shell-card-glow: rgba(214, 160, 57, 0.16);
+      --app-shell-border: rgba(214, 160, 57, 0.18);
       --card: #ffffff;
       --border: #edf1f7;
       --green: #17a66b;
