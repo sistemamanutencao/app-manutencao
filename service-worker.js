@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-sem-qr-acesso-rapido";
+const CACHE_NAME = "app-manutencao-v24-logo-dourado-manutencao";
 
 const FILES_TO_CACHE = [
   "./",
@@ -62,7 +62,8 @@ const FILES_TO_CACHE = [
   "./img/avatar-redefinicao-senha.png",
   "./img/icon-192.png",
   "./img/icon-512.png",
-  "./img/perfil-manutencao.png"
+  "./img/perfil-manutencao.png",
+  "./img/logo-manutencao-dourado.png"
 ];
 
 self.addEventListener("install", event => {
