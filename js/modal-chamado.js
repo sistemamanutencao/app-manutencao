@@ -21,9 +21,6 @@ function abrirDetalhesChamado(id) {
   setTextContent("detalheValidacao", montarTextoValidacaoOS(chamado));
   setTextContent("detalheEncerramento", montarTextoEncerramentoOS(chamado));
   setTextContent("detalheLocal", chamado.andar ? `${chamado.andar} / ${chamado.local}` : chamado.local);
-  setTextContent("detalheAtivo", montarTextoAtivoChamado(chamado));
-  setTextContent("detalheHorario", chamado.horario || "Não informado");
-  setTextContent("detalheAcompanhamento", chamado.precisaAcompanhamento || "Não informado");
   setTextContent("detalheCategoria", chamado.categoria);
   setTextContent("detalheSubcategoria", chamado.subcategoria || "Não informada");
   setTextContent("detalheTipoManutencao", chamado.tipoManutencao || "Corretiva");

@@ -11,7 +11,5 @@ const COLLECTIONS = Object.freeze({
   NOTIFICACOES: "notificacoes",
   COMUNICADOS: "comunicados",
   DIAGNOSTICOS: "diagnosticos",
-  CADASTROS_COLABORADORES: "cadastrosColaboradores",
-  INVENTARIO_ITENS: "inventarioItens",
-  INVENTARIO_ESTRUTURA: "inventarioEstrutura"
+  CADASTROS_COLABORADORES: "cadastrosColaboradores"
 });

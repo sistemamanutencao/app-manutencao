@@ -206,40 +206,6 @@ service cloud.firestore {
         ]);
     }
 
-    function itemInventarioValido() {
-      return request.resource.data.keys().hasOnly([
-          "estoque",
-          "imagem",
-          "atualizadoEm",
-          "atualizadoPorUid",
-          "atualizadoPorNome"
-        ])
-        && (request.resource.data.estoque == null || (request.resource.data.estoque is int && request.resource.data.estoque >= 0))
-        && request.resource.data.imagem is string
-        && request.resource.data.imagem.size() <= 700000
-        && request.resource.data.atualizadoPorUid == request.auth.uid
-        && request.resource.data.atualizadoPorNome is string;
-    }
-
-    function estruturaInventarioValida() {
-      return request.resource.data.keys().hasOnly([
-          "andares",
-          "catalogoPersonalizado",
-          "versao",
-          "atualizadoEm",
-          "atualizadoPorUid",
-          "atualizadoPorNome"
-        ])
-        && request.resource.data.andares is list
-        && request.resource.data.andares.size() <= 100
-        && request.resource.data.catalogoPersonalizado is list
-        && request.resource.data.catalogoPersonalizado.size() <= 500
-        && request.resource.data.versao is int
-        && request.resource.data.versao >= 1
-        && request.resource.data.atualizadoPorUid == request.auth.uid
-        && request.resource.data.atualizadoPorNome is string;
-    }
-
     function usuarioPodeAtualizarProprioCadastroBasico(id) {
       return estaAutenticado()
         && id == request.auth.uid
@@ -299,18 +265,6 @@ service cloud.firestore {
 
     match /diagnosticos/{id} {
       allow read, create, update, delete: if ehManutencao();
-    }
-
-    match /inventarioItens/{id} {
-      allow read: if ehManutencao();
-      allow create, update: if ehManutencao() && itemInventarioValido();
-      allow delete: if ehManutencao();
-    }
-
-    match /inventarioEstrutura/{id} {
-      allow read: if ehManutencao() && id == "principal";
-      allow create, update: if ehManutencao() && id == "principal" && estruturaInventarioValida();
-      allow delete: if ehManutencao() && id == "principal";
     }
 
     match /usuarios/{id} {

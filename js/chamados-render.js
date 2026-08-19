@@ -140,8 +140,6 @@ function montarTextoBuscaChamado(chamado) {
     chamado.numeroOS,
     chamado.descricao,
     chamado.local,
-    chamado.equipamentoCodigo,
-    chamado.equipamentoNome,
     chamado.setor,
     chamado.criadoPorNome,
     chamado.categoria,
@@ -165,7 +163,6 @@ function criarCardChamado(chamado) {
   const solicitante = chamado.criadoPorNome || chamado.solicitanteNome || "Não informado";
   const setorOuLocal = chamado.setor || chamado.local || "Não informado";
   const localOcorrencia = formatarLocalOcorrenciaChamado(chamado);
-  const horario = chamado.horario || "--:--";
   const acoesRapidas = criarAcoesRapidasChamado(chamado);
 
   return `
@@ -192,14 +189,6 @@ function criarCardChamado(chamado) {
               <path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-linecap="round" />
             </svg>
             ${escaparHTML(chamado.data || "Data não informada")}
-          </span>
-
-          <span class="ticket-meta" aria-label="Horário da OS">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <circle cx="12" cy="12" r="8" stroke="currentColor" />
-              <path d="M12 7v5l3 2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            ${escaparHTML(horario)}
           </span>
 
           <span class="priority-badge ${classePrioridade}" aria-label="Prioridade da OS">

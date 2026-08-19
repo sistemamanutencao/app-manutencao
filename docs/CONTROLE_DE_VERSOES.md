@@ -58,15 +58,3 @@ final.zip
 final2.zip
 ```
 | v24 | `app-manutencao-v24-experiencia-redefinicao-senha.zip` | Experiência visual de solicitação de redefinição de senha com avatar, feedback interno e envio pelo Firebase Auth | Pronto para teste/publicação |
-| v25 | `app-manutencao-v25-inventario-unidade.zip` | Inventário simples por andar e ambiente, imagem de referência e saldo local de estoque | Pronto para teste/publicação |
-
-| v26 | `app-manutencao-v26-ajuste-layout-inventario.zip` | Ajuste responsivo da tela de inventário, cabeçalho, botão Voltar e legibilidade dos textos | Pronto para teste/publicação |
-| v27 | `app-manutencao-v27-torneira-blukit-unificada.zip` | Unifica todas as torneiras temporizadas no cadastro “Torneira temporizada (de mesa) Blukit” | Pronto para teste/publicação |
-| v28 | `app-manutencao-v28-gerenciamento-andares-ambientes.zip` | Inclusão e exclusão de andares, ambientes e áreas internas no inventário | Pronto para teste/publicação |
-
-| v29 | `app-manutencao-v29-inventario-firebase.zip` | Imagem e saldo do inventário sincronizados pelo Firestore | Pronto para teste/publicação |
-
-| v30 | `app-manutencao-v30-estrutura-inventario-firebase.zip` | Andares, ambientes e áreas internas sincronizados pelo Firestore | Pronto para teste/publicação |
-| v31 | `app-manutencao-v31-edicao-andares-ambientes.zip` | Botão Editar abaixo de Excluir para renomear andares, ambientes e áreas internas com sincronização no Firestore | Pronto para teste/publicação |
-| v32 | `app-manutencao-v32-gerenciamento-itens-inventario.zip` | Inclusão e exclusão de itens por ambiente, cadastro de novos modelos e edição da quantidade instalada com sincronização no Firestore | Pronto para teste/publicação |
-| v33 | `app-manutencao-v33-edicao-exclusao-produtos-estoque.zip` | Edição e exclusão de produtos diretamente no estoque, com proteção para itens vinculados e limpeza do documento no Firestore | Pronto para teste/publicação |

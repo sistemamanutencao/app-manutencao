@@ -19,9 +19,6 @@ function obterCamposFormularioChamado() {
   const campos = {
     andar: document.getElementById("andarChamado"),
     local: document.getElementById("localChamado"),
-    equipamento: document.getElementById("equipamentoChamado"),
-    horario: document.getElementById("horarioChamado"),
-    acompanhamento: document.getElementById("precisaAcompanhamento"),
     categoria: document.getElementById("categoriaChamado"),
     subcategoria: document.getElementById("subcategoriaChamado"),
     tipoManutencao: document.getElementById("tipoManutencaoChamado"),
@@ -30,7 +27,7 @@ function obterCamposFormularioChamado() {
     foto: document.getElementById("fotoChamado")
   };
 
-  const obrigatorios = ["andar", "local", "horario", "acompanhamento", "categoria", "subcategoria", "prioridade", "descricao"];
+  const obrigatorios = ["andar", "local", "categoria", "subcategoria", "prioridade", "descricao"];
   const ausentes = obrigatorios.filter(nome => !campos[nome]);
 
   return {
@@ -41,18 +38,13 @@ function obterCamposFormularioChamado() {
 }
 
 function lerValoresFormularioChamado(campos) {
-  const equipamentoCodigo = obterValorCampoChamado(campos.equipamento).toUpperCase();
-  const ativoVinculado = equipamentoCodigo && typeof encontrarAtivoPorCodigo === "function"
-    ? encontrarAtivoPorCodigo(equipamentoCodigo)
-    : null;
-
   return {
     andar: obterValorCampoChamado(campos.andar),
     local: obterValorCampoChamado(campos.local),
-    equipamentoCodigo,
-    equipamentoNome: ativoVinculado ? (ativoVinculado.nome || "") : "",
-    horario: obterValorCampoChamado(campos.horario),
-    precisaAcompanhamento: obterValorCampoChamado(campos.acompanhamento),
+    equipamentoCodigo: "",
+    equipamentoNome: "",
+    horario: "Não informado",
+    precisaAcompanhamento: "Não informado",
     categoria: obterValorCampoChamado(campos.categoria),
     subcategoria: obterValorCampoChamado(campos.subcategoria),
     tipoManutencao: obterValorCampoChamado(campos.tipoManutencao) || "Corretiva",
@@ -75,8 +67,6 @@ function validarValoresFormularioChamado(valores) {
   const regras = [
     ["Escolher o andar", valores.andar],
     ["Local do andar", valores.local],
-    ["Melhor horário para atendimento", valores.horario],
-    ["Necessário acompanhar", valores.precisaAcompanhamento],
     ["Categoria da OS", valores.categoria],
     ["Subcategoria", valores.subcategoria],
     ["Prioridade", valores.prioridade],
@@ -92,8 +82,6 @@ function marcarCamposObrigatoriosChamado(campos, camposPendentes) {
   const mapa = {
     "Escolher o andar": campos.andar,
     "Local do andar": campos.local,
-    "Melhor horário para atendimento": campos.horario,
-    "Necessário acompanhar": campos.acompanhamento,
     "Categoria da OS": campos.categoria,
     "Subcategoria": campos.subcategoria,
     "Prioridade": campos.prioridade,
@@ -254,8 +242,6 @@ function limparFormularioChamado() {
   const campos = [
     "andarChamado",
     "localChamado",
-    "equipamentoChamado",
-    "horarioChamado",
     "categoriaChamado",
     "subcategoriaChamado",
     "tipoManutencaoChamado",
@@ -280,14 +266,9 @@ function limparFormularioChamado() {
   }
 
   const prioridadeInput = document.getElementById("prioridadeChamado");
-  const acompanhamentoInput = document.getElementById("precisaAcompanhamento");
 
   if (prioridadeInput) {
     prioridadeInput.value = "";
-  }
-
-  if (acompanhamentoInput) {
-    acompanhamentoInput.value = "";
   }
 
   document.querySelectorAll(".category-fast-button").forEach(botao => {

@@ -32,10 +32,7 @@ function montarTextoBuscaPainel(chamado) {
     chamado.numeroOS,
     chamado.descricao,
     chamado.local,
-    chamado.equipamentoCodigo,
-    chamado.equipamentoNome,
     chamado.setor,
-    chamado.horario,
     chamado.categoria,
     chamado.subcategoria,
     chamado.tipoManutencao,
@@ -80,15 +77,12 @@ function criarCardPainel(chamado) {
           <p><strong>Número da OS:</strong> ${escaparHTML(chamado.numeroOS || "Não informado")}</p>
           <p><strong>Etapa:</strong> ${escaparHTML(chamado.etapaFluxo || obterEtapaFluxoPorStatus(chamado.status))}</p>
           <p><strong>Responsável manutenção:</strong> ${escaparHTML(chamado.responsavelManutencao || "A definir")}</p>
-          <p><strong>Ativo / QR:</strong> ${escaparHTML(chamado.equipamentoCodigo || "Não vinculado")}${chamado.equipamentoNome ? ` • ${escaparHTML(chamado.equipamentoNome)}` : ""}</p>
           <p><strong>Categoria técnica:</strong> ${escaparHTML(chamado.categoria || "Não informada")}${chamado.subcategoria ? ` / ${escaparHTML(chamado.subcategoria)}` : ""}</p>
           <p><strong>Tipo de manutenção:</strong> ${escaparHTML(chamado.tipoManutencao || "Corretiva")}</p>
           <p><strong>Prioridade:</strong> ${escaparHTML(chamado.prioridade || "Não informada")}</p>
           <p><strong>SLA:</strong> ${escaparHTML(textoSLA)}</p>
           <p><strong>Criado por:</strong> ${escaparHTML(chamado.criadoPorNome || "Não informado")}</p>
           <p><strong>Andar:</strong> ${escaparHTML(chamado.andar || "Não informado")}</p>
-          <p><strong>Melhor horário:</strong> ${escaparHTML(chamado.horario || "Não informado")}</p>
-          <p><strong>Necessário acompanhar:</strong> ${escaparHTML(chamado.precisaAcompanhamento || "Não informado")}</p>
 
           ${criarControleStatusPainel(chamado, chamadoFinalizado)}
         </div>

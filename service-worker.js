@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v33-edicao-exclusao-produtos-estoque";
+const CACHE_NAME = "app-manutencao-v24-nova-os-simplificada";
 
 const FILES_TO_CACHE = [
   "./",
@@ -17,7 +17,6 @@ const FILES_TO_CACHE = [
   "./css/notificacoes.css",
   "./css/areas.css",
   "./css/diagnostico.css",
-  "./css/inventario.css",
   "./css/responsive.css",
   "./src/constants/andares.js",
   "./src/constants/locais.js",
@@ -56,8 +55,6 @@ const FILES_TO_CACHE = [
   "./js/preventivas.js",
   "./js/diagnostico.js",
   "./js/cadastro-colaboradores.js",
-  "./js/inventario-data.js",
-  "./js/inventario.js",
   "./js/app.js",
   "./js/event-action-maps.js",
   "./js/event-bindings.js",

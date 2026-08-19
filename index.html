@@ -130,17 +130,6 @@
             <p>Equipamentos rastreáveis</p>
           </div>
 
-          <div class="quick-card manut-only" data-nav-page="inventario">
-            <div class="quick-icon purple-bg">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z" stroke="currentColor" stroke-linejoin="round" />
-                <path d="m4.5 7.5 7.5 4 7.5-4M12 11.5V21" stroke="currentColor" stroke-linejoin="round" />
-              </svg>
-            </div>
-            <h3 class="manut-only-title">Inventário</h3>
-            <p>Ambientes e estoque</p>
-          </div>
-
           <div class="quick-card manut-only" data-nav-page="preventivas">
             <div class="quick-icon green-bg">
               <svg viewBox="0 0 24 24" fill="none">
@@ -773,24 +762,6 @@
     </section>
 
     <!-- ABA NOVO -->
-    <!-- ABA INVENTÁRIO DA UNIDADE -->
-    <section class="page manut-only" id="inventario">
-      <header class="page-header inventario-page-header">
-        <div>
-          <h1>Inventário da unidade</h1>
-          <p>Consulte os itens de cada ambiente e registre a imagem de referência e a quantidade disponível em estoque.</p>
-        </div>
-        <button type="button" id="botaoVoltarInventario" class="secondary-button inventario-voltar" hidden><span aria-hidden="true">←</span> Voltar</button>
-      </header>
-
-      <div class="inventario-tabs" role="tablist" aria-label="Seções do inventário">
-        <button class="inventario-tab is-active" type="button" data-inventario-tab="ambientes" role="tab" aria-selected="true">Ambientes</button>
-        <button class="inventario-tab" type="button" data-inventario-tab="estoque" role="tab" aria-selected="false">Estoque</button>
-      </div>
-
-      <div id="inventarioConteudo" class="inventario-conteudo" aria-live="polite"></div>
-    </section>
-
     <section class="page" id="novo">
       <header class="page-header">
         <h1>Nova OS</h1>
@@ -851,33 +822,6 @@
         <small class="form-help">As subcategorias mudam conforme a categoria escolhida.</small>
      </label>
 
-
-     <label>
-        Equipamento / patrimônio / QR Code
-        <input id="equipamentoChamado" type="text" placeholder="Ex: AR-SALA-02, Projetor LAB-INFO-01, Patrimônio 12345..." />
-        <small class="form-help">Opcional. Ao ler um QR Code do ativo, este campo poderá vir preenchido automaticamente.</small>
-     </label>
-
-
-      <label>
-        Melhor horário para atendimento
-        <select id="horarioChamado">
-          <option value="">Selecione</option>
-          <option value="Manhã">Manhã</option>
-          <option value="Tarde">Tarde</option>
-          <option value="Noite">Noite</option>
-          <option value="Qualquer horário">Qualquer horário</option>
-        </select>
-      </label>
-
-      <label>
-        Necessário acompanhar?
-        <select id="precisaAcompanhamento">
-          <option value="">Selecione</option>
-          <option value="Sim">Sim</option>
-          <option value="Não">Não</option>
-        </select>
-      </label>
 
         <label>
           Prioridade
@@ -1247,16 +1191,6 @@
     </button>
 
 
-    <button
-      id="botaoInventarioUnidade"
-      type="button"
-      class="secondary-button manut-only"
-      data-nav-page="inventario"
-    >
-      Inventário da unidade
-    </button>
-
-
     <button 
       type="button" 
       class="logout-button"
@@ -1523,22 +1457,6 @@
           <strong id="detalheLocal">-</strong>
         </div>
 
-        <div class="detail-item">
-          <span>Ativo / QR Code</span>
-          <strong id="detalheAtivo">-</strong>
-        </div>
-        
-
-        <div class="detail-item">
-          <span>Melhor horário</span>
-          <strong id="detalheHorario">-</strong>
-        </div>
-       
-      
-        <div class="detail-item acompanhamento-detail">
-          <span>Necessário acompanhar</span>
-          <strong id="detalheAcompanhamento" class="acompanhamento-badge">-</strong>
-        </div>
 
         <div class="detail-item">
           <span>Categoria da OS</span>
@@ -1657,20 +1575,6 @@
 
   <!-- MENU INFERIOR -->
   <!-- Navegação inferior -->
-  <dialog id="dialogoItemInventario" class="inventario-dialog">
-    <form method="dialog" class="inventario-dialog-card">
-      <button type="submit" class="inventario-dialog-fechar" value="cancel" aria-label="Fechar">×</button>
-      <div id="dialogoItemInventarioConteudo"></div>
-    </form>
-  </dialog>
-
-  <dialog id="dialogoEstruturaInventario" class="inventario-dialog">
-    <form id="formEstruturaInventario" class="inventario-dialog-card">
-      <button type="button" id="fecharDialogoEstruturaInventario" class="inventario-dialog-fechar" aria-label="Fechar">×</button>
-      <div id="dialogoEstruturaInventarioConteudo"></div>
-    </form>
-  </dialog>
-
   <nav class="bottom-nav">
     <div class="nav-item active" data-nav-page="inicio">
       <svg viewBox="0 0 24 24" fill="none">
@@ -1756,8 +1660,6 @@
   <script src="js/preventivas.js"></script>
   <script src="js/diagnostico.js"></script>
   <script src="js/cadastro-colaboradores.js"></script>
-  <script src="js/inventario-data.js"></script>
-  <script src="js/inventario.js"></script>
   <script src="js/app.js"></script>
   <script src="js/event-action-maps.js"></script>
   <script src="js/event-bindings.js"></script>
