@@ -161,3 +161,16 @@
 .modal-card {
   box-shadow: 0 12px 26px rgba(7, 11, 18, 0.13);
 }
+
+
+/* v24 - correção de contraste: o cabeçalho de boas-vindas fica sobre área clara. */
+#inicio .header h1 {
+  color: var(--text-dark);
+  text-shadow: none;
+}
+
+#inicio .header p {
+  color: #5f6982;
+  font-weight: 500;
+  text-shadow: none;
+}

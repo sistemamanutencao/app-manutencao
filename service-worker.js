@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-excluir-os-encerradas";
+const CACHE_NAME = "app-manutencao-v24-correcao-exclusao-layout";
 
 const FILES_TO_CACHE = [
   "./",

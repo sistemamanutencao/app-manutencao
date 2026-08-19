@@ -128,7 +128,11 @@ function atualizarPainelExclusaoEncerradas() {
     return;
   }
 
-  painelExclusao.hidden = !(abaFilaPainelAtual === "ENCERRADAS" && usuarioEhManutencaoAutorizada());
+  const deveExibir = abaFilaPainelAtual === "ENCERRADAS" && usuarioEhManutencaoAutorizada();
+
+  painelExclusao.hidden = !deveExibir;
+  painelExclusao.classList.toggle("is-visible", deveExibir);
+  painelExclusao.setAttribute("aria-hidden", String(!deveExibir));
 }
 
 async function excluirChamadoEncerrado(id, botao) {
@@ -164,7 +168,9 @@ Antes de confirmar, verifique se ela já foi exportada. Essa ação remove o reg
   try {
     if (botao) aplicarFeedbackCarregando(botao, "Excluindo...");
     await excluirChamadoFirebase(id);
+    chamados = chamados.filter(item => String(item.id) !== String(id));
     if (botao) aplicarFeedbackSucesso(botao, "Excluída", "Excluir OS");
+    renderizarPainelManutencao();
     alert("OS encerrada excluída com sucesso.");
   } catch (erro) {
     console.error("Erro ao excluir OS encerrada:", erro);
@@ -205,7 +211,10 @@ Use esta opção somente depois de exportar o relatório. A exclusão remove os 
   try {
     if (botao) aplicarFeedbackCarregando(botao, "Excluindo...");
     await Promise.all(lista.map(chamado => excluirChamadoFirebase(chamado.id)));
+    const idsExcluidos = new Set(lista.map(chamado => String(chamado.id)));
+    chamados = chamados.filter(chamado => !idsExcluidos.has(String(chamado.id)));
     if (botao) aplicarFeedbackSucesso(botao, "Excluídas", "Excluir encerradas filtradas");
+    renderizarPainelManutencao();
     alert(`${lista.length} OS encerrada(s) excluída(s) com sucesso.`);
   } catch (erro) {
     console.error("Erro ao excluir OS encerradas filtradas:", erro);
