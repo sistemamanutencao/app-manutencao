@@ -245,18 +245,69 @@ function idsIguais(idA, idB) {
   return String(idA) === String(idB);
 }
 
+function aplicarFeedbackCarregando(botao, textoCarregando = "Processando...") {
+  if (!botao) {
+    return;
+  }
+
+  if (!botao.dataset.textoOriginal) {
+    botao.dataset.textoOriginal = botao.textContent.trim();
+  }
+
+  botao.disabled = true;
+  botao.classList.add("is-loading");
+  botao.setAttribute("aria-busy", "true");
+  botao.textContent = textoCarregando;
+}
+
+function restaurarFeedbackBotao(botao, textoOriginal) {
+  if (!botao) {
+    return;
+  }
+
+  const textoBase = textoOriginal || botao.dataset.textoOriginal || botao.textContent.trim();
+
+  botao.disabled = false;
+  botao.classList.remove("is-loading", "button-success", "button-error");
+  botao.removeAttribute("aria-busy");
+  botao.textContent = textoBase;
+  delete botao.dataset.textoOriginal;
+}
+
 function aplicarFeedbackSucesso(botao, textoSucesso, textoOriginal) {
   if (!botao) {
     return;
   }
 
+  const textoBase = textoOriginal || botao.dataset.textoOriginal || botao.textContent.trim();
+
+  botao.disabled = false;
+  botao.classList.remove("is-loading", "button-error");
+  botao.removeAttribute("aria-busy");
   botao.classList.add("button-success");
   botao.textContent = textoSucesso;
 
   setTimeout(() => {
-    botao.classList.remove("button-success");
-    botao.textContent = textoOriginal;
+    restaurarFeedbackBotao(botao, textoBase);
   }, 1200);
+}
+
+function aplicarFeedbackErro(botao, textoErro = "Erro", textoOriginal) {
+  if (!botao) {
+    return;
+  }
+
+  const textoBase = textoOriginal || botao.dataset.textoOriginal || botao.textContent.trim();
+
+  botao.disabled = false;
+  botao.classList.remove("is-loading", "button-success");
+  botao.removeAttribute("aria-busy");
+  botao.classList.add("button-error");
+  botao.textContent = textoErro;
+
+  setTimeout(() => {
+    restaurarFeedbackBotao(botao, textoBase);
+  }, 1400);
 }
 
 const LIMITE_FOTOS_CHAMADO = 3;

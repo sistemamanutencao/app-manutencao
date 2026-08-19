@@ -377,6 +377,28 @@ async function excluirChamadoFirebase(id) {
   await firebaseDb.collection(COLLECTIONS.CHAMADOS).doc(String(id)).delete();
 }
 
+async function excluirChamadosFirebase(ids = []) {
+  const idsUnicos = Array.from(new Set(ids.map(id => String(id || "").trim()).filter(Boolean)));
+
+  if (!idsUnicos.length) {
+    return;
+  }
+
+  const TAMANHO_LOTE_FIRESTORE = 400;
+
+  for (let indice = 0; indice < idsUnicos.length; indice += TAMANHO_LOTE_FIRESTORE) {
+    const loteIds = idsUnicos.slice(indice, indice + TAMANHO_LOTE_FIRESTORE);
+    const batch = firebaseDb.batch();
+
+    loteIds.forEach(id => {
+      const referencia = firebaseDb.collection(COLLECTIONS.CHAMADOS).doc(id);
+      batch.delete(referencia);
+    });
+
+    await batch.commit();
+  }
+}
+
 function adicionarItemArrayFirebase(item) {
   return firebase.firestore.FieldValue.arrayUnion(item);
 }

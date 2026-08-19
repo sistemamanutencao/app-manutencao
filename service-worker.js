@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-correcao-exclusao-layout";
+const CACHE_NAME = "app-manutencao-v24-correcao-exclusao-firebase";
 
 const FILES_TO_CACHE = [
   "./",

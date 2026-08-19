@@ -75,11 +75,7 @@
   };
 
   const acoesDinamicas = {
-    prepararOSDoAtivo: (...argumentos) => executarAcao("prepararOSDoAtivo", ...argumentos),
-    mostrarHistoricoAtivo: (...argumentos) => executarAcao("mostrarHistoricoAtivo", ...argumentos),
-    imprimirEtiquetaAtivo: (...argumentos) => executarAcao("imprimirEtiquetaAtivo", ...argumentos),
     prepararPlanoPreventivoDoAtivo: (...argumentos) => executarAcao("prepararPlanoPreventivoDoAtivo", ...argumentos),
-    excluirAtivo: (...argumentos) => executarAcao("excluirAtivo", ...argumentos),
     abrirDetalhesChamado: (...argumentos) => executarAcao("abrirDetalhesChamado", ...argumentos),
     editarComunicado: (...argumentos) => executarAcao("editarComunicado", ...argumentos),
     excluirComunicado: (...argumentos) => executarAcao("excluirComunicado", ...argumentos),
@@ -90,8 +86,6 @@
     editarDiagnostico: (...argumentos) => executarAcao("editarDiagnostico", ...argumentos),
     excluirDiagnostico: (...argumentos) => executarAcao("excluirDiagnostico", ...argumentos),
     imprimirPagina: () => window.print(),
-    prepararCadastroAtivoPorQR: (...argumentos) => executarAcao("prepararCadastroAtivoPorQR", ...argumentos),
-    mostrarHistoricoAtivoNoLeitor: (...argumentos) => executarAcao("mostrarHistoricoAtivoNoLeitor", ...argumentos),
     abrirFotoChamadoAtual: (...argumentos) => executarAcao("abrirFotoChamadoAtual", Number(argumentos[0])),
     abrirFotoFinalizacaoChamadoAtual: (...argumentos) => executarAcao("abrirFotoFinalizacaoChamadoAtual", Number(argumentos[0])),
     marcarNotificacaoComoLida: (...argumentos) => executarAcao("marcarNotificacaoComoLida", ...argumentos),

@@ -565,3 +565,20 @@
   }
 }
 
+
+
+/* Feedback operacional dos botões */
+.admin-action-button.is-loading,
+.danger-button.is-loading,
+.secondary-button.is-loading {
+  cursor: wait;
+  opacity: .78;
+}
+
+.admin-action-button.button-error,
+.danger-button.button-error,
+.secondary-button.button-error {
+  background: #fff2f2 !important;
+  border-color: #ffc8c8 !important;
+  color: #d93030 !important;
+}

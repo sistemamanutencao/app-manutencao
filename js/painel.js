@@ -135,6 +135,25 @@ function atualizarPainelExclusaoEncerradas() {
   painelExclusao.setAttribute("aria-hidden", String(!deveExibir));
 }
 
+
+function chamadoEstaEncerradoParaExclusao(chamado) {
+  return chamado && String(chamado.status || "").trim().toUpperCase() === "ENCERRADO";
+}
+
+function obterMensagemErroExclusaoFirestore(erro) {
+  const codigo = String(erro && erro.code || "");
+
+  if (codigo === "permission-denied") {
+    return "Não foi possível excluir porque o Firestore bloqueou a operação. Verifique se as regras publicadas no Firebase permitem delete em chamados para o perfil manutencao e se o usuário logado está com perfil manutencao em usuarios/{uid}.";
+  }
+
+  if (codigo === "unavailable" || codigo === "deadline-exceeded") {
+    return "Não foi possível excluir por falha de conexão com o Firebase. Verifique a internet e tente novamente.";
+  }
+
+  return "Não foi possível excluir a OS encerrada. Verifique sua conexão, permissões e tente novamente.";
+}
+
 async function excluirChamadoEncerrado(id, botao) {
   if (!usuarioEhManutencaoAutorizada()) {
     alert("Somente a manutenção autorizada pode excluir OS encerradas.");
@@ -148,7 +167,7 @@ async function excluirChamadoEncerrado(id, botao) {
     return;
   }
 
-  if (chamado.status !== "ENCERRADO") {
+  if (!chamadoEstaEncerradoParaExclusao(chamado)) {
     alert("Apenas OS com status ENCERRADO podem ser excluídas por esta opção.");
     return;
   }
@@ -175,7 +194,7 @@ Antes de confirmar, verifique se ela já foi exportada. Essa ação remove o reg
   } catch (erro) {
     console.error("Erro ao excluir OS encerrada:", erro);
     if (botao) aplicarFeedbackErro(botao, "Erro", "Excluir OS");
-    alert("Não foi possível excluir a OS encerrada. Verifique sua conexão e permissões no Firestore.");
+    alert(obterMensagemErroExclusaoFirestore(erro));
   }
 }
 
@@ -190,7 +209,7 @@ async function excluirOSEncerradasFiltradas(botao) {
     return;
   }
 
-  const lista = obterFilaPainelFiltrada().filter(chamado => chamado.status === "ENCERRADO");
+  const lista = obterFilaPainelFiltrada().filter(chamadoEstaEncerradoParaExclusao);
 
   if (!lista.length) {
     alert("Nenhuma OS encerrada encontrada para exclusão com os filtros atuais.");
@@ -210,7 +229,11 @@ Use esta opção somente depois de exportar o relatório. A exclusão remove os 
 
   try {
     if (botao) aplicarFeedbackCarregando(botao, "Excluindo...");
-    await Promise.all(lista.map(chamado => excluirChamadoFirebase(chamado.id)));
+    if (typeof excluirChamadosFirebase === "function") {
+      await excluirChamadosFirebase(lista.map(chamado => chamado.id));
+    } else {
+      await Promise.all(lista.map(chamado => excluirChamadoFirebase(chamado.id)));
+    }
     const idsExcluidos = new Set(lista.map(chamado => String(chamado.id)));
     chamados = chamados.filter(chamado => !idsExcluidos.has(String(chamado.id)));
     if (botao) aplicarFeedbackSucesso(botao, "Excluídas", "Excluir encerradas filtradas");
@@ -219,6 +242,6 @@ Use esta opção somente depois de exportar o relatório. A exclusão remove os 
   } catch (erro) {
     console.error("Erro ao excluir OS encerradas filtradas:", erro);
     if (botao) aplicarFeedbackErro(botao, "Erro", "Excluir encerradas filtradas");
-    alert("Não foi possível concluir a exclusão das OS encerradas. Verifique sua conexão e permissões no Firestore.");
+    alert(obterMensagemErroExclusaoFirestore(erro));
   }
 }
