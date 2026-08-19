@@ -9,15 +9,75 @@
   <title>App de Manutenção Predial</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#1f6fe5" />
+  <meta name="theme-color" content="#1b140e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Manutenção" />
 
+  <style>
+    html, body {
+      background: #1b140e;
+    }
+
+    #appSplash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      background:
+        radial-gradient(circle at 50% 22%, rgba(214, 160, 57, 0.34) 0%, rgba(214, 160, 57, 0.14) 22%, rgba(27, 20, 14, 0.96) 54%, #120d09 100%),
+        linear-gradient(180deg, #2d1d11 0%, #1b140e 42%, #110d09 100%);
+      transition: opacity .42s ease, visibility .42s ease;
+    }
+
+    #appSplash::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.00) 100%);
+      pointer-events: none;
+    }
+
+    .splash-logo-box {
+      width: min(70vw, 320px);
+      max-width: 320px;
+      aspect-ratio: 1 / 1;
+      border-radius: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(212, 161, 64, 0.22);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+      backdrop-filter: blur(2px);
+    }
+
+    .splash-logo-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.38));
+    }
+
+    body.app-ready #appSplash {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  </style>
 </head>
 
 
 <body>
+  <div id="appSplash" aria-hidden="true">
+    <div class="splash-logo-box">
+      <img src="img/logo-manutencao-dourado.png" alt="Logo Manutenção" />
+    </div>
+  </div>
   <!-- Estrutura principal do app -->
   <main class="phone-screen">
     <!-- Botão global de notificações -->
@@ -1503,6 +1563,24 @@
   <script src="js/event-action-maps.js"></script>
   <script src="js/event-bindings.js"></script>
   <script src="js/service-worker-register.js"></script>
+
+  <script>
+    (function () {
+      function finalizarSplash() {
+        document.body.classList.add('app-ready');
+        setTimeout(function () {
+          var splash = document.getElementById('appSplash');
+          if (splash) splash.remove();
+        }, 520);
+      }
+
+      window.addEventListener('load', function () {
+        setTimeout(finalizarSplash, 180);
+      });
+
+      setTimeout(finalizarSplash, 2400);
+    })();
+  </script>
 </body>
 
 </html>
