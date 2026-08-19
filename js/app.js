@@ -73,7 +73,6 @@ function prepararTelaSemSessao() {
   chamados = [];
   comunicados = [];
   notificacoes = [];
-  ativos = [];
   planosPreventivos = [];
   diagnosticos = [];
   cadastrosColaboradores = [];
@@ -91,9 +90,6 @@ function prepararTelaSemSessao() {
     renderizarComunicados();
   }
 
-  if (typeof renderizarAtivos === "function") {
-    renderizarAtivos();
-  }
 
   if (typeof renderizarPlanosPreventivos === "function") {
     renderizarPlanosPreventivos();
@@ -302,20 +298,6 @@ function iniciarMonitoresDeDados() {
     alert("Não foi possível carregar as notificações internas.\nVerifique sua conexão e tente atualizar a página.");
   });
 
-  monitorAtivos = observarAtivosFirebase(lista => {
-    ativos = lista;
-
-    if (typeof renderizarAtivos === "function") {
-      renderizarAtivos();
-    }
-
-    if (typeof prepararQRCodeInicial === "function") {
-      prepararQRCodeInicial();
-    }
-  }, erro => {
-    console.error("Erro ao carregar ativos:", erro);
-    alert("Não foi possível carregar ativos e QR Codes.\nVerifique sua conexão e tente atualizar a página.");
-  });
   monitorPlanosPreventivos = observarPlanosPreventivosFirebase(lista => {
     planosPreventivos = lista;
 
@@ -366,10 +348,6 @@ function encerrarMonitoresDeDados() {
     monitorComunicados = null;
   }
 
-  if (typeof monitorAtivos === "function") {
-    monitorAtivos();
-    monitorAtivos = null;
-  }
 
   if (typeof monitorNotificacoes === "function") {
     monitorNotificacoes();

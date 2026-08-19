@@ -22,7 +22,6 @@ function aplicarPermissoesNaTela() {
   const areaPerfilLogado = document.getElementById("areaPerfilLogado");
   const botaoPainel = document.getElementById("botaoPainelManutencao");
   const areaNovoComunicado = document.getElementById("areaNovoComunicado");
-  const areaNovoAtivo = document.getElementById("areaNovoAtivo");
   const areaNovoPlanoPreventivo = document.getElementById("areaNovoPlanoPreventivo");
 
   if (areaNavegacao) {
@@ -46,9 +45,6 @@ function aplicarPermissoesNaTela() {
     areaNovoComunicado.style.display = usuarioPodeCriarComunicado() ? "grid" : "none";
   }
 
-  if (areaNovoAtivo) {
-    areaNovoAtivo.style.display = usuarioPodeGerenciarAtivos() ? "grid" : "none";
-  }
 
   if (areaNovoPlanoPreventivo) {
     areaNovoPlanoPreventivo.style.display = usuarioPodeGerenciarPreventivas() ? "grid" : "none";
@@ -60,10 +56,6 @@ function aplicarPermissoesNaTela() {
 
   preencherResumoUsuarioNaTela();
 
-
-  if (typeof renderizarAtivos === "function") {
-    renderizarAtivos();
-  }
 
   if (typeof renderizarPlanosPreventivos === "function") {
     renderizarPlanosPreventivos();

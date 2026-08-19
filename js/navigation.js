@@ -11,7 +11,7 @@ function openPage(pageId, navElement) {
     itemNavegacao = null;
   }
 
-  const paginasRestritasManutencao = ["painel", "ativos", "preventivas"];
+  const paginasRestritasManutencao = ["painel", "preventivas"];
 
   if (paginasRestritasManutencao.includes(paginaDestino) && !usuarioEhManutencaoAutorizada()) {
     alert("Acesso restrito à manutenção autorizada.\nSeu perfil não possui permissão para abrir esta área.");
@@ -83,13 +83,6 @@ function executarRenderizacaoDaPagina(pageId) {
     renderizarComunicados();
   }
 
-  if (pageId === "ativos" && typeof renderizarAtivos === "function") {
-    renderizarAtivos();
-  }
-
-  if (pageId === "leitor-qr" && typeof renderizarResultadoLeitorQR === "function") {
-    renderizarResultadoLeitorQR(null);
-  }
 
   if (pageId === "preventivas" && typeof renderizarPlanosPreventivos === "function") {
     renderizarPlanosPreventivos();

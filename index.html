@@ -63,17 +63,6 @@
             <p>Abrir Ordem de Serviço</p>
           </div>
 
-          <div class="quick-card" data-action="abrir-leitor-qr">
-            <div class="quick-icon green-bg">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M4 4h6v6H4V4ZM14 4h6v6h-6V4ZM4 14h6v6H4v-6Z" stroke="currentColor" stroke-linejoin="round" />
-                <path d="M14 14h2M18 14h2M14 18h6M18 16v4" stroke="currentColor" stroke-linecap="round" />
-              </svg>
-            </div>
-            <h3>Ler QR Code</h3>
-            <p>Consultar histórico ou abrir OS</p>
-          </div>
-
           <div class="quick-card" data-nav-page="chamados">
             <div class="quick-icon green-bg">
               <svg viewBox="0 0 24 24" fill="none">
@@ -116,18 +105,6 @@
             </div>
             <h3>Fila operacional de OS</h3>
             <p>Atender chamados</p>
-          </div>
-
-          <div class="quick-card manut-only" data-nav-page="ativos">
-            <div class="quick-icon blue-bg">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M4 7h16v10H4V7Z" stroke="currentColor" stroke-linejoin="round" />
-                <path d="M8 11h8M8 14h5" stroke="currentColor" stroke-linecap="round" />
-                <path d="M6 19h12" stroke="currentColor" stroke-linecap="round" />
-              </svg>
-            </div>
-            <h3 class="manut-only-title">Ativos / QR</h3>
-            <p>Equipamentos rastreáveis</p>
           </div>
 
           <div class="quick-card manut-only" data-nav-page="preventivas">
@@ -326,142 +303,6 @@
     </section>
 
 
-    <!-- ABA ATIVOS / EQUIPAMENTOS -->
-    <section class="page" id="ativos">
-      <header class="page-header">
-        <h1>Ativos e QR Code</h1>
-        <p>Cadastre equipamentos, ambientes e patrimônios para vincular cada OS a um histórico rastreável.</p>
-      </header>
-
-      <div class="form-card" id="areaNovoAtivo">
-        <label>
-          Código do ativo / QR
-          <input id="codigoAtivo" type="text" placeholder="Ex: AR-SALA-02, PROJ-LAB-01, BEB-BIB-01" />
-        </label>
-
-        <label>
-          Nome do ativo
-          <input id="nomeAtivo" type="text" placeholder="Ex: Ar-condicionado Split 12000 BTUs" />
-        </label>
-
-        <label>
-          Localização
-          <select id="localAtivo">
-            <option value="">Selecione</option>
-            <option>Sala de Aula</option>
-            <option>Laboratório de Informática</option>
-            <option>Laboratório Técnico</option>
-            <option>Banheiro</option>
-            <option>Recepção</option>
-            <option>Biblioteca</option>
-            <option>Auditório</option>
-            <option>Cozinha Pedagógica</option>
-            <option>Área Externa</option>
-            <option>Coordenação</option>
-            <option>Outro local</option>
-          </select>
-        </label>
-
-        <div class="form-row">
-          <label>
-            Tipo de cadastro
-            <select id="categoriaAtivo">
-              <option value="Equipamento">Equipamento</option>
-              <option value="Ambiente">Ambiente</option>
-              <option value="Infraestrutura">Infraestrutura</option>
-              <option value="Mobiliário">Mobiliário</option>
-              <option value="TI / Audiovisual">TI / Audiovisual</option>
-            </select>
-          </label>
-
-          <label>
-            Criticidade
-            <select id="criticidadeAtivo">
-              <option value="Baixa">Baixa</option>
-              <option value="Média">Média</option>
-              <option value="Alta">Alta</option>
-              <option value="Urgente">Urgente</option>
-            </select>
-          </label>
-        </div>
-
-        <label>
-          Categoria principal de manutenção
-          <select id="categoriaManutencaoAtivo">
-            <option value="">Selecione</option>
-            <option value="Elétrica">Elétrica</option>
-            <option value="Hidráulica">Hidráulica</option>
-            <option value="Alvenaria">Alvenaria</option>
-            <option value="Pintura">Pintura</option>
-            <option value="Eletrônica">Eletrônica</option>
-            <option value="Outros">Outros</option>
-          </select>
-        </label>
-
-        <label>
-          Observações do ativo/local
-          <textarea id="observacoesAtivo" placeholder="Ex: ambiente com grande circulação, equipamento essencial para aula, verificar histórico de reincidência..."></textarea>
-        </label>
-
-        <button type="button" class="primary-button" data-action="salvar-ativo">
-          Cadastrar ativo/local
-        </button>
-      </div>
-
-      <div class="form-card qr-help-card">
-        <h3>Como usar o QR Code</h3>
-        <p>Depois de cadastrar um ativo ou local, o app gera o link do QR Code e permite imprimir uma etiqueta simples com código, nome, localização e endereço.</p>
-        <p>Use o leitor para consultar histórico, abrir nova OS vinculada ou conferir reincidência daquele ponto.</p>
-      </div>
-
-      <div class="section-header spacing">
-        <h2>Ativos cadastrados</h2>
-      </div>
-
-      <div class="asset-list" id="listaAtivos">
-        <!-- Ativos carregados pelo JavaScript -->
-      </div>
-    </section>
-
-    <!-- ABA LEITOR QR CODE -->
-    <section class="page" id="leitor-qr">
-      <header class="page-header">
-        <h1>Leitor de QR Code</h1>
-        <p>Leia o QR Code de um ambiente, equipamento ou patrimônio para consultar histórico de manutenção ou abrir uma nova OS vinculada.</p>
-      </header>
-
-      <div class="form-card qr-reader-card">
-        <video id="videoLeitorQR" class="qr-reader-video" playsinline muted></video>
-        <p id="statusLeitorQR" class="form-help">Clique em iniciar leitura e permita o acesso à câmera.</p>
-
-        <div class="form-row">
-          <button type="button" class="primary-button" data-action="iniciar-leitura-qr">
-            Iniciar leitura
-          </button>
-          <button type="button" class="secondary-button" data-action="parar-leitura-qr">
-            Parar câmera
-          </button>
-        </div>
-
-        <label>
-          Código do QR
-          <input id="codigoQRManual" type="text" placeholder="Digite ou cole o código do QR" />
-        </label>
-
-        <button type="button" class="secondary-button" data-action="processar-qr-manual">
-          Consultar código
-        </button>
-      </div>
-
-      <div class="section-header spacing">
-        <h2>Resultado da leitura</h2>
-      </div>
-
-      <div id="resultadoLeitorQR" class="asset-list">
-        <!-- Resultado carregado pelo JavaScript -->
-      </div>
-    </section>
-
     <!-- ABA PREVENTIVAS -->
     <section class="page" id="preventivas">
       <header class="page-header">
@@ -480,8 +321,8 @@
         <h3 id="tituloFormularioPlanoPreventivo">Novo plano preventivo</h3>
 
         <label>
-          Ativo / patrimônio / QR Code
-          <input id="ativoPlanoPreventivo" type="text" placeholder="Ex: AR-SALA-02" />
+          Local / equipamento / patrimônio
+          <input id="ativoPlanoPreventivo" type="text" placeholder="Ex: Sala 02, ar-condicionado, bomba d'água" />
         </label>
 
         <label>
@@ -1655,8 +1496,6 @@
   <script src="js/painel.js"></script>
   <script src="js/perfil.js"></script>
   <script src="js/comunicados.js"></script>
-  <script src="js/ativos.js"></script>
-  <script src="js/leitor-qr.js"></script>
   <script src="js/preventivas.js"></script>
   <script src="js/diagnostico.js"></script>
   <script src="js/cadastro-colaboradores.js"></script>

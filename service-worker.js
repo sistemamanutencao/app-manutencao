@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-nova-os-simplificada";
+const CACHE_NAME = "app-manutencao-v24-sem-qr-acesso-rapido";
 
 const FILES_TO_CACHE = [
   "./",
@@ -50,8 +50,6 @@ const FILES_TO_CACHE = [
   "./js/painel.js",
   "./js/perfil.js",
   "./js/comunicados.js",
-  "./js/ativos.js",
-  "./js/leitor-qr.js",
   "./js/preventivas.js",
   "./js/diagnostico.js",
   "./js/cadastro-colaboradores.js",

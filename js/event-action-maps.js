@@ -26,14 +26,9 @@
 
   const acoesClique = {
     "abrir-painel-notificacoes": () => executarAcao("abrirPainelNotificacoes"),
-    "abrir-leitor-qr": () => executarAcao("abrirLeitorQRCode"),
     "exportar-os-excel": () => executarAcao("exportarOSFinalizadasExcel"),
     "exportar-os-pdf": () => executarAcao("exportarOSFinalizadasPDF"),
     "exportar-os-word": () => executarAcao("exportarOSFinalizadasWord"),
-    "salvar-ativo": () => executarAcao("salvarAtivo"),
-    "iniciar-leitura-qr": () => executarAcao("iniciarLeituraQRCode"),
-    "parar-leitura-qr": () => executarAcao("pararLeituraQRCode"),
-    "processar-qr-manual": () => executarAcao("processarQRCodeManual"),
     "salvar-plano-preventivo": () => executarAcao("salvarPlanoPreventivo"),
     "cancelar-edicao-plano-preventivo": () => executarAcao("cancelarEdicaoPlanoPreventivo"),
     "criar-item-diagnostico": elemento => executarAcao("criarItemDiagnostico", elemento),
