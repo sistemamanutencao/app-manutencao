@@ -4,8 +4,8 @@
   "description": "Aplicativo para abertura e controle de chamados de manutenção predial.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#1b140e",
-  "theme_color": "#1b140e",
+  "background_color": "#000c2b",
+  "theme_color": "#000c2b",
   "orientation": "portrait",
   "icons": [
     {

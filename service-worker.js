@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-icone-instalador-senac-80";
+const CACHE_NAME = "app-manutencao-v24-splash-senac-80";
 
 const FILES_TO_CACHE = [
   "./",
@@ -63,8 +63,7 @@ const FILES_TO_CACHE = [
   "./img/icon-192.png",
   "./img/icon-512.png",
   "./img/apple-touch-icon.png",
-  "./img/perfil-manutencao.png",
-  "./img/logo-manutencao-dourado.png"
+  "./img/perfil-manutencao.png"
 ];
 
 self.addEventListener("install", event => {
