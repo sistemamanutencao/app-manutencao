@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-perfil-foto-reset-senac80";
+const CACHE_NAME = "app-manutencao-v25-inicio-sem-nova-os-comunicados";
 
 const FILES_TO_CACHE = [
   "./",

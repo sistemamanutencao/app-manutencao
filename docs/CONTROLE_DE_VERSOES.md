@@ -58,3 +58,4 @@ final.zip
 final2.zip
 ```
 | v24 | `app-manutencao-v24-experiencia-redefinicao-senha.zip` | Experiência visual de solicitação de redefinição de senha com avatar, feedback interno e envio pelo Firebase Auth | Pronto para teste/publicação |
+| v25 | `app-manutencao-v25-inicio-sem-nova-os-comunicados.zip` | Remove Nova OS e Comunicados do Acesso rápido, mantendo ambos na navegação inferior e reajustando o grid | Pronto para teste/publicação |
