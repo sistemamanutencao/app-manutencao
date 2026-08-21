@@ -1,5 +1,5 @@
 /* Firebase Cloud Messaging no mesmo Service Worker do PWA.
- * A v28 usa os pacotes compat para preservar a arquitetura atual sem bundler.
+ * A v29 usa os pacotes compat para preservar a arquitetura atual sem bundler.
  */
 try {
   importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js");
@@ -25,7 +25,7 @@ try {
     return self.registration.showNotification(titulo, {
       body: corpo,
       icon: "./img/icon-192.png",
-      badge: "./img/icon-192.png",
+      badge: "./img/notification-badge.png",
       tag: data.tag || (data.chamadoId ? `novo-chamado-${data.chamadoId}` : "novo-chamado"),
       renotify: true,
       requireInteraction: String(data.prioridade || "").toLowerCase() === "urgente",
@@ -80,7 +80,7 @@ self.addEventListener("notificationclick", event => {
   })());
 });
 
-const CACHE_NAME = "app-manutencao-v28-push-configurado";
+const CACHE_NAME = "app-manutencao-v29-badge-notificacao";
 
 const FILES_TO_CACHE = [
   "./",
@@ -147,6 +147,7 @@ const FILES_TO_CACHE = [
   "./img/icon-192.png",
   "./img/icon-512.png",
   "./img/apple-touch-icon.png",
+  "./img/notification-badge.png",
   "./img/perfil-manutencao.png"
 ];
 
