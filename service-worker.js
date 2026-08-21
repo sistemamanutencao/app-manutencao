@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-splash-senac-80";
+const CACHE_NAME = "app-manutencao-v24-perfil-foto-reset-senac80";
 
 const FILES_TO_CACHE = [
   "./",

@@ -25,22 +25,23 @@
     }
 
 .avatar.avatar-manutencao {
-  width: clamp(150px, 38vw, 180px);
-  height: clamp(150px, 38vw, 180px);
-  background: linear-gradient(145deg, #090806 0%, #1a1409 100%);
-  padding: 6px;
-  border: 3px solid rgba(209, 154, 45, 0.45);
+  width: clamp(152px, 40vw, 186px);
+  height: clamp(152px, 40vw, 186px);
+  background: #ffffff;
+  padding: 0;
+  border: 3px solid rgba(17, 41, 77, 0.08);
   border-radius: 28px;
   overflow: hidden;
   margin-bottom: 18px;
-  box-shadow: 0 14px 30px rgba(12, 18, 32, 0.2), 0 0 0 1px rgba(255, 205, 112, 0.22);
+  box-shadow: 0 14px 30px rgba(12, 18, 32, 0.14), 0 0 0 1px rgba(17, 41, 77, 0.04);
 }
 
 .avatar.avatar-manutencao img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  border-radius: 22px;
+  object-fit: cover;
+  object-position: center 24%;
+  border-radius: 24px;
   display: block;
 }
 
@@ -575,15 +576,15 @@
 .password-recovery-avatar {
   position: absolute;
   left: 50%;
-  bottom: 8px;
-  width: min(88%, 330px);
-  max-width: 330px;
+  bottom: 10px;
+  width: min(54vw, 188px);
+  max-width: 188px;
   height: auto;
   transform: translateX(-50%);
   display: block;
   pointer-events: none;
-  border-radius: 22px;
-  box-shadow: 0 14px 34px rgba(12, 18, 32, 0.22);
+  border-radius: 24px;
+  box-shadow: 0 14px 34px rgba(12, 18, 32, 0.18);
 }
 
 .password-recovery-card {
@@ -752,15 +753,15 @@
   .password-recovery-avatar {
   position: absolute;
   left: 50%;
-  bottom: 8px;
-  width: min(88%, 330px);
-  max-width: 330px;
+  bottom: 10px;
+  width: min(54vw, 188px);
+  max-width: 188px;
   height: auto;
   transform: translateX(-50%);
   display: block;
   pointer-events: none;
-  border-radius: 22px;
-  box-shadow: 0 14px 34px rgba(12, 18, 32, 0.22);
+  border-radius: 24px;
+  box-shadow: 0 14px 34px rgba(12, 18, 32, 0.18);
 }
 
   .password-recovery-title-row {
