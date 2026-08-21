@@ -34,7 +34,8 @@
     }
 
 @media (max-width: 340px) {
-      .quick-grid { grid-template-columns: repeat(2, 1fr); }
+      .quick-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .quick-grid.quick-grid-manutencao { grid-template-columns: repeat(6, minmax(0, 1fr)); }
       .quick-card { height: 105px; }
       .hero { height: 170px; }
       .hero-text { width: 68%; }

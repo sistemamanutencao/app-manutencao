@@ -394,6 +394,11 @@ function aplicarPermissoesInterface() {
     elemento.style.display = manutencao ? "none" : "";
   });
 
+  const gridAcessoRapido = document.querySelector(".quick-grid");
+  if (gridAcessoRapido) {
+    gridAcessoRapido.classList.toggle("quick-grid-manutencao", manutencao);
+  }
+
   atualizarRotulosVisaoChamados();
 
   document.querySelectorAll("[data-permissao]").forEach(elemento => {

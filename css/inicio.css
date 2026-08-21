@@ -94,8 +94,25 @@
 
 .quick-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 9px;
+    }
+
+/* Manutenção: 5 atalhos visíveis, sem aparência de célula faltando. */
+.quick-grid.quick-grid-manutencao {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+.quick-grid.quick-grid-manutencao > .quick-card {
+      grid-column: span 2;
+    }
+
+.quick-grid.quick-grid-manutencao > .quick-card[data-nav-page="preventivas"] {
+      grid-column: 2 / span 2;
+    }
+
+.quick-grid.quick-grid-manutencao > .quick-card[data-nav-page="diagnostico"] {
+      grid-column: 4 / span 2;
     }
 
 .quick-card {

@@ -9,6 +9,7 @@
   <title>App de Manutenção Predial</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
   <meta name="theme-color" content="#1b140e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -123,7 +124,7 @@
             <p>Abrir Ordem de Serviço</p>
           </div>
 
-          <div class="quick-card" data-nav-page="chamados">
+          <div class="quick-card hide-for-manut" data-nav-page="chamados">
             <div class="quick-icon green-bg">
               <svg viewBox="0 0 24 24" fill="none">
                 <path d="M9 7h11M9 12h11M9 17h11" stroke="currentColor" stroke-linecap="round" />
@@ -203,7 +204,7 @@
         </div>
       </section>
 
-      <section>
+      <section class="hide-for-manut">
         <div class="section-header spacing">
           <h2>Minhas OS</h2>
           <a href="#" data-nav-page="chamados">Ver todos</a>
