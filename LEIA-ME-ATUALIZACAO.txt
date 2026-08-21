@@ -1,0 +1,10 @@
+V29 - atualização somente
+
+Copie estes arquivos para a raiz do SEU REPOSITÓRIO ORIGINAL app-manutencao, preservando as pastas:
+- service-worker.js
+- js/push-notifications.js
+- img/notification-badge.png
+- docs/COMMIT_SUMMARY_V29_BADGE_NOTIFICACAO.md
+
+Não abra esta pasta como um novo repositório no GitHub Desktop.
+Não clique em "Publish repository".
