@@ -1,0 +1,2 @@
+Coloque aqui a imagem senac-predio.png usada no card principal.
+O caminho no HTML está como: img/senac-predio.png

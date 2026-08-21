@@ -1,0 +1,1608 @@
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App de Manutenção Predial</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
+  <meta name="theme-color" content="#000c2b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Manutenção" />
+
+  <style>
+    html, body {
+      background: #000c2b;
+    }
+
+    #appSplash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: #000c2b;
+      transition: opacity .32s ease, visibility .32s ease;
+    }
+
+    .splash-logo-box {
+      width: min(78vw, 360px);
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .splash-logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    body.app-ready #appSplash {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+
+<body>
+  <div id="appSplash" aria-hidden="true">
+    <div class="splash-logo-box">
+      <img src="img/icon-512.png" alt="Senac 80 anos" />
+    </div>
+  </div>
+  <!-- Estrutura principal do app -->
+  <main class="phone-screen">
+    <!-- Botão global de notificações -->
+    <button type="button" id="botaoNotificacoes" class="notifications-button" data-action="abrir-painel-notificacoes" aria-label="Abrir notificações">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M10 21h4" stroke-linecap="round" />
+      </svg>
+      <span id="contadorNotificacoes" class="notifications-badge">0</span>
+    </button>
+
+    <!-- Páginas principais -->
+    <!-- ABA INÍCIO -->
+    <section class="page active" id="inicio">
+      <header class="header">
+        <div>
+          <h1>Olá, seja bem-vindo!</h1>
+          <p>Senac Campo Mourão</p>
+        </div>  
+      </header>
+
+      <section class="hero">
+        <div class="hero-text">
+          <h2>Precisou?<br>A gente resolve.</h2>
+          <p>Abra uma Ordem de Serviço e acompanhe a manutenção com histórico e evidências.</p>
+        </div>
+        <img class="hero-building" src="img/senac-predio.png" alt="Prédio Senac Campo Mourão" />
+      </section>
+
+      <section>
+        <div class="section-header">
+          <h2>Acesso rápido</h2>
+        </div>
+
+        <div class="quick-grid">
+          <div class="quick-card hide-for-manut" data-nav-page="chamados">
+            <div class="quick-icon green-bg">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M9 7h11M9 12h11M9 17h11" stroke="currentColor" stroke-linecap="round" />
+                <path d="M4 7h.01M4 12h.01M4 17h.01" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+              </svg>
+            </div>
+            <h3 id="tituloCardChamadosRapido">Minhas OS</h3>
+            <p id="textoCardChamadosRapido">Acompanhar</p>
+          </div>
+
+          <div class="quick-card hide-for-manut" data-nav-page="areas">
+            <div class="quick-icon purple-bg">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M7 4h10a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="M9 4v5h6V4" stroke="currentColor" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <h3>Áreas e serviços</h3>
+            <p>Ver categorias</p>
+          </div>
+
+          <div class="quick-card manut-only" data-nav-page="painel">
+            <div class="quick-icon purple-bg">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M5 7h14M5 12h14M5 17h9" stroke="currentColor" stroke-linecap="round" />
+                <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-13Z" stroke="currentColor" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <h3>Fila operacional de OS</h3>
+            <p>Atender chamados</p>
+          </div>
+
+          <div class="quick-card manut-only" data-nav-page="preventivas">
+            <div class="quick-icon green-bg">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M7 3v4M17 3v4M4 9h16" stroke="currentColor" stroke-linecap="round" />
+                <path d="M5 6h14v14H5V6Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="m8 14 2 2 5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <h3 class="manut-only-title">Preventivas</h3>
+            <p>Planos recorrentes</p>
+          </div>
+
+          <div class="quick-card manut-only" data-nav-page="diagnostico">
+            <div class="quick-icon orange-bg">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M9 6h11M9 12h11M9 18h7" stroke="currentColor" stroke-linecap="round" />
+                <path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <h3 class="manut-only-title">Diagnóstico inicial</h3>
+            <p>Inspeção da unidade</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="manut-only" id="secaoChamadosNovosInicio">
+        <div class="section-header spacing">
+          <h2>Novos chamados <span id="contadorChamadosNovosInicio" class="inicio-count-badge">0</span></h2>
+          <a href="#" data-nav-page="painel">Ver fila</a>
+        </div>
+
+        <div class="tickets-card" id="listaChamadosNovosInicio">
+          <!-- Apenas OS com status ABERTO serão carregadas pelo JavaScript -->
+        </div>
+      </section>
+
+      <section id="secaoComunicadosInicio">
+        <div class="section-header spacing">
+          <h2>Comunicados recentes</h2>
+          <a href="#" data-nav-page="comunicados">Ver todos</a>
+        </div>
+
+        <div class="notice-list" id="listaComunicadosInicio">
+          <!-- Comunicados recentes serão carregados pelo JavaScript -->
+        </div>
+      </section>
+
+      <section class="hide-for-manut">
+        <div class="section-header spacing">
+          <h2>Minhas OS</h2>
+          <a href="#" data-nav-page="chamados">Ver todos</a>
+        </div>
+
+        <div class="tickets-card" id="listaOSInicio">
+          <!-- OS recentes carregadas pelo JavaScript -->
+        </div>
+      </section>
+
+    </section>
+
+    <!-- ABA CHAMADOS -->
+    <section class="page" id="chamados">
+      <header class="page-header">
+        <h1 id="tituloPaginaChamados">Ordens de Serviço</h1>
+        <p id="textoPaginaChamados">Acompanhe as OS abertas, em triagem, execução, validação e encerramento.</p>
+      </header>
+
+      <div class="chamados-tabs" role="tablist" aria-label="Separar ordens de serviço por situação">
+        <button type="button" class="chamados-tab active" id="abaChamadosAtivas" data-action="selecionar-aba-chamados-ativas" role="tab" aria-selected="true">
+          OS ativas <span id="contadorChamadosAtivas">0</span>
+        </button>
+        <button type="button" class="chamados-tab" id="abaChamadosEncerradas" data-action="selecionar-aba-chamados-encerradas" role="tab" aria-selected="false">
+          OS encerradas <span id="contadorChamadosEncerradas">0</span>
+        </button>
+      </div>
+
+      <div class="filter-row" id="filtrosOS">
+        <button class="filter active" data-os-filter="TODOS">Todos</button>
+        <button class="filter" data-os-filter="ATRASADOS">Atrasados</button>
+        <button class="filter" data-os-filter="ABERTO">Abertos</button>
+        <button class="filter" data-os-filter="EM ANDAMENTO">Andamento</button>
+        <button class="filter" data-os-filter="AGUARDANDO">Aguardando</button>
+        <button class="filter" data-os-filter="CONCLUÍDO">Concluídos</button>
+        <button class="filter" data-os-filter="VALIDADO">Validados</button>
+        <button class="filter" data-os-filter="CANCELADO">Cancelados</button>
+      </div>
+
+      <div class="search-box">
+        <input 
+         type="text" 
+         id="buscaOS" 
+         placeholder="Buscar por nº da OS, local, categoria, descrição ou criador..."
+         data-input-action="pesquisar-os"
+        />
+      </div>
+
+      <div class="export-card manut-only">
+        <div>
+          <h3>Exportar Ordens de Serviço</h3>
+          <p>Gere relatórios das OS disponíveis para a manutenção, respeitando busca e filtro ativos, sem imagens ou anexos.</p>
+        </div>
+
+        <div class="export-actions">
+          <button type="button" class="secondary-button" data-action="exportar-os-excel">Excel</button>
+          <button type="button" class="secondary-button" data-action="exportar-os-pdf">PDF</button>
+          <button type="button" class="secondary-button" data-action="exportar-os-word">Word</button>
+        </div>
+      </div>
+
+      <div class="tickets-card" id="listaOS">
+        <!-- Todos os chamados carregados pelo JavaScript -->
+      </div>
+    </section>
+
+    <!-- ABA ÁREAS E SERVIÇOS -->
+    <section class="page" id="areas">
+      <header class="page-header">
+        <h1>Áreas e serviços</h1>
+        <p>Escolha a categoria da manutenção para entender melhor o tipo de solicitação.</p>
+      </header>
+
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon green-bg">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M9 18h6M10 22h4" stroke="currentColor" stroke-linecap="round" />
+              <path d="M8 14a6 6 0 1 1 8 0c-.8.7-1.2 1.5-1.2 2.4H9.2C9.2 15.5 8.8 14.7 8 14Z" stroke="currentColor" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="service-info">
+            <h3>Elétrica</h3>
+            <p>Lâmpadas, tomadas, disjuntores, queda de energia e curto-circuito.</p>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon blue-bg">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 10h12a4 4 0 0 1 4 4v1" stroke="currentColor" stroke-linecap="round" />
+              <path d="M6 10V6M11 10V6" stroke="currentColor" stroke-linecap="round" />
+              <path d="M19 18s-2 2.2-2 3.5a2 2 0 0 0 4 0C21 20.2 19 18 19 18Z" fill="currentColor" />
+            </svg>
+          </div>
+          <div class="service-info">
+            <h3>Hidráulica</h3>
+            <p>Vazamentos, torneiras, descargas, ralos, pias e infiltrações.</p>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon orange-bg">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 3h9v18H7V3Z" fill="currentColor" opacity=".95" />
+              <path d="M16 5h2v16h-2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+              <circle cx="13" cy="12" r="1" fill="#fff" />
+            </svg>
+          </div>
+          <div class="service-info">
+            <h3>Alvenaria</h3>
+            <p>Portas, paredes, pisos, fechaduras, divisórias e pequenos reparos.</p>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon purple-bg">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 20h16" stroke="currentColor" stroke-linecap="round" />
+              <path d="M6 16 16 6l2 2L8 18H6v-2Z" stroke="currentColor" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="service-info">
+            <h3>Pintura</h3>
+            <p>Retoques, pintura de salas, corredores, paredes manchadas e conservação.</p>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon blue-bg">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="5" width="16" height="11" rx="2" stroke="currentColor" />
+              <path d="M8 21h8M12 16v5" stroke="currentColor" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div class="service-info">
+            <h3>Eletrônica</h3>
+            <p>Projetores, controles, equipamentos, cabos, telas e suporte técnico simples.</p>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon green-bg">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 3v18" stroke="currentColor" stroke-linecap="round" />
+              <path d="M5 8h14M5 16h14" stroke="currentColor" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div class="service-info">
+            <h3>Outros serviços</h3>
+            <p>Solicitações gerais que não se encaixam nas categorias principais.</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="primary-button" data-nav-page="novo">Abrir OS</button>
+    </section>
+
+
+    <!-- ABA PREVENTIVAS -->
+    <section class="page" id="preventivas">
+      <header class="page-header">
+        <h1>Preventivas</h1>
+        <p>Planeje manutenções recorrentes para reduzir falhas, emergências e danos estruturais.</p>
+      </header>
+
+      <div class="dashboard-grid preventive-summary-grid">
+        <div class="dashboard-card"><span>Planos ativos</span><strong id="totalPlanosPreventivos">0</strong><small>Rotinas programadas</small></div>
+        <div class="dashboard-card"><span>Vencidas</span><strong id="totalPreventivasVencidas">0</strong><small>Precisam ser realizadas</small></div>
+        <div class="dashboard-card"><span>Próximos 7 dias</span><strong id="totalPreventivasSemana">0</strong><small>Agenda preventiva</small></div>
+        <div class="dashboard-card"><span>Inativas</span><strong id="totalPreventivasInativas">0</strong><small>Planos pausados</small></div>
+      </div>
+
+      <div class="form-card" id="areaNovoPlanoPreventivo">
+        <h3 id="tituloFormularioPlanoPreventivo">Novo plano preventivo</h3>
+
+        <label>
+          Local / equipamento / patrimônio
+          <input id="ativoPlanoPreventivo" type="text" placeholder="Ex: Sala 02, ar-condicionado, bomba d'água" />
+        </label>
+
+        <label>
+          Nome da rotina
+          <input id="nomePlanoPreventivo" type="text" placeholder="Ex: Limpeza preventiva do ar-condicionado" />
+        </label>
+
+        <div class="form-row">
+          <label>
+            Categoria técnica
+            <select id="categoriaPlanoPreventivo" data-change-action="atualizar-subcategorias-plano-preventivo">
+              <option value="">Selecione</option>
+              <option value="Elétrica">Elétrica</option>
+              <option value="Hidráulica">Hidráulica</option>
+              <option value="Alvenaria">Alvenaria</option>
+              <option value="Pintura">Pintura</option>
+              <option value="Eletrônica">Eletrônica</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </label>
+
+          <label>
+            Subcategoria
+            <select id="subcategoriaPlanoPreventivo">
+              <option value="">Selecione</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Setor / local
+          <input id="localPlanoPreventivo" type="text" placeholder="Ex: Sala 02, Laboratório de informática" />
+        </label>
+
+        <div class="form-row">
+          <label>
+            Frequência da preventiva
+            <input id="quantidadeFrequenciaPlanoPreventivo" type="number" min="1" step="1" placeholder="Ex: 15" />
+          </label>
+
+          <label>
+            Período
+            <select id="unidadeFrequenciaPlanoPreventivo">
+              <option value="dias">Dias</option>
+              <option value="semanas">Semanas</option>
+              <option value="meses">Meses</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Próxima execução
+            <input id="proximaExecucaoPlanoPreventivo" type="date" />
+          </label>
+
+          <label>
+            Responsável padrão
+            <input id="responsavelPlanoPreventivo" type="text" placeholder="Ex: Equipe de manutenção" />
+          </label>
+        </div>
+
+        <label>
+          Checklist da preventiva
+          <textarea id="checklistPlanoPreventivo" placeholder="Digite uma atividade por linha. Ex:\nVerificar fixação\nLimpar filtros\nTestar funcionamento"></textarea>
+        </label>
+
+        <label>
+          Observações da rotina
+          <textarea id="observacoesPlanoPreventivo" placeholder="Ex: verificar filtros, ruídos, vazamentos, fixação e funcionamento geral..."></textarea>
+        </label>
+
+        <button type="button" class="primary-button" id="botaoSalvarPlanoPreventivo" data-action="salvar-plano-preventivo">
+          Cadastrar plano preventivo
+        </button>
+
+        <button type="button" class="secondary-button" id="botaoCancelarEdicaoPlanoPreventivo" data-action="cancelar-edicao-plano-preventivo" hidden>
+          Cancelar edição
+        </button>
+      </div>
+
+      <div class="form-card qr-help-card">
+        <h3>Como funciona</h3>
+        <p>Ao executar uma preventiva, marque-a como realizada quando não houver necessidade de abrir OS. Se encontrar um problema, gere uma OS preventiva. Nos dois casos, a próxima execução será atualizada conforme a frequência cadastrada.</p>
+      </div>
+
+      <div class="section-header spacing">
+        <h2>Planos cadastrados</h2>
+      </div>
+
+      <div class="form-card">
+        <div class="form-row preventive-filter-grid">
+          <label>
+            Filtrar por situação
+            <select id="filtroSituacaoPreventiva" data-change-action="renderizar-planos-preventivos">
+              <option value="TODAS">Todas</option>
+              <option value="VENCIDAS">Vencidas</option>
+              <option value="SEMANA">Próximos 7 dias</option>
+              <option value="PROGRAMADAS">Programadas</option>
+              <option value="INATIVAS">Inativas</option>
+            </select>
+          </label>
+
+          <label>
+            Buscar plano
+            <input id="buscaPlanoPreventivo" type="search" placeholder="Nome, ativo, local ou categoria" data-input-action="renderizar-planos-preventivos" />
+          </label>
+        </div>
+      </div>
+
+      <div class="preventive-list" id="listaPlanosPreventivos">
+        <!-- Planos carregados pelo JavaScript -->
+      </div>
+    </section>
+
+    <!-- ABA DIAGNÓSTICO INICIAL -->
+    <section class="page manut-only" id="diagnostico">
+      <header class="page-header">
+        <h1>Diagnóstico inicial da unidade</h1>
+        <p>Registre inspeções por ambiente, sistema técnico, criticidade e ação recomendada antes de transformar tudo em OS.</p>
+      </header>
+
+      <div class="diagnostic-dashboard">
+        <div class="dashboard-card"><span>Itens registrados</span><strong id="totalDiagnosticoItens">0</strong><small>Base de levantamento</small></div>
+        <div class="dashboard-card"><span>P1 críticos</span><strong id="totalDiagnosticoP1">0</strong><small>Risco ou paralisação</small></div>
+        <div class="dashboard-card"><span>Pendentes</span><strong id="totalDiagnosticoPendentes">0</strong><small>Aguardando ação</small></div>
+        <div class="dashboard-card"><span>Preventivas</span><strong id="totalDiagnosticoPreventivas">0</strong><small>Rotina programável</small></div>
+      </div>
+
+      <details class="form-card diagnostic-collapsible" id="areaNovoDiagnostico">
+        <summary class="diagnostic-collapsible-summary">
+          <span>
+            <strong id="tituloFormularioDiagnostico">Novo item de diagnóstico</strong>
+            <small>Abra para registrar ou editar uma inspeção</small>
+          </span>
+          <span class="diagnostic-collapsible-indicator" aria-hidden="true">⌄</span>
+        </summary>
+        <div class="diagnostic-collapsible-content">
+        <p class="form-help">Use este registro para mapear a situação técnica da unidade. Abra OS apenas quando a demanda estiver clara.</p>
+
+        <label>
+          Local vistoriado
+          <select id="localDiagnostico">
+            <option value="">Selecione o local vistoriado</option>
+          </select>
+        </label>
+
+        <div class="form-row">
+          <label>
+            Sistema técnico
+            <select id="sistemaDiagnostico">
+              <option value="">Selecione</option>
+              <option value="Segurança">Segurança</option>
+              <option value="Elétrica">Elétrica</option>
+              <option value="Iluminação">Iluminação</option>
+              <option value="Hidráulica">Hidráulica</option>
+              <option value="Climatização">Climatização</option>
+              <option value="Civil / mobiliário">Civil / mobiliário</option>
+              <option value="Portas / fechaduras">Portas / fechaduras</option>
+              <option value="Acessibilidade">Acessibilidade</option>
+              <option value="Área externa">Área externa</option>
+              <option value="Inspeção geral">Inspeção geral</option>
+            </select>
+          </label>
+
+          <label>
+            Tipo de demanda
+            <select id="tipoDiagnostico">
+              <option value="">Selecione</option>
+              <option value="Corretiva urgente">Corretiva urgente</option>
+              <option value="Corretiva normal">Corretiva normal</option>
+              <option value="Preventiva">Preventiva</option>
+              <option value="Inspeção">Inspeção</option>
+              <option value="Melhoria">Melhoria</option>
+              <option value="Recorrente">Recorrente</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Prioridade
+            <select id="prioridadeDiagnostico">
+              <option value="">Selecione</option>
+              <option value="P1 - Urgente">P1 - Urgente</option>
+              <option value="P2 - Alta">P2 - Alta</option>
+              <option value="P3 - Normal">P3 - Normal</option>
+              <option value="P4 - Baixa">P4 - Baixa</option>
+              <option value="P5 - Preventiva">P5 - Preventiva</option>
+            </select>
+          </label>
+
+          <label>
+            Status
+            <select id="statusDiagnostico">
+              <option value="Pendente">Pendente</option>
+              <option value="Em inspeção">Em inspeção</option>
+              <option value="Aguardando material">Aguardando material</option>
+              <option value="Gerar OS">Gerar OS</option>
+              <option value="Resolvido">Resolvido</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Descrição técnica
+          <textarea id="descricaoDiagnostico" placeholder="Ex: Tomada solta próxima ao quadro branco, com risco de mau contato..."></textarea>
+        </label>
+
+        <label>
+          Risco ou impacto
+          <textarea id="riscoDiagnostico" placeholder="Ex: Choque elétrico, paralisação da sala, desperdício, queda, infiltração ativa..."></textarea>
+        </label>
+
+        <label>
+          Ação recomendada
+          <textarea id="acaoDiagnostico" placeholder="Ex: Substituir tomada, fixar caixa, revisar circuito, isolar área..."></textarea>
+        </label>
+
+        <label>
+          Material necessário
+          <input id="materialDiagnostico" type="text" placeholder="Ex: tomada 10A, espelho, parafusos, reparo de torneira..." />
+        </label>
+
+        <button type="button" class="primary-button" id="botaoSalvarDiagnostico" data-action="criar-item-diagnostico">
+          Salvar item do diagnóstico
+        </button>
+
+        <button type="button" class="secondary-button" id="botaoCancelarEdicaoDiagnostico" data-action="cancelar-edicao-diagnostico" hidden>
+          Cancelar edição
+        </button>
+        </div>
+      </details>
+
+      <details class="form-card diagnostic-collapsible" id="areaChecklistDiagnostico">
+        <summary class="diagnostic-collapsible-summary">
+          <span>
+            <strong>Checklist rápido de inspeção</strong>
+            <small>Abra para consultar itens comuns da vistoria</small>
+          </span>
+          <span class="diagnostic-collapsible-indicator" aria-hidden="true">⌄</span>
+        </summary>
+        <div class="diagnostic-collapsible-content">
+          <p class="form-help">Clique em um item para preencher a descrição e sugerir o sistema técnico.</p>
+          <div id="checklistDiagnosticoPadrao"></div>
+        </div>
+      </details>
+
+      <div class="section-header spacing">
+        <h2>Itens do diagnóstico</h2>
+      </div>
+
+      <div class="form-card diagnostic-filters">
+        <select id="filtroStatusDiagnostico" data-change-action="filtrar-diagnostico-status">
+          <option value="TODOS">Todos os status</option>
+          <option value="Pendente">Pendentes</option>
+          <option value="Em inspeção">Em inspeção</option>
+          <option value="Aguardando material">Aguardando material</option>
+          <option value="Gerar OS">Gerar OS</option>
+          <option value="Resolvido">Resolvidos</option>
+        </select>
+
+        <select id="filtroPrioridadeDiagnostico" data-change-action="filtrar-diagnostico-prioridade">
+          <option value="TODAS">Todas as prioridades</option>
+          <option value="P1 - Urgente">P1 - Urgente</option>
+          <option value="P2 - Alta">P2 - Alta</option>
+          <option value="P3 - Normal">P3 - Normal</option>
+          <option value="P4 - Baixa">P4 - Baixa</option>
+          <option value="P5 - Preventiva">P5 - Preventiva</option>
+        </select>
+
+        <input id="buscaDiagnostico" type="search" placeholder="Buscar por local, sistema, descrição, risco ou material" data-input-action="pesquisar-diagnostico" />
+      </div>
+
+      <div class="diagnostic-list" id="listaDiagnostico">
+        <!-- Diagnóstico carregado pelo JavaScript -->
+      </div>
+    </section>
+
+    <!-- ABA NOVO -->
+    <section class="page" id="novo">
+      <header class="page-header">
+        <h1>Nova OS</h1>
+        <p>Registre uma Ordem de Serviço para a equipe de manutenção avaliar, executar e encerrar com rastreabilidade.</p>
+      </header>
+
+     <form class="form-card" data-form-action="bloquear-submit">
+
+     <label>
+        Escolher o andar
+        <select id="andarChamado" data-change-action="atualizar-locais-andar-manutencao">
+          <option value="">Selecione o andar</option>
+          <option value="1º ANDAR">1º ANDAR</option>
+          <option value="SL ANDAR">SL ANDAR</option>
+          <option value="0º ANDAR">0º ANDAR</option>
+          <option value="-1º ANDAR">-1º ANDAR</option>
+          <option value="Telhado">Telhado</option>
+        </select>
+        <small class="form-help">Depois de escolher o andar, o campo abaixo mostra somente os locais daquele andar.</small>
+     </label>
+
+     <label>
+        Local do andar
+        <select id="localChamado" disabled>
+          <option value="">Selecione um andar primeiro</option>
+        </select>
+     </label>
+
+     <label>
+        Tipo de manutenção
+        <select id="tipoManutencaoChamado">
+          <option value="Corretiva">Corretiva</option>
+          <option value="Preventiva">Preventiva</option>
+          <option value="Inspeção">Inspeção</option>
+          <option value="Melhoria">Melhoria</option>
+        </select>
+        <small class="form-help">Use Corretiva para falhas, Preventiva para rotina programada, Inspeção para vistoria e Melhoria para evolução da estrutura.</small>
+     </label>
+
+     <label>
+        Categoria da OS
+        <select id="categoriaChamado" data-change-action="atualizar-subcategorias-chamado">
+          <option value="">Selecione</option>
+          <option value="Elétrica">Elétrica</option>
+          <option value="Hidráulica">Hidráulica</option>
+          <option value="Alvenaria">Alvenaria</option>
+          <option value="Pintura">Pintura</option>
+          <option value="Eletrônica">Eletrônica</option>
+          <option value="Outros">Outros</option>
+        </select>
+     </label>
+
+     <label>
+        Subcategoria
+        <select id="subcategoriaChamado">
+          <option value="">Selecione uma categoria primeiro</option>
+        </select>
+        <small class="form-help">As subcategorias mudam conforme a categoria escolhida.</small>
+     </label>
+
+
+        <label>
+          Prioridade
+          <select id="prioridadeChamado">
+            <option value="">Selecione</option>
+            <option value="Baixa">Baixa</option>
+            <option value="Média">Média</option>
+            <option value="Alta">Alta</option>
+            <option value="Urgente">Urgente</option>
+          </select>
+        </label>
+
+        <label>
+          Descrição da solicitação
+          <textarea id="descricaoChamado" placeholder="Descreva a ocorrência com detalhes..."></textarea>
+        </label>
+
+        <label>
+          Fotos de abertura / antes
+          <input id="fotoChamado" type="file" accept="image/*" multiple />
+          <small class="form-help">Você pode selecionar até 3 imagens de abertura por OS.</small>
+        </label>
+
+        <button 
+        type="button" 
+        class="primary-button" 
+        data-action="criar-chamado"
+       >
+        Abrir OS
+       </button>
+      </form>
+    </section>
+
+  <!-- ABA COMUNICADOS -->
+  
+  <section class="page" id="comunicados">
+    <header class="page-header">
+      <h1>Comunicados</h1>
+    </header>
+
+    <div class="comunicados-admin-layout">
+      <div class="form-card comunicado-form-card" id="areaNovoComunicado">
+        <div class="comunicado-form-header">
+          <div>
+            <h2 id="tituloFormularioComunicado">Novo comunicado</h2>
+            <p id="subtituloFormularioComunicado">Publique um aviso para todos os usuários autorizados.</p>
+          </div>
+          <button type="button" class="comunicado-clear-button" id="botaoLimparComunicado" data-action="limpar-comunicado">
+            Limpar campos
+          </button>
+        </div>
+
+        <input id="comunicadoEditandoId" type="hidden" value="" />
+
+        <label>
+          Título do comunicado
+          <input 
+            id="tituloComunicado" 
+            type="text" 
+            placeholder="Ex: Interrupção de energia no Bloco B"
+          />
+        </label>
+
+        <label>
+          Mensagem
+          <textarea 
+            id="textoComunicado" 
+            placeholder="Digite o aviso que será exibido para os usuários..."
+          ></textarea>
+        </label>
+
+        <div class="comunicado-form-row">
+          <label>
+            Origem do aviso
+            <select id="origemComunicado">
+              <option value="Manutenção">Manutenção</option>
+              <option value="Administração">Administração</option>
+              <option value="Coordenação">Coordenação</option>
+            </select>
+          </label>
+
+          <label>
+            Nível do comunicado
+            <select id="nivelComunicado" data-change-action="selecionar-nivel-comunicado-select">
+              <option value="normal">Normal</option>
+              <option value="importante">Importante</option>
+              <option value="urgente">Urgente</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="comunicado-level-grid" role="group" aria-label="Nível do comunicado">
+          <button type="button" class="comunicado-level-card is-active" data-action="selecionar-nivel-comunicado" data-nivel="normal">
+            <span class="comunicado-level-icon comunicado-level-icon-normal" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 14h3l8 4V6L7 10H4v4Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="M18 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-linecap="round" />
+              </svg>
+            </span>
+            <strong>Normal</strong>
+          </button>
+
+          <button type="button" class="comunicado-level-card" data-action="selecionar-nivel-comunicado" data-nivel="importante">
+            <span class="comunicado-level-icon comunicado-level-icon-importante" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 14h3l8 4V6L7 10H4v4Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="M18 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-linecap="round" />
+              </svg>
+            </span>
+            <strong>Importante</strong>
+          </button>
+
+          <button type="button" class="comunicado-level-card" data-action="selecionar-nivel-comunicado" data-nivel="urgente">
+            <span class="comunicado-level-icon comunicado-level-icon-urgente" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 14h3l8 4V6L7 10H4v4Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="M18 9a4 4 0 0 1 0 6M21 7a7 7 0 0 1 0 10" stroke="currentColor" stroke-linecap="round" />
+              </svg>
+            </span>
+            <strong>Urgente</strong>
+          </button>
+        </div>
+
+        <div class="comunicado-form-actions">
+          <button 
+            type="button" 
+            class="primary-button" 
+            id="botaoSalvarComunicado"
+            data-action="salvar-comunicado"
+          >
+            Publicar comunicado
+          </button>
+
+          <button 
+            type="button" 
+            class="secondary-button comunicado-cancel-edit" 
+            id="botaoCancelarEdicaoComunicado"
+            data-action="cancelar-edicao-comunicado"
+            hidden
+          >
+            Cancelar edição
+          </button>
+        </div>
+      </div>
+
+      <div class="comunicados-management-panel">
+        <section class="comunicados-summary" id="resumoComunicados">
+          <!-- Resumo dos comunicados será carregado pelo JavaScript -->
+        </section>
+
+        <div class="comunicado-filter-row" id="filtrosComunicados">
+          <button type="button" class="comunicado-filter is-active" data-dynamic-action="filtrarComunicados" data-param0="todos">Todos</button>
+          <button type="button" class="comunicado-filter" data-dynamic-action="filtrarComunicados" data-param0="urgente">Urgentes</button>
+          <button type="button" class="comunicado-filter" data-dynamic-action="filtrarComunicados" data-param0="importante">Importantes</button>
+          <button type="button" class="comunicado-filter" data-dynamic-action="filtrarComunicados" data-param0="normal">Normais</button>
+        </div>
+
+        <div class="notice-list comunicado-list" id="listaComunicados">
+          <!-- Comunicados serão carregados pelo JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ABA PERFIL -->
+<section class="page" id="perfil">
+  <!-- FORMULÁRIO DE LOGIN / IDENTIFICAÇÃO -->
+  <div class="form-card profile-form-card" id="areaFormularioPerfil">
+    <div class="login-header">
+      <img
+        class="login-brand-logo"
+        src="img/engrenagem-painel-login-v25.png"
+        alt="Central de Manutenção"
+      />
+    </div>
+
+    <div class="login-access-card login-access-card-colaborador primeiro-acesso-card">
+      <h2>Primeiro acesso do colaborador</h2>
+      <p class="form-help">Use o e-mail previamente autorizado pela manutenção para criar sua senha. O acesso antigo por nome e setor foi ocultado para incentivar o cadastro individual.</p>
+
+      <label>
+        E-mail autorizado
+        <input
+          id="primeiroAcessoEmailColaborador"
+          type="email"
+          autocomplete="email"
+          placeholder="seu.email@exemplo.com"
+        />
+      </label>
+
+      <label>
+        Criar senha
+        <input
+          id="primeiroAcessoSenhaColaborador"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Mínimo de 6 caracteres"
+        />
+      </label>
+
+      <label>
+        Confirmar senha
+        <input
+          id="primeiroAcessoConfirmarSenhaColaborador"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Repita a senha"
+        />
+      </label>
+
+      <button
+        type="button"
+        class="primary-button first-access-button"
+        data-action="criar-primeiro-acesso-colaborador"
+      >
+        Criar senha e entrar
+      </button>
+    </div>
+
+
+    <div class="maintenance-login-box login-access-card login-access-card-manutencao">
+      <h2>Acesso autorizado</h2>
+      <p class="form-help">Uso da manutenção, gerência e colaboradores com primeiro acesso concluído.</p>
+
+      <label>
+        E-mail
+        <input
+          id="loginEmailUsuario"
+          type="email"
+          autocomplete="email"
+          placeholder="usuario@senac.com"
+        />
+      </label>
+
+      <label>
+        Senha
+        <input
+          id="loginSenhaUsuario"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Digite sua senha"
+        />
+      </label>
+
+      <button
+        type="button"
+        class="secondary-button"
+        data-action="entrar-firebase"
+      >
+        Entrar com e-mail
+      </button>
+
+      <button
+        type="button"
+        class="password-reset-button"
+        data-action="redefinir-senha-firebase"
+      >
+        Esqueci minha senha
+      </button>
+    </div>
+
+    <div class="password-recovery-experience" id="experienciaRedefinicaoSenha" hidden>
+      <div class="password-recovery-hero">
+        <img
+          class="password-recovery-avatar"
+          src="img/avatar-redefinicao-senha.png"
+          alt="Senac 80 anos"
+        />
+      </div>
+
+      <div class="password-recovery-card">
+        <div class="password-recovery-title-row">
+          <span class="password-recovery-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <rect x="5" y="10" width="14" height="10" rx="3" stroke="currentColor" stroke-width="2" />
+              <path d="M12 14v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </span>
+          <div>
+            <h2>Esqueceu sua senha?</h2>
+            <p>Informe o e-mail cadastrado e enviaremos um link seguro para você redefinir sua senha.</p>
+          </div>
+        </div>
+
+        <label>
+          E-mail cadastrado
+          <input
+            id="resetEmailUsuario"
+            type="email"
+            autocomplete="email"
+            placeholder="seu@email.com"
+          />
+        </label>
+
+        <button
+          type="button"
+          class="primary-button password-recovery-send-button"
+          data-action="enviar-redefinicao-senha-visual"
+        >
+          Enviar link de redefinição
+        </button>
+
+        <p class="password-recovery-helper">Verifique também spam ou quarentena após o envio.</p>
+
+        <div class="password-recovery-info">
+          <strong>Link seguro enviado pelo Firebase</strong>
+          <span>Após redefinir a senha, volte ao app e entre normalmente no sistema.</span>
+        </div>
+
+        <p class="password-recovery-feedback" id="feedbackRedefinicaoSenha" role="status" aria-live="polite"></p>
+
+        <button
+          type="button"
+          class="password-recovery-back"
+          data-action="voltar-login-redefinicao"
+        >
+          Voltar para o login
+        </button>
+      </div>
+    </div>
+
+    <p class="login-secure-note">Acesso seguro e monitorado</p>
+  </div>
+
+  <!-- ÁREA EXIBIDA SOMENTE DEPOIS DO LOGIN -->
+  <div id="areaPerfilLogado">
+    <div class="profile-card">
+      <div class="avatar" id="perfilAvatar">CO</div>
+      <h2 id="perfilNomeTitulo">Colaborador</h2>
+      <p id="perfilSubtitulo">Colaborador • Senac Campo Mourão</p>
+    </div>
+
+    <div class="profile-menu">
+      <div class="profile-item">
+        <span>Nome</span>
+        <strong id="perfilNomeValor">Colaborador</strong>
+      </div>
+
+      <div class="profile-item">
+        <span>Unidade</span>
+        <strong id="perfilUnidadeValor">Senac Campo Mourão</strong>
+      </div>
+
+      <div class="profile-item">
+        <span>Setor</span>
+        <strong id="perfilSetorValor">Manutenção</strong>
+      </div>
+
+      <div class="profile-item">
+        <span>Perfil de acesso</span>
+        <strong id="perfilAcessoTexto">Colaborador</strong>
+      </div>
+
+      <div class="profile-item">
+        <span>E-mail</span>
+        <strong id="perfilEmailValor">usuario@senac.com</strong>
+      </div>
+    </div>
+
+    <section class="push-alert-card manut-only" id="areaAlertasPush" hidden aria-labelledby="tituloAlertasPush">
+      <div class="push-alert-card-header">
+        <div class="push-alert-icon" aria-hidden="true">🔔</div>
+        <div>
+          <h3 id="tituloAlertasPush">Alertas no celular</h3>
+          <strong id="statusAlertasPush">Desativado</strong>
+        </div>
+      </div>
+
+      <p id="detalheAlertasPush">
+        Ative para receber alertas de novos chamados mesmo com o PWA em segundo plano.
+      </p>
+
+      <div class="push-alert-actions">
+        <button
+          type="button"
+          class="primary-button"
+          id="botaoAtivarAlertasPush"
+          data-action="ativar-alertas-push"
+        >
+          Ativar alertas neste aparelho
+        </button>
+
+        <button
+          type="button"
+          class="secondary-button push-disable-button"
+          id="botaoDesativarAlertasPush"
+          data-action="desativar-alertas-push"
+          hidden
+        >
+          Desativar neste aparelho
+        </button>
+      </div>
+    </section>
+
+    <button 
+      id="botaoPainelManutencao" 
+      class="primary-button" 
+      data-nav-page="painel"
+    >
+      Painel da manutenção
+    </button>
+
+
+    <button 
+      type="button" 
+      class="logout-button"
+    >
+      Sair da conta
+    </button>
+  </div>
+</section>
+
+<!-- ABA PAINEL DA MANUTENÇÃO -->
+    <section class="page" id="painel">
+      <header class="page-header">
+        <h1>Painel da manutenção</h1>
+        <p>Gerencie as OS recebidas com indicadores por período, categoria, prioridade, setor crítico e preventivas.</p>
+      </header>
+
+      <details class="form-card painel-collapsible-card painel-fila-topo painel-fila-operacional-card" open>
+        <summary class="painel-collapsible-summary">
+          <span>
+            <strong>Fila operacional de OS</strong>
+            <small>Busca, filtros e lista de ordens de serviço para atendimento da manutenção.</small>
+          </span>
+        </summary>
+
+        <div class="painel-fila-tabs" role="tablist" aria-label="Separar ordens de serviço por situação">
+          <button type="button" class="painel-fila-tab active" id="abaFilaAtivas" data-action="selecionar-aba-fila-ativas" role="tab" aria-selected="true">
+            OS ativas <span id="contadorFilaAtivas">0</span>
+          </button>
+          <button type="button" class="painel-fila-tab" id="abaFilaEncerradas" data-action="selecionar-aba-fila-encerradas" role="tab" aria-selected="false">
+            OS encerradas <span id="contadorFilaEncerradas">0</span>
+          </button>
+        </div>
+
+        <div class="admin-controls">
+          <input 
+            type="text" 
+            id="buscaPainel" 
+            placeholder="Buscar por nº da OS, local, setor, descrição ou criador..."
+            data-input-action="pesquisar-painel"
+          />
+
+          <select id="filtroPainelStatus" data-change-action="filtrar-painel-status">
+            <option value="TODOS">Todos os status</option>
+            <option value="ABERTO">Abertos</option>
+            <option value="EM ANDAMENTO">Em andamento</option>
+            <option value="AGUARDANDO">Aguardando</option>
+            <option value="CONCLUÍDO">Concluídos / aguardando validação</option>
+            <option value="VALIDADO">Validados</option>
+            <option value="CANCELADO">Cancelados</option>
+            <option value="ATRASADOS">Atrasados</option>
+          </select>
+
+          <select id="filtroPainelPrioridade" data-change-action="filtrar-painel-prioridade">
+            <option value="TODAS">Todas as prioridades</option>
+            <option value="Urgente">Urgente</option>
+            <option value="Alta">Alta</option>
+            <option value="Média">Média</option>
+            <option value="Baixa">Baixa</option>
+          </select>
+
+          <button 
+            type="button" 
+            class="secondary-button admin-clear-button" 
+            data-action="limpar-filtros-painel"
+          >
+            Limpar filtros
+          </button>
+        </div>
+
+        <div class="painel-delete-closed-card" id="painelExcluirEncerradas" hidden>
+          <div>
+            <strong>Limpeza de OS encerradas</strong>
+            <p>Use somente depois de exportar o relatório. A exclusão remove definitivamente as OS encerradas filtradas do Firebase.</p>
+          </div>
+          <button type="button" class="danger-button painel-delete-closed-button" data-action="excluir-os-encerradas-filtradas">
+            Excluir encerradas filtradas
+          </button>
+        </div>
+
+        <div class="admin-list" id="listaPainelManutencao">
+          <!-- As OS do painel serão carregadas aqui pelo JavaScript -->
+        </div>
+      </details>
+
+      <details class="form-card maintenance-action-card manut-only cadastro-colaborador-card painel-collapsible-card">
+        <summary class="painel-collapsible-summary">
+          <span>
+            <strong>Cadastro de colaboradores</strong>
+            <small>Autorize colaboradores por nome, e-mail e setor. O perfil criado será sempre colaborador.</small>
+          </span>
+        </summary>
+
+        <div class="form-row cadastro-colaborador-grid">
+          <label>
+            Nome completo
+            <input id="cadastroColaboradorNome" type="text" autocomplete="name" placeholder="Nome do colaborador" />
+          </label>
+
+          <label>
+            E-mail
+            <input id="cadastroColaboradorEmail" type="email" autocomplete="email" placeholder="colaborador@exemplo.com" />
+          </label>
+
+          <label>
+            Setor
+            <input id="cadastroColaboradorSetor" type="text" placeholder="Ex: Biblioteca, Administrativo, Laboratório" />
+          </label>
+        </div>
+
+        <button type="button" class="primary-button" data-action="cadastrar-colaborador-pendente">
+          Autorizar colaborador
+        </button>
+
+        <div class="cadastro-colaborador-lista" id="listaCadastrosColaboradores">
+          <!-- Cadastros de colaboradores serão carregados aqui pelo JavaScript -->
+        </div>
+      </details>
+
+      <details class="form-card painel-collapsible-card painel-indicadores-resumo">
+        <summary class="painel-collapsible-summary">
+          <span>
+            <strong>Resumo dos indicadores</strong>
+            <small>Filtros e cards quantitativos do painel.</small>
+          </span>
+        </summary>
+
+        <div class="dashboard-period-card">
+          <div class="form-row dashboard-period-grid">
+            <label>
+              Período dos indicadores
+              <select id="filtroPeriodoDashboard" data-change-action="alterar-periodo-dashboard">
+                <option value="TODOS">Todo o histórico</option>
+                <option value="7">Últimos 7 dias</option>
+                <option value="30" selected>Últimos 30 dias</option>
+                <option value="90">Últimos 90 dias</option>
+              </select>
+            </label>
+            <label>
+              Categoria
+              <select id="filtroCategoriaDashboard" data-change-action="alterar-categoria-dashboard">
+                <option value="TODAS">Todas as categorias</option>
+                <option value="Elétrica">Elétrica</option>
+                <option value="Hidráulica">Hidráulica</option>
+                <option value="Alvenaria">Alvenaria</option>
+                <option value="Pintura">Pintura</option>
+                <option value="Eletrônica">Eletrônica</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </label>
+          </div>
+          <small class="form-help">Os cards e rankings abaixo consideram o período e a categoria selecionados. A fila operacional continua usando os filtros próprios.</small>
+        </div>
+
+        <div class="dashboard-grid dashboard-grid-kpi">
+          <div class="dashboard-card"><span>Total de OS</span><strong id="totalOSPainel">0</strong><small>Base operacional registrada</small></div>
+          <div class="dashboard-card"><span>Backlog ativo</span><strong id="totalBacklogPainel">0</strong><small>OS em execução ou triagem</small></div>
+          <div class="dashboard-card"><span>Atrasadas</span><strong id="totalAtrasadosPainel">0</strong><small>Fora do prazo definido</small></div>
+          <div class="dashboard-card"><span>Aguardando validação</span><strong id="totalAguardandoValidacaoPainel">0</strong><small>Execução finalizada pela manutenção</small></div>
+          <div class="dashboard-card"><span>Encerradas</span><strong id="totalEncerradasPainel">0</strong><small>OS validadas e auditadas</small></div>
+          <div class="dashboard-card"><span>Urgentes</span><strong id="totalUrgentesPainel">0</strong><small>Demandas críticas abertas</small></div>
+          <div class="dashboard-card"><span>Preventivas</span><strong id="totalPreventivasPainel">0</strong><small>Controle preventivo</small></div>
+          <div class="dashboard-card"><span>Emergenciais</span><strong id="totalEmergenciaisPainel">0</strong><small>Impacto imediato</small></div>
+          <div class="dashboard-card"><span>Tempo atendimento</span><strong id="tempoMedioAtendimentoPainel">--</strong><small>Abertura até início</small></div>
+          <div class="dashboard-card"><span>Tempo reparo</span><strong id="tempoMedioReparoPainel">--</strong><small>Início até conclusão</small></div>
+          <div class="dashboard-card"><span>Disponibilidade</span><strong id="disponibilidadePainel">--</strong><small>OS concluídas no prazo</small></div>
+          <div class="dashboard-card"><span>OS no período</span><strong id="totalOSPeriodoPainel">0</strong><small>Conforme filtro aplicado</small></div>
+          <div class="dashboard-card"><span>Planos vencidos</span><strong id="totalPreventivasVencidasPainel">0</strong><small>Preventivas fora da data</small></div>
+          <div class="dashboard-card"><span>SLA cumprido</span><strong id="slaCumpridoPainel">--</strong><small>Concluídas dentro do prazo</small></div>
+        </div>
+      </details>
+
+      <details class="form-card painel-collapsible-card painel-indicadores-operacionais">
+        <summary class="painel-collapsible-summary">
+          <span>
+            <strong>Indicadores operacionais</strong>
+            <small>Status, prioridades, setores, equipamentos, categorias, preventivas e resumo mensal.</small>
+          </span>
+        </summary>
+
+        <div class="insight-grid">
+          <div class="insight-card">
+            <h3>Status das OS</h3>
+            <div id="indicadorStatusOS" class="indicator-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>OS por prioridade</h3>
+            <div id="indicadorPrioridadesOS" class="indicator-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>Setores com maior demanda</h3>
+            <div id="rankingSetoresPainel" class="ranking-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>Equipamentos críticos</h3>
+            <div id="rankingEquipamentosPainel" class="ranking-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>OS por categoria</h3>
+            <div id="indicadorCategoriasOS" class="indicator-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>Tipo de manutenção</h3>
+            <div id="indicadorTiposManutencao" class="indicator-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>Preventivas próximas/vencidas</h3>
+            <div id="rankingPreventivasPainel" class="ranking-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <h3>Resumo mensal</h3>
+            <div id="indicadorResumoMensal" class="indicator-list"></div>
+          </div>
+        </div>
+      </details>
+
+      <button type="button" class="secondary-button" data-nav-page="perfil">Voltar para perfil</button>
+    </section>
+  </main>
+
+  <!-- MODAL DE DETALHES DO CHAMADO -->
+  <div class="modal-overlay" id="modalChamado">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="detalheTitulo">Detalhes da OS</h2>
+          <p id="detalheData">OS aberta em --/--/----</p>
+        </div>
+
+        <button type="button" id="botaoFecharModalX" class="modal-close" data-action="fechar-detalhes-chamado">×</button>
+      </div>
+
+      <span class="status status-blue" id="detalheStatus">ABERTO</span>
+
+      <div class="detail-list">
+        <div class="detail-item">
+          <span>Número da OS</span>
+          <strong id="detalheNumeroOS">-</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Etapa operacional</span>
+          <strong id="detalheEtapaFluxo">-</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Criado por</span>
+          <strong id="detalheCriadoPor">-</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Responsável manutenção</span>
+          <strong id="detalheResponsavel">-</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Validação da OS</span>
+          <strong id="detalheValidacao">-</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Encerramento</span>
+          <strong id="detalheEncerramento">-</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Local da ocorrência</span>
+          <strong id="detalheLocal">-</strong>
+        </div>
+
+
+        <div class="detail-item">
+          <span>Categoria da OS</span>
+          <strong id="detalheCategoria">-</strong>
+        </div>
+        <div class="detail-item">
+          <span>Subcategoria</span>
+          <strong id="detalheSubcategoria">-</strong>
+        </div>
+        <div class="detail-item">
+          <span>Tipo de manutenção</span>
+          <strong id="detalheTipoManutencao">-</strong>
+        </div>
+        <div class="detail-item">
+          <span>Prioridade</span>
+          <strong id="detalhePrioridade">-</strong>
+        </div>
+        <div class="detail-item">
+          <span>Prazo</span>
+          <strong id="detalheSLA">-</strong>
+        </div>
+        <div class="detail-item">
+          <span>Evidências fotográficas</span>
+          <div id="detalheFoto" class="detail-photo">Nenhuma</div>
+        </div>
+      </div>
+
+      <div class="detail-description">
+        <h3>Descrição da solicitação</h3>
+        <p id="detalheDescricao">-</p>
+      </div>
+
+      <div class="history-box">
+        <h3>Histórico da OS</h3>
+        <div id="detalheHistorico">
+          <!-- O histórico será carregado aqui -->
+        </div>
+      </div>
+
+      <div id="areaControlePrioridadeOS" class="priority-control-box priority-control-box-actions" style="display: none;">
+        <label for="seletorPrioridadeOS">Ajustar prioridade</label>
+        <div class="priority-control-row">
+          <select id="seletorPrioridadeOS">
+            <option value="Baixa">Baixa</option>
+            <option value="Média">Média</option>
+            <option value="Alta">Alta</option>
+            <option value="Urgente">Urgente</option>
+          </select>
+          <button type="button" class="secondary-button priority-control-button" data-action="alterar-prioridade-chamado">
+            Salvar
+          </button>
+        </div>
+      </div>
+
+      <div id="areaControleColaborador">
+        <button type="button" id="botaoCancelarChamadoColaborador" class="danger-button" data-action="cancelar-chamado-atual">
+          Cancelar OS
+        </button>
+      </div>
+
+      <button type="button" id="botaoFecharModal" class="secondary-button" data-action="fechar-detalhes-chamado">
+        Fechar
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL DE VISUALIZAÇÃO DA FOTO -->
+  <div class="modal-overlay" id="modalFotoChamado">
+    <div class="modal-card image-modal-card">
+      <div class="modal-header">
+        <div>
+          <h2>Foto anexada</h2>
+          <p id="tituloFotoChamado">Foto da OS</p>
+        </div>
+
+        <button type="button" class="modal-close" data-action="fechar-visualizacao-foto">×</button>
+      </div>
+
+      <img id="imagemFotoChamado" class="image-modal-preview" alt="" />
+
+      <button type="button" class="secondary-button" data-action="fechar-visualizacao-foto">
+        Fechar foto
+      </button>
+    </div>
+  </div>
+
+
+
+  <!-- MODAL DE NOTIFICAÇÕES INTERNAS -->
+  <div class="modal-overlay" id="modalNotificacoes">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2>Notificações</h2>
+          <p>Atualizações recentes das OS.</p>
+        </div>
+
+        <button type="button" class="modal-close" data-action="fechar-painel-notificacoes">×</button>
+      </div>
+
+      <p class="notifications-help-text">As notificações ficam marcadas como lidas apenas para o usuário atual.</p>
+
+      <div class="notifications-list" id="listaNotificacoes">
+        <!-- Notificações carregadas pelo JavaScript -->
+      </div>
+
+      <button type="button" id="botaoMarcarTodasNotificacoes" class="secondary-button" data-action="marcar-todas-notificacoes-lidas">
+        Marcar todas como lidas
+      </button>
+
+      <button type="button" class="secondary-button" data-action="fechar-painel-notificacoes">
+        Fechar
+      </button>
+    </div>
+  </div>
+
+  <!-- MENU INFERIOR -->
+  <!-- Navegação inferior -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-nav-page="inicio">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-8.5Z" stroke-linejoin="round" />
+      </svg>
+      Início
+    </div>
+
+    <div class="nav-item" data-nav-page="chamados">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M9 4h6v4H9V4Z" stroke-linejoin="round" />
+        <path d="M7 6H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2" stroke-linejoin="round" />
+        <path d="M8 13h8M8 17h6" stroke-linecap="round" />
+      </svg>
+      OS
+    </div>
+
+    <div class="nav-item nav-item-novo" data-nav-page="novo">
+      <div class="nav-plus">+</div>
+      Novo
+    </div>
+
+    <div class="nav-item" data-nav-page="comunicados">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 14h3l8 4V6l-8 4H4v4Z" stroke-linejoin="round" />
+        <path d="M18 9a4 4 0 0 1 0 6M21 7a7 7 0 0 1 0 10" stroke-linecap="round" />
+      </svg>
+      Comunicados
+    </div>
+
+    <div class="nav-item" data-nav-page="perfil">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M20 21a8 8 0 0 0-16 0" stroke-linecap="round" />
+        <path d="M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" stroke-linejoin="round" />
+      </svg>
+      Perfil
+    </div>
+  </nav>
+
+
+  <!-- Dependências externas -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js"></script>
+
+  <!-- Constantes globais do projeto -->
+  <script src="src/constants/andares.js"></script>
+  <script src="src/constants/locais.js"></script>
+  <script src="src/constants/categorias.js"></script>
+  <script src="src/constants/subcategorias.js"></script>
+  <script src="src/constants/status.js"></script>
+  <script src="src/constants/prioridades.js"></script>
+  <script src="src/constants/tiposOS.js"></script>
+  <script src="src/constants/perfis.js"></script>
+  <script src="src/constants/permissoes.js"></script>
+  <script src="src/constants/firebase.js"></script>
+  <script src="src/constants/push.js"></script>
+  <script src="src/constants/exportacoes.js"></script>
+  <script src="src/constants/index.js"></script>
+
+  <!-- Módulos JavaScript do app -->
+  <script src="js/state.js"></script>
+  <script src="js/ui-feedback.js"></script>
+  <script src="js/auth-permissions.js"></script>
+  <script src="js/firebase-service.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/notificacoes.js"></script>
+  <script src="js/push-notifications.js"></script>
+  <script src="js/categorias.js"></script>
+  <script src="js/logs-tecnicos.js"></script>
+  <script src="js/chamados-form.js"></script>
+  <script src="js/chamados-render.js"></script>
+  <script src="js/chamados.js"></script>
+  <script src="js/exportacoes.js"></script>
+  <script src="js/modal-chamado.js"></script>
+  <script src="js/painel-indicadores.js"></script>
+  <script src="js/painel-cards.js"></script>
+  <script src="js/painel-status.js"></script>
+  <script src="js/painel.js"></script>
+  <script src="js/perfil.js"></script>
+  <script src="js/comunicados.js"></script>
+  <script src="js/preventivas.js"></script>
+  <script src="js/diagnostico.js"></script>
+  <script src="js/cadastro-colaboradores.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/event-action-maps.js"></script>
+  <script src="js/event-bindings.js"></script>
+  <script src="js/service-worker-register.js"></script>
+
+  <script>
+    (function () {
+      function finalizarSplash() {
+        document.body.classList.add('app-ready');
+        setTimeout(function () {
+          var splash = document.getElementById('appSplash');
+          if (splash) splash.remove();
+        }, 520);
+      }
+
+      window.addEventListener('load', function () {
+        setTimeout(finalizarSplash, 180);
+      });
+
+      setTimeout(finalizarSplash, 2400);
+    })();
+  </script>
+</body>
+
+</html>

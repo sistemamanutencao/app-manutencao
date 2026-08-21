@@ -1,0 +1,40 @@
+/* ===================== BASE: VARIÁVEIS, RESET E CORPO ===================== */
+
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+:root {
+  --blue: #1f6fe5;
+      --dark-blue: #1e477f;
+      --text-dark: #151f3a;
+      --text-muted: #737d96;
+      --bg: #f5f7fc;
+      --app-shell-bg: radial-gradient(circle at 50% -8%, rgba(214, 160, 57, 0.28) 0%, rgba(74, 49, 24, 0.82) 30%, #1b140e 62%, #100c08 100%);
+      --app-shell-card-glow: rgba(214, 160, 57, 0.16);
+      --app-shell-border: rgba(214, 160, 57, 0.18);
+      --card: #ffffff;
+      --border: #edf1f7;
+      --green: #17a66b;
+      --orange: #e58a00;
+      --purple: #7257e8;
+    }
+
+html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: #1b140e;
+      background-image: var(--app-shell-bg);
+      background-attachment: fixed;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+body {
+      display: flex;
+      justify-content: center;
+    }

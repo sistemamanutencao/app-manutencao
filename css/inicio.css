@@ -1,0 +1,167 @@
+/* ===================== ABA INÍCIO: HERO, ACESSOS RÁPIDOS E SINO ===================== */
+
+.bell-button {
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      background: #fff;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      color: var(--text-dark);
+      position: relative;
+      box-shadow: 0 8px 18px rgba(20, 40, 80, 0.08);
+    }
+
+.bell-button svg {
+      width: 25px;
+      height: 25px;
+    }
+
+.bell-badge {
+      position: absolute;
+      top: -7px;
+      right: -6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      border: 2px solid #f8faff;
+    }
+
+.hero {
+      width: 100%;
+      height: 210px;
+      border-radius: 18px;
+      background: var(--dark-blue);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 26px;
+      box-shadow: 0 8px 18px rgba(20, 40, 80, 0.08);
+    }
+
+.hero-text {
+      position: relative;
+      z-index: 3;
+      width: 58%;
+      padding: 29px 0 0 21px;
+      color: #fff;
+    }
+
+.hero-text h2 {
+      font-size: 27px;
+      line-height: 1.15;
+      font-weight: 850;
+      letter-spacing: -0.4px;
+      margin-bottom: 17px;
+    }
+
+.hero-text p {
+      font-size: 15px;
+      line-height: 1.42;
+      color: #dce8ff;
+      font-weight: 500;
+    }
+
+.hero-building {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 61%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.95;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,.15) 14%, #000 35%);
+      mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,.15) 14%, #000 35%);
+    }
+
+.hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(90deg, rgba(30, 71, 127, 0) 0%, rgba(30, 71, 127, 0.15) 58%, rgba(30, 71, 127, 0.05) 100%);
+      pointer-events: none;
+    }
+
+.quick-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+/* v25: manutenção mantém 3 atalhos principais em uma única linha, sem espaços vazios. */
+.quick-grid.quick-grid-manutencao {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+.quick-card {
+      height: 130px;
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 7px 14px rgba(20, 40, 80, 0.07);
+      padding: 14px 5px 10px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+.quick-icon {
+      width: 47px;
+      height: 47px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 11px;
+    }
+
+.quick-icon svg {
+      width: 26px;
+      height: 26px;
+      stroke-width: 2.4;
+    }
+
+.quick-card h3 {
+      font-size: 11.8px;
+      line-height: 1.15;
+      font-weight: 850;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+
+.quick-card p {
+      font-size: 10.5px;
+      line-height: 1.1;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+.quick-card {
+      cursor: pointer;
+    }
+
+/* v26: contador dos chamados novos exibidos na página inicial da manutenção. */
+.inicio-count-badge {
+      display: inline-flex;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 7px;
+      margin-left: 5px;
+      border-radius: 999px;
+      align-items: center;
+      justify-content: center;
+      background: #d93030;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1;
+      vertical-align: 2px;
+}

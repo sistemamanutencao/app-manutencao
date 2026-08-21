@@ -1,0 +1,350 @@
+/* ===================== RESPONSIVIDADE ===================== */
+
+@media (max-width: 390px) {
+      .phone-screen {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .header h1 { font-size: 26px; }
+
+      .hero-text {
+        width: 60%;
+        padding-left: 18px;
+      }
+
+      .hero-building {
+        width: 60%;
+        right: 0;
+      }
+
+      .quick-grid { gap: 7px; }
+      .quick-card h3 { font-size: 11px; }
+      .quick-card p { font-size: 10px; }
+
+      .ticket {
+        grid-template-columns: 52px minmax(0, 1fr);
+      }
+
+      .status {
+        grid-column: 2;
+        justify-self: start;
+        margin-top: 3px;
+      }
+    }
+
+@media (max-width: 340px) {
+      .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .quick-grid.quick-grid-manutencao { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .quick-card { height: 105px; }
+      .hero { height: 170px; }
+      .hero-text { width: 68%; }
+      .hero-building {
+        width: 55%;
+        opacity: 0.9;
+      }
+    }
+
+@media (max-width: 390px) {
+  .detail-photo {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .foto-preview-grid,
+  .foto-preview-wrapper {
+    justify-items: start;
+  }
+}
+
+/* =====================================================
+   v13 - RESPONSIVIDADE DA LISTA E DETALHES DE OS
+   Ajustes visuais conservadores para PWA/celular.
+   Não altera regras de negócio, permissões ou Firebase.
+===================================================== */
+
+@media (max-width: 480px) {
+  .phone-screen {
+    max-width: 100%;
+    min-height: 100dvh;
+    padding: 16px 14px calc(98px + env(safe-area-inset-bottom));
+    overflow-x: hidden;
+  }
+
+  .page-header {
+    margin-bottom: 16px;
+  }
+
+  .page-header h1,
+  .header h1 {
+    font-size: 24px;
+    line-height: 1.12;
+  }
+
+  .page-header p,
+  .header p {
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .search-box {
+    margin-bottom: 12px;
+  }
+
+  .search-box input {
+    height: 44px;
+    border-radius: 13px;
+    font-size: 13.5px;
+  }
+
+  .filter-row {
+    gap: 8px;
+    margin-bottom: 13px;
+    padding-bottom: 5px;
+    scrollbar-width: thin;
+  }
+
+  .filter {
+    padding: 9px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+  }
+
+  .tickets-card {
+    gap: 8px;
+    padding: 6px 0;
+  }
+
+  .ticket.ticket-operational {
+    grid-template-columns: minmax(0, 1fr) 14px;
+    gap: 7px;
+    padding: 12px 10px 11px 13px;
+    border-radius: 14px;
+    box-shadow: 0 4px 11px rgba(10, 31, 68, 0.09);
+  }
+
+  .ticket-operational-info {
+    gap: 7px;
+  }
+
+  .ticket-header-row {
+    gap: 8px;
+  }
+
+  .ticket-header-row h3 {
+    font-size: 15px;
+    line-height: 1.2;
+  }
+
+  .ticket-header-row .status {
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 9.8px;
+    max-width: 128px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ticket-detail-list {
+    gap: 3px;
+  }
+
+  .ticket-detail-list p {
+    font-size: 12.5px;
+    line-height: 1.3;
+  }
+
+  .ticket-footer-row {
+    gap: 8px;
+    padding-top: 7px;
+  }
+
+  .ticket-meta,
+  .priority-badge {
+    font-size: 11.8px;
+  }
+
+  .ticket-meta svg,
+  .priority-badge svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .priority-badge {
+    margin-left: 0;
+  }
+
+  .ticket-chevron {
+    font-size: 24px;
+  }
+
+  .bottom-nav {
+    height: calc(78px + env(safe-area-inset-bottom));
+    padding: 7px 6px calc(10px + env(safe-area-inset-bottom));
+  }
+
+  .nav-item {
+    font-size: 10.5px;
+  }
+
+  .nav-item svg {
+    width: 23px;
+    height: 23px;
+    margin-bottom: 4px;
+  }
+
+  .nav-plus {
+    width: 49px;
+    height: 49px;
+    border-radius: 15px;
+    margin-bottom: 5px;
+  }
+
+  .modal-overlay {
+    align-items: flex-start;
+    justify-content: center;
+    padding: 10px 10px calc(90px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+
+  .modal-card {
+    max-width: 100%;
+    max-height: calc(100dvh - 20px - env(safe-area-inset-bottom));
+    border-radius: 20px;
+    padding: 18px 14px 20px;
+  }
+
+  .modal-header {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .modal-header h2 {
+    font-size: 19px;
+    line-height: 1.18;
+  }
+
+  .modal-header p {
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+
+  .modal-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    font-size: 26px;
+    flex: 0 0 auto;
+  }
+
+  .detail-list,
+  .detail-description,
+  .history-box {
+    margin-top: 12px;
+    border-radius: 14px;
+  }
+
+  .detail-item {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+    padding: 11px 12px;
+  }
+
+  .detail-item span,
+  .detail-item strong {
+    font-size: 12.5px;
+    text-align: left;
+    max-width: 100%;
+    word-break: break-word;
+  }
+
+  .detail-description {
+    padding: 12px;
+  }
+
+  .detail-description h3,
+  .history-box h3 {
+    font-size: 14px;
+  }
+
+  .detail-description p,
+  .history-item p {
+    font-size: 13px;
+    line-height: 1.42;
+  }
+
+  .modal-label {
+    margin-top: 12px;
+    margin-bottom: 10px;
+  }
+
+  .modal-label select,
+  .form-card input,
+  .form-card select,
+  .form-card textarea {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .history-box {
+    padding: 12px;
+  }
+
+  .foto-preview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-items: stretch;
+  }
+
+  .foto-preview-wrapper {
+    justify-items: stretch;
+  }
+
+  .foto-preview {
+    max-width: none;
+    height: 78px;
+  }
+}
+
+@media (max-width: 360px) {
+  .phone-screen {
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+
+  .ticket.ticket-operational {
+    padding: 11px 9px 10px 12px;
+  }
+
+  .ticket-header-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ticket-header-row .status {
+    max-width: 100%;
+  }
+
+  .ticket-footer-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .priority-badge {
+    align-self: flex-start;
+  }
+
+  .modal-card {
+    padding: 16px 12px 18px;
+  }
+
+  .foto-preview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 481px) {
+  .modal-card {
+    scrollbar-gutter: stable;
+  }
+}
