@@ -57,7 +57,9 @@
     "alterar-prioridade-chamado": elemento => executarAcao("alterarPrioridadeChamadoAtual", elemento),
     "fechar-visualizacao-foto": () => executarAcao("fecharVisualizacaoFoto"),
     "fechar-painel-notificacoes": () => executarAcao("fecharPainelNotificacoes"),
-    "marcar-todas-notificacoes-lidas": () => executarAcao("marcarTodasNotificacoesComoLidas")
+    "marcar-todas-notificacoes-lidas": () => executarAcao("marcarTodasNotificacoesComoLidas"),
+    "ativar-alertas-push": () => executarAcao("ativarAlertasPush"),
+    "desativar-alertas-push": () => executarAcao("desativarAlertasPush")
   };
 
   const acoesMudanca = {

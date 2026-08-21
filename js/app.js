@@ -16,6 +16,11 @@ document.addEventListener("DOMContentLoaded", inicializarAplicacao);
 
 function inicializarAplicacao() {
   inicializarFirebaseServico();
+
+  if (typeof inicializarPushNotifications === "function") {
+    inicializarPushNotifications();
+  }
+
   configurarEventosGlobais();
   prepararTelaSemSessao();
 
@@ -104,6 +109,11 @@ function prepararTelaSemSessao() {
   }
 
   aplicarPermissoesInterface();
+
+  if (typeof atualizarInterfacePush === "function") {
+    atualizarInterfacePush();
+  }
+
   openPage(usuarioPodeVerPainel() ? "painel" : "inicio");
 }
 
@@ -138,6 +148,11 @@ async function processarEstadoAutenticacao(usuarioFirebase) {
     aplicarPermissoesNaTela();
     aplicarPermissoesInterface();
     iniciarMonitoresDeDados();
+
+    if (typeof atualizarInterfacePush === "function") {
+      atualizarInterfacePush();
+    }
+
     openPage("inicio");
     return;
   }
@@ -167,6 +182,17 @@ async function processarEstadoAutenticacao(usuarioFirebase) {
     aplicarPermissoesNaTela();
     aplicarPermissoesInterface();
     iniciarMonitoresDeDados();
+
+    if (typeof atualizarInterfacePush === "function") {
+      atualizarInterfacePush();
+    }
+
+    if (typeof sincronizarAlertasPushAutorizados === "function") {
+      sincronizarAlertasPushAutorizados().catch(erro => {
+        console.warn("Não foi possível sincronizar os alertas push:", erro);
+      });
+    }
+
     openPage(usuarioEhManutencaoAutorizada() ? "painel" : "inicio");
   } catch (erro) {
     console.error("Erro ao carregar usuário:", erro);
@@ -271,6 +297,10 @@ function iniciarMonitoresDeDados() {
     chamados = lista;
     renderizarChamados();
     atualizarPainelSeAberto();
+
+    if (typeof tentarAbrirChamadoPushPendente === "function") {
+      tentarAbrirChamadoPushPendente();
+    }
   }, erro => {
     console.error("Erro ao carregar chamados:", erro);
     alert("Não foi possível carregar as OS.\nVerifique sua conexão e tente atualizar a página.");

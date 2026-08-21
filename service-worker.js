@@ -1,4 +1,86 @@
-const CACHE_NAME = "app-manutencao-v25-inicio-sem-nova-os-comunicados";
+/* Firebase Cloud Messaging no mesmo Service Worker do PWA.
+ * A v28 usa os pacotes compat para preservar a arquitetura atual sem bundler.
+ */
+try {
+  importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js");
+  importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js");
+
+  firebase.initializeApp({
+    apiKey: "AIzaSyC48Vz7xsw8Ikzp3yz3QqVFWWPrvp1D3z4",
+    authDomain: "app-manutencao-2169f.firebaseapp.com",
+    databaseURL: "https://app-manutencao-2169f-default-rtdb.firebaseio.com",
+    projectId: "app-manutencao-2169f",
+    storageBucket: "app-manutencao-2169f.firebasestorage.app",
+    messagingSenderId: "729718839494",
+    appId: "1:729718839494:web:d92add8d24aa1e3fc65fc7"
+  });
+
+  const messagingPush = firebase.messaging();
+
+  messagingPush.onBackgroundMessage(payload => {
+    const data = payload && payload.data ? payload.data : {};
+    const titulo = data.title || "Novo chamado de manutenção";
+    const corpo = data.body || "Há uma nova OS aguardando atendimento.";
+
+    return self.registration.showNotification(titulo, {
+      body: corpo,
+      icon: "./img/icon-192.png",
+      badge: "./img/icon-192.png",
+      tag: data.tag || (data.chamadoId ? `novo-chamado-${data.chamadoId}` : "novo-chamado"),
+      renotify: true,
+      requireInteraction: String(data.prioridade || "").toLowerCase() === "urgente",
+      vibrate: [200, 100, 200],
+      data: {
+        chamadoId: data.chamadoId || "",
+        url: data.url || ""
+      }
+    });
+  });
+} catch (erroFirebaseMessaging) {
+  console.warn("Firebase Messaging indisponível no Service Worker:", erroFirebaseMessaging);
+}
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+
+  const dados = event.notification.data || {};
+  const chamadoId = dados.chamadoId || "";
+  const destino = dados.url || (() => {
+    const url = new URL("./", self.registration.scope);
+    if (chamadoId) {
+      url.searchParams.set("chamado", chamadoId);
+    }
+    return url.href;
+  })();
+
+  event.waitUntil((async () => {
+    const janelas = await self.clients.matchAll({
+      type: "window",
+      includeUncontrolled: true
+    });
+
+    const janelaApp = janelas.find(cliente => cliente.url.startsWith(self.registration.scope));
+
+    if (janelaApp) {
+      await janelaApp.focus();
+
+      if (chamadoId) {
+        janelaApp.postMessage({
+          type: "OPEN_CHAMADO",
+          chamadoId
+        });
+      }
+
+      return;
+    }
+
+    if (self.clients.openWindow) {
+      await self.clients.openWindow(destino);
+    }
+  })());
+});
+
+const CACHE_NAME = "app-manutencao-v28-push-configurado";
 
 const FILES_TO_CACHE = [
   "./",
@@ -28,6 +110,7 @@ const FILES_TO_CACHE = [
   "./src/constants/perfis.js",
   "./src/constants/permissoes.js",
   "./src/constants/firebase.js",
+  "./src/constants/push.js",
   "./src/constants/exportacoes.js",
   "./src/constants/index.js",
   "./js/state.js",
@@ -37,6 +120,7 @@ const FILES_TO_CACHE = [
   "./js/utils.js",
   "./js/navigation.js",
   "./js/notificacoes.js",
+  "./js/push-notifications.js",
   "./js/categorias.js",
   "./js/logs-tecnicos.js",
   "./js/chamados-form.js",

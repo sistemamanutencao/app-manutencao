@@ -59,3 +59,7 @@ final2.zip
 ```
 | v24 | `app-manutencao-v24-experiencia-redefinicao-senha.zip` | Experiência visual de solicitação de redefinição de senha com avatar, feedback interno e envio pelo Firebase Auth | Pronto para teste/publicação |
 | v25 | `app-manutencao-v25-inicio-sem-nova-os-comunicados.zip` | Remove Nova OS e Comunicados do Acesso rápido, mantendo ambos na navegação inferior e reajustando o grid | Pronto para teste/publicação |
+| v26 | `app-manutencao-v26-novos-chamados-inicio.zip` | Exibe na página Início da manutenção todos e somente os chamados com status ABERTO; remove automaticamente da lista ao mudar para qualquer outro status | Pronto para teste/publicação |
+| v27 | `app-manutencao-v27-push-novos-chamados.zip` | Infraestrutura de alertas push de novos chamados via FCM + Cloudflare Worker gratuito, com ativação por aparelho e abertura direta da OS | Configuração externa pendente antes do teste real |
+
+| v28 | `app-manutencao-v28-push-configurado.zip` | Ativa notificações push de novos chamados com VAPID pública, Worker publicado e KV remoto configurado | Pronto para publicação e teste real no celular |

@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "app-manutencao-push",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-21",
+  "vars": {
+    "FIREBASE_PROJECT_ID": "app-manutencao-2169f",
+    "APP_URL": "https://sistemamanutencao.github.io/app-manutencao/",
+    "ALLOWED_ORIGIN": "https://sistemamanutencao.github.io"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "PUSH_DEVICES",
+      "id": "2b3dca27655643b1a0c00848caefb2db",
+      "remote": true
+    }
+  ]
+}

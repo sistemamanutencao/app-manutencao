@@ -90,6 +90,12 @@ async function criarChamado() {
       await registrarNotificacaoNovoChamado(chamadoId, novoChamado);
     }
 
+    if (typeof enviarAlertaPushNovoChamado === "function") {
+      enviarAlertaPushNovoChamado(chamadoId).catch(erro => {
+        console.warn("OS criada; alerta push não enviado:", erro);
+      });
+    }
+
     await appFeedback(`OS ${numeroOS} aberta com sucesso.\nA solicitação já está disponível para acompanhamento.`, { tipo: "sucesso", titulo: "OS registrada" });
     limparFormularioChamado();
     prepararAbaChamadosAposEnvio();

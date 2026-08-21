@@ -32,6 +32,7 @@ function obterChamadosVisiveis() {
 function renderizarChamados() {
   const listaChamados = document.getElementById("listaChamados") || document.getElementById("listaOS");
   const listaChamadosInicio = document.getElementById("listaChamadosInicio") || document.getElementById("listaOSInicio");
+  const listaChamadosNovosInicio = document.getElementById("listaChamadosNovosInicio");
   const chamadosVisiveis = obterChamadosVisiveis();
   const chamadosDaAba = filtrarChamadosPorAba(chamadosVisiveis);
   const chamadosFiltrados = obterChamadosFiltrados(chamadosDaAba);
@@ -54,6 +55,28 @@ function renderizarChamados() {
     listaChamadosInicio.innerHTML = chamadosInicio.length > 0
       ? chamadosInicio.map(criarCardChamado).join("")
       : criarMensagemVazia("Nenhum chamado recente", "Abra um novo chamado para acompanhar por aqui.");
+  }
+
+  if (listaChamadosNovosInicio) {
+    const manutencaoAutorizada = typeof usuarioEhManutencaoAutorizada === "function"
+      && usuarioEhManutencaoAutorizada();
+    const chamadosNovos = manutencaoAutorizada
+      ? ordenarChamadosPorPrioridade(
+          chamados.filter(chamado => String(chamado.status || "ABERTO").toUpperCase() === "ABERTO")
+        )
+      : [];
+    const contadorChamadosNovosInicio = document.getElementById("contadorChamadosNovosInicio");
+
+    if (contadorChamadosNovosInicio) {
+      contadorChamadosNovosInicio.textContent = chamadosNovos.length;
+    }
+
+    listaChamadosNovosInicio.innerHTML = chamadosNovos.length > 0
+      ? chamadosNovos.map(criarCardChamado).join("")
+      : criarMensagemVazia(
+          "Nenhum chamado novo",
+          "Quando uma nova OS for aberta, ela aparecerá aqui até a manutenção iniciar o atendimento."
+        );
   }
 
   if (typeof atualizarResumoPerfil === "function") {

@@ -155,6 +155,17 @@
         </div>
       </section>
 
+      <section class="manut-only" id="secaoChamadosNovosInicio">
+        <div class="section-header spacing">
+          <h2>Novos chamados <span id="contadorChamadosNovosInicio" class="inicio-count-badge">0</span></h2>
+          <a href="#" data-nav-page="painel">Ver fila</a>
+        </div>
+
+        <div class="tickets-card" id="listaChamadosNovosInicio">
+          <!-- Apenas OS com status ABERTO serão carregadas pelo JavaScript -->
+        </div>
+      </section>
+
       <section id="secaoComunicadosInicio">
         <div class="section-header spacing">
           <h2>Comunicados recentes</h2>
@@ -1046,6 +1057,41 @@
       </div>
     </div>
 
+    <section class="push-alert-card manut-only" id="areaAlertasPush" hidden aria-labelledby="tituloAlertasPush">
+      <div class="push-alert-card-header">
+        <div class="push-alert-icon" aria-hidden="true">🔔</div>
+        <div>
+          <h3 id="tituloAlertasPush">Alertas no celular</h3>
+          <strong id="statusAlertasPush">Desativado</strong>
+        </div>
+      </div>
+
+      <p id="detalheAlertasPush">
+        Ative para receber alertas de novos chamados mesmo com o PWA em segundo plano.
+      </p>
+
+      <div class="push-alert-actions">
+        <button
+          type="button"
+          class="primary-button"
+          id="botaoAtivarAlertasPush"
+          data-action="ativar-alertas-push"
+        >
+          Ativar alertas neste aparelho
+        </button>
+
+        <button
+          type="button"
+          class="secondary-button push-disable-button"
+          id="botaoDesativarAlertasPush"
+          data-action="desativar-alertas-push"
+          hidden
+        >
+          Desativar neste aparelho
+        </button>
+      </div>
+    </section>
+
     <button 
       id="botaoPainelManutencao" 
       class="primary-button" 
@@ -1493,6 +1539,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js"></script>
 
   <!-- Constantes globais do projeto -->
   <script src="src/constants/andares.js"></script>
@@ -1505,6 +1552,7 @@
   <script src="src/constants/perfis.js"></script>
   <script src="src/constants/permissoes.js"></script>
   <script src="src/constants/firebase.js"></script>
+  <script src="src/constants/push.js"></script>
   <script src="src/constants/exportacoes.js"></script>
   <script src="src/constants/index.js"></script>
 
@@ -1516,6 +1564,7 @@
   <script src="js/utils.js"></script>
   <script src="js/navigation.js"></script>
   <script src="js/notificacoes.js"></script>
+  <script src="js/push-notifications.js"></script>
   <script src="js/categorias.js"></script>
   <script src="js/logs-tecnicos.js"></script>
   <script src="js/chamados-form.js"></script>

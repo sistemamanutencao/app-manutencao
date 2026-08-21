@@ -779,3 +779,73 @@
     font-size: 20px;
   }
 }
+
+/* ===================== V28 — ALERTAS PUSH NO CELULAR ===================== */
+.push-alert-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 7px 16px rgba(20, 40, 80, 0.07);
+  padding: 16px;
+  margin: 0 0 18px;
+}
+
+.push-alert-card[hidden] {
+  display: none !important;
+}
+
+.push-alert-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.push-alert-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(31, 111, 229, 0.1);
+  font-size: 21px;
+  flex: 0 0 44px;
+}
+
+.push-alert-card h3 {
+  margin: 0 0 3px;
+  color: var(--text-dark);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.push-alert-card strong {
+  display: block;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.push-alert-card p {
+  margin: 12px 0 14px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.push-alert-actions {
+  display: grid;
+  gap: 9px;
+}
+
+.push-alert-actions .primary-button,
+.push-alert-actions .secondary-button {
+  width: 100%;
+  margin: 0;
+}
+
+.push-disable-button {
+  background: #fff;
+  color: var(--text-dark);
+  border: 1px solid var(--border);
+}
