@@ -379,7 +379,6 @@ async function tratarMensagemPushPrimeiroPlano(payload) {
     await registro.showNotification(titulo, {
       body: corpo,
       icon: "./img/icon-192.png",
-      badge: "./img/notification-badge.png",
       tag: data.tag || (data.chamadoId ? `novo-chamado-${data.chamadoId}` : "novo-chamado"),
       data: {
         chamadoId: data.chamadoId || "",
