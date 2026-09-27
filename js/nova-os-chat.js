@@ -133,6 +133,7 @@
 
   let estado = criarEstadoInicial();
   let inicializado = false;
+  let chaveUsuarioInicializado = "";
   let resultadoEnvio = null;
   let envioEmAndamento = false;
   let urlsPreview = [];
@@ -155,6 +156,18 @@
   function inicializarChatNovaOS() {
     if (!novaOSChatAtivo()) return;
 
+    const chaveUsuarioAtual = obterChaveUsuarioAtual();
+    const usuarioMudou = inicializado && chaveUsuarioInicializado !== chaveUsuarioAtual;
+
+    if (usuarioMudou) {
+      limparPreviewsFotos();
+      limparInputFoto();
+      resultadoEnvio = null;
+      envioEmAndamento = false;
+      estado = criarEstadoInicial();
+      inicializado = false;
+    }
+
     if (resultadoEnvio) {
       resultadoEnvio = null;
       estado = criarEstadoInicial();
@@ -162,19 +175,38 @@
 
     if (!inicializado) {
       inicializado = true;
+      chaveUsuarioInicializado = chaveUsuarioAtual;
       estado = criarEstadoInicial();
       adicionarMensagemSistema(
-        `Olá${obterPrimeiroNomeUsuario() ? `, ${obterPrimeiroNomeUsuario()}` : ""}. Vou te ajudar a abrir um chamado. Responda às opções e eu organizo as informações para a manutenção.`
+        `Olá, ${obterNomePerfilSaudacao()}. Vou te ajudar a abrir um chamado. Responda às opções e eu organizo as informações para a manutenção.`
       );
     }
 
     renderizarChatNovaOS();
   }
 
-  function obterPrimeiroNomeUsuario() {
-    const nome = typeof usuarioAtual !== "undefined" && usuarioAtual ? String(usuarioAtual.nome || "").trim() : "";
-    if (!nome || nome.toLowerCase() === "colaborador") return "";
-    return nome.split(/\s+/)[0];
+  function obterChaveUsuarioAtual() {
+    if (typeof usuarioAtual === "undefined" || !usuarioAtual) return "sem-usuario";
+
+    return [
+      String(usuarioAtual.id || ""),
+      String(usuarioAtual.email || ""),
+      String(usuarioAtual.perfil || ""),
+      String(usuarioAtual.nome || "")
+    ].join("|");
+  }
+
+  function obterNomePerfilSaudacao() {
+    if (typeof usuarioAtual === "undefined" || !usuarioAtual) return "Colaborador";
+
+    if (typeof obterNomePerfilFormatado === "function") {
+      return obterNomePerfilFormatado(usuarioAtual.perfil);
+    }
+
+    const perfil = String(usuarioAtual.perfil || "").toLowerCase();
+    if (perfil.includes("ger")) return "Gerência";
+    if (perfil.includes("manut")) return "Manutenção";
+    return "Colaborador";
   }
 
   function reiniciarChatNovaOS() {
@@ -183,7 +215,7 @@
     resultadoEnvio = null;
     estado = criarEstadoInicial();
     adicionarMensagemSistema(
-      `Vamos começar novamente${obterPrimeiroNomeUsuario() ? `, ${obterPrimeiroNomeUsuario()}` : ""}.`
+      `Vamos começar novamente, ${obterNomePerfilSaudacao()}.`
     );
     renderizarChatNovaOS();
   }
