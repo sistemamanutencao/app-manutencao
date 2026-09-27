@@ -1,0 +1,731 @@
+/* =====================================================
+   NOVA OS - ASSISTENTE CONVERSACIONAL GUIADO
+===================================================== */
+
+.nova-os-chat-page {
+  --chat-navy: #0b1f3a;
+  --chat-navy-soft: #14345d;
+  --chat-blue: #1f6fe5;
+  --chat-blue-soft: #eaf2ff;
+  --chat-surface: #ffffff;
+  --chat-surface-alt: #f5f8fc;
+  --chat-border: #dfe7f2;
+  --chat-text: #14213a;
+  --chat-muted: #68758c;
+  --chat-success: #168a5b;
+  --chat-warning: #b96800;
+  --chat-danger: #c93434;
+  --chat-shadow: 0 12px 32px rgba(12, 34, 68, 0.10);
+}
+
+.nova-os-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 2px 2px 0;
+}
+
+.nova-os-chat-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.nova-os-chat-heading-icon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: linear-gradient(145deg, var(--chat-blue), #1756b9);
+  color: #fff;
+  box-shadow: 0 9px 18px rgba(31, 111, 229, .24);
+}
+
+.nova-os-chat-heading-icon svg {
+  width: 25px;
+  height: 25px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.nova-os-chat-heading h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1.1;
+  font-weight: 850;
+  letter-spacing: -.25px;
+}
+
+.nova-os-chat-heading p {
+  margin: 4px 0 0;
+  color: rgba(255,255,255,.70);
+  font-size: 12.5px;
+  line-height: 1.3;
+  font-weight: 650;
+}
+
+.nova-os-chat-reset {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 11px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 12px;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nova-os-chat-shell {
+  overflow: hidden;
+  border: 1px solid rgba(219, 228, 241, .95);
+  border-radius: 24px;
+  background: var(--chat-surface);
+  box-shadow: var(--chat-shadow);
+}
+
+.nova-os-chat-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 15px;
+  border-bottom: 1px solid var(--chat-border);
+  background: #fbfdff;
+}
+
+
+.nova-os-chat-back {
+  min-height: 32px;
+  padding: 5px 9px;
+  border: 1px solid #d9e3f0;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--chat-blue);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nova-os-chat-back[hidden] {
+  display: none !important;
+}
+
+.nova-os-chat-progress {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--chat-blue-soft);
+  color: var(--chat-blue);
+  font-size: 11.5px;
+  font-weight: 850;
+}
+
+.nova-os-chat-toolbar small {
+  color: var(--chat-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.nova-os-chat-content {
+  padding: 16px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(31,111,229,.06), transparent 28%),
+    linear-gradient(180deg, #f8fbff 0%, #f3f7fc 100%);
+}
+
+.nova-os-chat-messages {
+  display: grid;
+  gap: 12px;
+}
+
+.nova-os-message-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.nova-os-message-row-user {
+  justify-content: flex-end;
+}
+
+.nova-os-avatar-assistant {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--chat-navy);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 5px 12px rgba(11,31,58,.16);
+}
+
+.nova-os-message {
+  max-width: min(84%, 430px);
+  padding: 11px 13px;
+  border-radius: 17px;
+  font-size: 13.5px;
+  line-height: 1.42;
+  font-weight: 650;
+  word-break: break-word;
+}
+
+.nova-os-message-assistant {
+  border: 1px solid var(--chat-border);
+  border-bottom-left-radius: 6px;
+  background: #fff;
+  color: var(--chat-text);
+  box-shadow: 0 4px 12px rgba(23, 52, 91, .055);
+}
+
+.nova-os-message-user {
+  border-bottom-right-radius: 6px;
+  background: var(--chat-blue);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(31,111,229,.18);
+}
+
+.nova-os-message-alert {
+  border-color: #ffd09b;
+  background: #fff7e9;
+  color: #7c4500;
+}
+
+.nova-os-message-edit {
+  border-color: #cbdcff;
+  background: #f0f5ff;
+  color: #234f91;
+}
+
+.nova-os-current-question {
+  margin-bottom: 2px;
+}
+
+.nova-os-chat-interaction {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.nova-os-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-left: 38px;
+}
+
+.nova-os-options-grid-large {
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 3px;
+  scrollbar-width: thin;
+}
+
+.nova-os-choice {
+  min-width: 0;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 11px 10px 12px;
+  border: 1px solid #d9e3f0;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--chat-text);
+  text-align: left;
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 1.25;
+  font-weight: 780;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(18, 45, 82, .045);
+  transition: border-color .15s ease, transform .15s ease, background .15s ease;
+}
+
+.nova-os-choice:hover,
+.nova-os-choice:focus-visible {
+  border-color: #9bbcf0;
+  background: #f7faff;
+  outline: none;
+}
+
+.nova-os-choice:active {
+  transform: scale(.985);
+}
+
+.nova-os-choice-arrow {
+  flex: 0 0 auto;
+  color: var(--chat-blue);
+  font-size: 21px;
+  font-weight: 500;
+}
+
+.nova-os-question-help {
+  margin: -3px 0 0 38px;
+  color: var(--chat-muted);
+  font-size: 11.5px;
+  line-height: 1.4;
+  font-weight: 650;
+}
+
+.nova-os-text-response {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-left: 38px;
+}
+
+.nova-os-text-response-stack {
+  grid-template-columns: 1fr;
+}
+
+.nova-os-text-response input,
+.nova-os-text-response textarea {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #cfdaea;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--chat-text);
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.4;
+  outline: none;
+}
+
+.nova-os-text-response textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.nova-os-text-response input:focus,
+.nova-os-text-response textarea:focus {
+  border-color: #75a3eb;
+  box-shadow: 0 0 0 3px rgba(31,111,229,.10);
+}
+
+.nova-os-send-inline,
+.nova-os-button-primary,
+.nova-os-button-secondary {
+  border: none;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.nova-os-send-inline {
+  min-height: 48px;
+  padding: 0 15px;
+  background: var(--chat-blue);
+  color: #fff;
+}
+
+.nova-os-photo-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-left: 38px;
+}
+
+.nova-os-photo-button {
+  min-height: 74px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  border: 1px solid #d7e1ef;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--chat-text);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nova-os-photo-button span:first-child {
+  color: var(--chat-blue);
+  font-size: 21px;
+}
+
+.nova-os-photo-skip {
+  grid-column: 1 / -1;
+  min-height: 42px;
+  border: none;
+  background: transparent;
+  color: var(--chat-blue);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.nova-os-photo-info {
+  margin-left: 38px;
+  padding: 9px 11px;
+  border-radius: 12px;
+  background: #edf8f3;
+  color: var(--chat-success);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.nova-os-chat-footer {
+  display: flex;
+  align-items: center;
+  min-height: 51px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--chat-border);
+  background: #fff;
+}
+
+.nova-os-back-button {
+  border: none;
+  background: transparent;
+  color: #50627c;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nova-os-back-button[hidden] {
+  display: none;
+}
+
+.nova-os-summary-card,
+.nova-os-success-card {
+  margin-left: 38px;
+  overflow: hidden;
+  border: 1px solid #dce5f0;
+  border-radius: 19px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(18, 45, 82, .07);
+}
+
+.nova-os-summary-card {
+  padding: 15px;
+}
+
+.nova-os-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.nova-os-summary-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--chat-blue);
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .45px;
+  text-transform: uppercase;
+}
+
+.nova-os-summary-header h2,
+.nova-os-success-card h2 {
+  margin: 0;
+  color: var(--chat-text);
+  font-size: 16px;
+  line-height: 1.25;
+  font-weight: 900;
+}
+
+.nova-os-priority {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 900;
+}
+
+.prioridade-urgente {
+  background: #ffe9e9;
+  color: #be2929;
+}
+
+.prioridade-alta {
+  background: #fff0dd;
+  color: #a95b00;
+}
+
+.prioridade-normal {
+  background: #eaf2ff;
+  color: #1f62c5;
+}
+
+.prioridade-baixa {
+  background: #eaf8f1;
+  color: #167a52;
+}
+
+.nova-os-summary-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid #edf1f6;
+}
+
+.nova-os-summary-list > div {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.nova-os-summary-list dt {
+  color: var(--chat-muted);
+  font-size: 11.5px;
+  font-weight: 750;
+}
+
+.nova-os-summary-list dd {
+  margin: 0;
+  color: var(--chat-text);
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 780;
+  word-break: break-word;
+}
+
+.nova-os-summary-photos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.nova-os-summary-photos img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 11px;
+  border: 1px solid #e1e8f2;
+}
+
+.nova-os-summary-photo-empty {
+  margin-top: 11px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  background: #f5f7fa;
+  color: var(--chat-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.nova-os-summary-notice {
+  margin: 12px 0 0;
+  color: var(--chat-muted);
+  font-size: 11.5px;
+  line-height: 1.4;
+  font-weight: 650;
+}
+
+.nova-os-summary-actions,
+.nova-os-success-actions {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: 9px;
+  margin-top: 13px;
+}
+
+.nova-os-button-primary,
+.nova-os-button-secondary {
+  min-height: 45px;
+  padding: 8px 11px;
+}
+
+.nova-os-button-primary {
+  background: var(--chat-blue);
+  color: #fff;
+  box-shadow: 0 7px 15px rgba(31,111,229,.18);
+}
+
+.nova-os-button-secondary {
+  border: 1px solid #d5dfec;
+  background: #fff;
+  color: var(--chat-text);
+}
+
+.nova-os-button-primary:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.nova-os-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-left: 38px;
+}
+
+.nova-os-edit-grid button {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #d9e3f0;
+  border-radius: 13px;
+  background: #fff;
+  color: var(--chat-text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nova-os-edit-grid .nova-os-edit-cancel {
+  grid-column: 1 / -1;
+  color: var(--chat-blue);
+  background: #f6f9ff;
+}
+
+.nova-os-success-card {
+  padding: 24px 17px;
+  text-align: center;
+}
+
+.nova-os-success-icon {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 12px;
+  border-radius: 18px;
+  background: #e7f7ef;
+  color: var(--chat-success);
+  font-size: 27px;
+  font-weight: 900;
+}
+
+.nova-os-success-card p {
+  margin: 6px 0 0;
+  color: var(--chat-muted);
+  font-size: 12.5px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.nova-os-success-card .nova-os-priority {
+  margin-top: 12px;
+}
+
+.nova-os-success-actions {
+  grid-template-columns: 1fr;
+  margin-top: 17px;
+}
+
+.nova-os-chat-legacy-fields {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.nova-os-file-input {
+  position: fixed;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+
+@media (max-width: 480px) {
+  .nova-os-chat-header {
+    align-items: flex-start;
+  }
+
+  .nova-os-chat-heading-icon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    border-radius: 13px;
+  }
+
+  .nova-os-chat-heading h1 {
+    font-size: 18px;
+  }
+
+  .nova-os-chat-reset {
+    min-height: 35px;
+    padding: 0 9px;
+    font-size: 10.5px;
+  }
+
+  .nova-os-chat-content {
+    padding: 13px 11px 14px;
+  }
+
+  .nova-os-options-grid,
+  .nova-os-text-response,
+  .nova-os-photo-actions,
+  .nova-os-question-help,
+  .nova-os-photo-info,
+  .nova-os-summary-card,
+  .nova-os-success-card,
+  .nova-os-edit-grid {
+    margin-left: 38px;
+  }
+
+  .nova-os-choice {
+    min-height: 46px;
+    padding: 9px 9px 9px 10px;
+    font-size: 11.8px;
+  }
+
+  .nova-os-options-grid-large {
+    max-height: 310px;
+  }
+}
+
+@media (max-width: 360px) {
+  .nova-os-options-grid,
+  .nova-os-photo-actions,
+  .nova-os-edit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nova-os-photo-skip,
+  .nova-os-edit-grid .nova-os-edit-cancel {
+    grid-column: auto;
+  }
+
+  .nova-os-summary-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .nova-os-summary-list > div {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+}

@@ -57,9 +57,7 @@
     "alterar-prioridade-chamado": elemento => executarAcao("alterarPrioridadeChamadoAtual", elemento),
     "fechar-visualizacao-foto": () => executarAcao("fecharVisualizacaoFoto"),
     "fechar-painel-notificacoes": () => executarAcao("fecharPainelNotificacoes"),
-    "marcar-todas-notificacoes-lidas": () => executarAcao("marcarTodasNotificacoesComoLidas"),
-    "ativar-alertas-push": () => executarAcao("ativarAlertasPush"),
-    "desativar-alertas-push": () => executarAcao("desativarAlertasPush")
+    "marcar-todas-notificacoes-lidas": () => executarAcao("marcarTodasNotificacoesComoLidas")
   };
 
   const acoesMudanca = {
@@ -73,7 +71,8 @@
     "alterar-categoria-dashboard": elemento => executarAcao("alterarCategoriaDashboard", elemento.value),
     "filtrar-painel-status": elemento => executarAcao("filtrarPainelStatus", elemento.value),
     "filtrar-painel-prioridade": elemento => executarAcao("filtrarPainelPrioridade", elemento.value),
-    "selecionar-nivel-comunicado-select": elemento => executarAcao("selecionarNivelComunicadoSelect", elemento)
+    "selecionar-nivel-comunicado-select": elemento => executarAcao("selecionarNivelComunicadoSelect", elemento),
+    "processar-fotos-chat-nova-os": elemento => executarAcao("processarFotosChatNovaOS", elemento)
   };
 
   const acoesDinamicas = {
@@ -102,7 +101,18 @@
     gerarOSPreventiva: (...argumentos) => executarAcao("gerarOSPreventiva", ...argumentos),
     editarPlanoPreventivo: (...argumentos) => executarAcao("editarPlanoPreventivo", ...argumentos),
     inativarPlanoPreventivo: (...argumentos) => executarAcao("inativarPlanoPreventivo", ...argumentos),
-    excluirPlanoPreventivo: (...argumentos) => executarAcao("excluirPlanoPreventivo", ...argumentos)
+    excluirPlanoPreventivo: (...argumentos) => executarAcao("excluirPlanoPreventivo", ...argumentos),
+    reiniciarChatNovaOS: (...argumentos) => executarAcao("reiniciarChatNovaOS", ...argumentos),
+    voltarChatNovaOS: (...argumentos) => executarAcao("voltarChatNovaOS", ...argumentos),
+    responderChatNovaOS: (...argumentos) => executarAcao("responderChatNovaOS", ...argumentos),
+    enviarTextoChatNovaOS: (...argumentos) => executarAcao("enviarTextoChatNovaOS", ...argumentos),
+    acionarFotoChatNovaOS: (...argumentos) => executarAcao("acionarFotoChatNovaOS", ...argumentos),
+    continuarSemFotoChatNovaOS: (...argumentos) => executarAcao("continuarSemFotoChatNovaOS", ...argumentos),
+    abrirEdicaoResumoChatNovaOS: (...argumentos) => executarAcao("abrirEdicaoResumoChatNovaOS", ...argumentos),
+    editarResumoChatNovaOS: (...argumentos) => executarAcao("editarResumoChatNovaOS", ...argumentos),
+    confirmarEnvioChatNovaOS: (...argumentos) => executarAcao("confirmarEnvioChatNovaOS", ...argumentos),
+    acompanharChamadoChatNovaOS: (...argumentos) => executarAcao("acompanharChamadoChatNovaOS", ...argumentos),
+    voltarInicioChatNovaOS: (...argumentos) => executarAcao("voltarInicioChatNovaOS", ...argumentos)
   };
 
   const acoesEntrada = {

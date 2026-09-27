@@ -24,6 +24,7 @@ function obterCamposFormularioChamado() {
     tipoManutencao: document.getElementById("tipoManutencaoChamado"),
     prioridade: document.getElementById("prioridadeChamado"),
     descricao: document.getElementById("descricaoChamado"),
+    equipamentoNome: document.getElementById("equipamentoNomeChamado"),
     foto: document.getElementById("fotoChamado")
   };
 
@@ -42,7 +43,7 @@ function lerValoresFormularioChamado(campos) {
     andar: obterValorCampoChamado(campos.andar),
     local: obterValorCampoChamado(campos.local),
     equipamentoCodigo: "",
-    equipamentoNome: "",
+    equipamentoNome: obterValorCampoChamado(campos.equipamentoNome),
     horario: "Não informado",
     precisaAcompanhamento: "Não informado",
     categoria: obterValorCampoChamado(campos.categoria),
@@ -246,6 +247,7 @@ function limparFormularioChamado() {
     "subcategoriaChamado",
     "tipoManutencaoChamado",
     "descricaoChamado",
+    "equipamentoNomeChamado",
     "fotoChamado"
   ];
 

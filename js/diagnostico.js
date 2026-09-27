@@ -474,10 +474,16 @@ function prepararOSComDiagnostico(id) {
   const item = encontrarDiagnosticoPorId(id);
   if (!item) return;
 
-  const local = separarLocalDiagnostico(item.local);
   openPage("novo");
 
   setTimeout(() => {
+    if (typeof preencherChatNovaOSComDiagnostico === "function") {
+      preencherChatNovaOSComDiagnostico(item);
+      return;
+    }
+
+    // Fallback de compatibilidade caso o módulo conversacional não esteja disponível.
+    const local = separarLocalDiagnostico(item.local);
     const andar = document.getElementById("andarChamado");
     const localCampo = document.getElementById("localChamado");
     const tipo = document.getElementById("tipoManutencaoChamado");
@@ -490,7 +496,6 @@ function prepararOSComDiagnostico(id) {
       andar.value = local.andar;
       atualizarLocaisPorAndarManutencao(local.local);
     }
-
     if (localCampo && local.local) localCampo.value = local.local;
     if (tipo) tipo.value = normalizarTipoParaOS(item.tipo);
     if (categoria) {
@@ -499,10 +504,7 @@ function prepararOSComDiagnostico(id) {
     }
     if (subcategoria && subcategoria.options.length > 1) subcategoria.selectedIndex = 1;
     if (prioridade) prioridade.value = normalizarPrioridadeParaOS(item.prioridade);
-    if (descricao) {
-      descricao.value = montarDescricaoOSDiagnostico(item);
-      descricao.focus();
-    }
+    if (descricao) descricao.value = montarDescricaoOSDiagnostico(item);
   }, 80);
 }
 

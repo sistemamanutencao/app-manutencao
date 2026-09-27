@@ -71,6 +71,10 @@ function atualizarItemNavegacaoAtivo(pageId, navElement) {
 }
 
 function executarRenderizacaoDaPagina(pageId) {
+  if (pageId === "novo" && typeof inicializarChatNovaOS === "function") {
+    inicializarChatNovaOS();
+  }
+
   if (pageId === "painel") {
     renderizarPainelManutencao();
   }
