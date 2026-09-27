@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-manutencao-v24-chat-os-guiada-v2-saudacao-perfil";
+const CACHE_NAME = "app-manutencao-v24-exclusao-canceladas-v1";
 
 const FILES_TO_CACHE = [
   "./",

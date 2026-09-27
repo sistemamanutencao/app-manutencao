@@ -95,7 +95,7 @@
     validarOS: (...argumentos) => executarAcao("validarOS", ...argumentos),
     encerrarOS: (...argumentos) => executarAcao("encerrarOS", ...argumentos),
     salvarStatusPainel: (...argumentos) => executarAcao("salvarStatusPainel", ...argumentos),
-    excluirChamadoEncerrado: (...argumentos) => executarAcao("excluirChamadoEncerrado", ...argumentos),
+    excluirChamadoFinalizado: (...argumentos) => executarAcao("excluirChamadoFinalizado", ...argumentos),
     executarAcaoRapidaOS: (...argumentos) => executarAcao("executarAcaoRapidaOS", ...argumentos),
     marcarPreventivaRealizada: (...argumentos) => executarAcao("marcarPreventivaRealizada", ...argumentos),
     gerarOSPreventiva: (...argumentos) => executarAcao("gerarOSPreventiva", ...argumentos),

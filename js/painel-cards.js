@@ -107,8 +107,8 @@ function criarCardPainel(chamado) {
             </button>
           ` : ""}
 
-          ${chamado.status === "ENCERRADO" && usuarioEhManutencaoAutorizada() ? `
-            <button type="button" class="admin-action-button painel-danger-action" data-dynamic-action="excluirChamadoEncerrado" data-param0="${formatarAtributoHTML(chamado.id)}" data-pass-element="true">
+          ${["ENCERRADO", "CANCELADO"].includes(chamado.status) && usuarioEhManutencaoAutorizada() ? `
+            <button type="button" class="admin-action-button painel-danger-action" data-dynamic-action="excluirChamadoFinalizado" data-param0="${formatarAtributoHTML(chamado.id)}" data-pass-element="true">
               Excluir OS
             </button>
           ` : ""}

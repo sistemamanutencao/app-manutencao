@@ -140,6 +140,11 @@ function chamadoEstaEncerradoParaExclusao(chamado) {
   return chamado && String(chamado.status || "").trim().toUpperCase() === "ENCERRADO";
 }
 
+function chamadoPodeSerExcluido(chamado) {
+  const status = String(chamado && chamado.status || "").trim().toUpperCase();
+  return status === "ENCERRADO" || status === "CANCELADO";
+}
+
 function obterMensagemErroExclusaoFirestore(erro) {
   const codigo = String(erro && erro.code || "");
 
@@ -151,12 +156,12 @@ function obterMensagemErroExclusaoFirestore(erro) {
     return "Não foi possível excluir por falha de conexão com o Firebase. Verifique a internet e tente novamente.";
   }
 
-  return "Não foi possível excluir a OS encerrada. Verifique sua conexão, permissões e tente novamente.";
+  return "Não foi possível excluir a OS. Verifique sua conexão, permissões e tente novamente.";
 }
 
-async function excluirChamadoEncerrado(id, botao) {
+async function excluirChamadoFinalizado(id, botao) {
   if (!usuarioEhManutencaoAutorizada()) {
-    alert("Somente a manutenção autorizada pode excluir OS encerradas.");
+    alert("Somente a manutenção autorizada pode excluir OS encerradas ou canceladas.");
     return;
   }
 
@@ -167,17 +172,19 @@ async function excluirChamadoEncerrado(id, botao) {
     return;
   }
 
-  if (!chamadoEstaEncerradoParaExclusao(chamado)) {
-    alert("Apenas OS com status ENCERRADO podem ser excluídas por esta opção.");
+  if (!chamadoPodeSerExcluido(chamado)) {
+    alert("Apenas OS com status ENCERRADO ou CANCELADO podem ser excluídas.");
     return;
   }
 
   const numero = chamado.numeroOS || chamado.id;
+  const status = String(chamado.status || "").trim().toUpperCase();
+  const rotuloStatus = status === "CANCELADO" ? "cancelada" : "encerrada";
   const confirmado = await appConfirm(
     `Deseja excluir definitivamente a OS ${numero}?
 
-Antes de confirmar, verifique se ela já foi exportada. Essa ação remove o registro do Firebase e não pode ser desfeita pelo app.`,
-    { titulo: "Excluir OS encerrada", textoConfirmar: "Excluir definitivamente", textoCancelar: "Voltar" }
+Esta OS está ${rotuloStatus}. Antes de confirmar, verifique se o registro precisa ser mantido ou exportado. A exclusão remove o chamado do Firebase e não pode ser desfeita pelo app.`,
+    { titulo: `Excluir OS ${rotuloStatus}`, textoConfirmar: "Excluir definitivamente", textoCancelar: "Voltar" }
   );
 
   if (!confirmado) {
@@ -190,9 +197,10 @@ Antes de confirmar, verifique se ela já foi exportada. Essa ação remove o reg
     chamados = chamados.filter(item => String(item.id) !== String(id));
     if (botao) aplicarFeedbackSucesso(botao, "Excluída", "Excluir OS");
     renderizarPainelManutencao();
-    alert("OS encerrada excluída com sucesso.");
+    if (typeof renderizarChamados === "function") renderizarChamados();
+    alert(`OS ${rotuloStatus} excluída com sucesso.`);
   } catch (erro) {
-    console.error("Erro ao excluir OS encerrada:", erro);
+    console.error(`Erro ao excluir OS ${rotuloStatus}:`, erro);
     if (botao) aplicarFeedbackErro(botao, "Erro", "Excluir OS");
     alert(obterMensagemErroExclusaoFirestore(erro));
   }
