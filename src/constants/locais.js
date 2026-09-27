@@ -1,91 +1,101 @@
 /* =====================================================
-   CONSTANTES - LOCAIS POR ANDAR
+   CONSTANTES - AMBIENTES POR LOCAL PRINCIPAL
 ===================================================== */
 
+const LOCAIS_ESTACIONAMENTO_MANUTENCAO = Object.freeze([
+  "Lavanderia",
+  "Subestação",
+  "Cisterna Coletora",
+  "Casa de Bombas d’Água",
+  "Reservatório d’Água",
+  "Depósito",
+  "Elevador de Carga - Limpeza",
+  "Elevador de Carga - Cozinha",
+  "Elevador Social"
+]);
+
+const LOCAIS_TERREO_MANUTENCAO = Object.freeze([
+  "Banheiro Masculino",
+  "Banheiro Feminino",
+  "Confeitaria",
+  "Guarita",
+  "Recepção",
+  "Cozinha",
+  "Auditório",
+  "Administração",
+  "Sala Master",
+  "Sala Gerência",
+  "Sala Compras",
+  "Sala Financeiro",
+  "Banheiro da Administração",
+  "Banheiro do Camarim",
+  "Sala de Controle",
+  "Escadaria",
+  "Elevador de Carga - Limpeza",
+  "Elevador de Carga - Cozinha",
+  "Elevador Social"
+]);
+
 const LOCAIS_PRIMEIRO_ANDAR_MANUTENCAO = Object.freeze([
-  "banheiro masculino",
-  "banheiro feminino",
+  "Biblioteca",
+  "Banheiro da Biblioteca",
+  "Área de Convivência 1",
+  "Área de Convivência 2",
+  "Banheiro Feminino",
+  "Banheiro Masculino",
+  "Banheiro PCD",
+  "Sala TI",
+  "Escadaria",
+  "Escadaria de Emergência",
+  "Elevador de Carga - Limpeza",
+  "Elevador Social"
+]);
+
+const LOCAIS_SEGUNDO_ANDAR_MANUTENCAO = Object.freeze([
+  "Banheiro Masculino",
+  "Banheiro Feminino",
   "SABES",
-  "Sala manicure",
+  "Sala de Manicure",
   "Espaço Salão",
-  "Banheiro feminino SABES",
-  "Banheiro masculino SABES",
+  "Banheiro Feminino SABES",
+  "Banheiro Masculino SABES",
   "Depósito",
   "Esterilização",
   "Expurgo",
-  "Depósito inbel",
-  "Sala Instrutores",
-  "Sala-01",
-  "Sala-02",
-  "Sala-03",
-  "Sala-04",
-  "Sala-05",
-  "Sala-06",
-  "Sala-07",
-  "Sala-08",
-  "Sala-09",
-  "Sala-10 INFORMATICA",
-  "Sala-11 INFORMATICA",
-  "Sala-12",
-  "Sala-13 Laboratório de Hardware",
-  "Sala-14 Enfermagem",
+  "Depósito Inbel",
+  "Sala de Instrutores",
+  "Sala 01",
+  "Sala 02",
+  "Sala 03",
+  "Sala 04",
+  "Sala 05",
+  "Sala 06",
+  "Sala 07",
+  "Sala 08",
+  "Sala 09",
+  "Sala 10 — Informática",
+  "Sala 11 — Informática",
+  "Sala 12",
+  "Sala 13 — Laboratório de Hardware",
+  "Sala 14 — Enfermagem",
   "Escadaria",
-  "Escadaria de emergência"
+  "Escadaria de Emergência",
+  "Elevador de Carga - Limpeza",
+  "Elevador Social"
+]);
+
+const LOCAIS_AREA_EXTERNA_MANUTENCAO = Object.freeze([
+  "Área externa — Frente",
+  "Área externa — Fundos",
+  "Área externa Confeitaria",
+  "Telhado",
+  "Outro ambiente externo"
 ]);
 
 const LOCAIS_POR_ANDAR_MANUTENCAO = Object.freeze({
-  "1º ANDAR": LOCAIS_PRIMEIRO_ANDAR_MANUTENCAO,
-  "SL ANDAR": Object.freeze([
-    "BIBLIOTECA",
-    "Banheiro Biblioteca",
-    "Área de convivência 1",
-    "Área de convivência 2",
-    "Banheiro feminino",
-    "Banheiro masculino",
-    "Banheiro PCD",
-    "Sala TI",
-    "Escadaria",
-    "Escadaria de emergência"
-  ]),
-  "0º ANDAR": Object.freeze([
-    "banheiro masculino",
-    "banheiro feminino",
-    "Cantina",
-    "Área externa cantina",
-    "Guarita",
-    "Recepção",
-    "Cozinha",
-    "Auditório",
-    "Administração",
-    "Sala Master",
-    "Sala Gerencia",
-    "Sala Compras",
-    "Sala Financeiro",
-    "Banheiro administração",
-    "Área externa fundos",
-    "Área externa frente",
-    "Banheiro camarim",
-    "Sala de controle",
-    "Escadaria"
-  ]),
-  "-1º ANDAR": Object.freeze([
-    "Estacionamento",
-    "Cozinha Colaborador",
-    "Vestuário feminino",
-    "Vestuário masculino",
-    "Almoxarifado 2",
-    "Almoxarifado de bebidas",
-    "Almoxarifado de alimentos",
-    "Recebimento",
-    "Lavanderia",
-    "Espaço transformador",
-    "Espaço Caldeira",
-    "Esgoto",
-    "Sala bombas d'água",
-    "Caixa d'água"
-  ]),
-  "Telhado": Object.freeze([
-    "Toda unidade",
-    ...LOCAIS_PRIMEIRO_ANDAR_MANUTENCAO
-  ])
+  "Estacionamento": LOCAIS_ESTACIONAMENTO_MANUTENCAO,
+  "Térreo": LOCAIS_TERREO_MANUTENCAO,
+  "1º andar": LOCAIS_PRIMEIRO_ANDAR_MANUTENCAO,
+  "2º andar": LOCAIS_SEGUNDO_ANDAR_MANUTENCAO,
+  "Área externa": LOCAIS_AREA_EXTERNA_MANUTENCAO
 });

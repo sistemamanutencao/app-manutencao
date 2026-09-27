@@ -1,11 +1,11 @@
 /* =====================================================
-   CONSTANTES - ANDARES
+   CONSTANTES - LOCAIS PRINCIPAIS DA UNIDADE
 ===================================================== */
 
 const ANDARES_MANUTENCAO = Object.freeze([
-  "1º ANDAR",
-  "SL ANDAR",
-  "0º ANDAR",
-  "-1º ANDAR",
-  "Telhado"
+  "Estacionamento",
+  "Térreo",
+  "1º andar",
+  "2º andar",
+  "Área externa"
 ]);

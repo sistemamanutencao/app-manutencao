@@ -97,6 +97,16 @@
         </div>
 
         <div class="quick-grid">
+          <div class="quick-card" data-nav-page="novo">
+            <div class="quick-icon blue-bg">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M14.7 6.3a4 4 0 0 0-5 5L4 17l3 3 5.7-5.7a4 4 0 0 0 5-5l-3 3-2.4-2.4 2.4-3Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <h3>Nova OS</h3>
+            <p>Abrir Ordem de Serviço</p>
+          </div>
+
           <div class="quick-card hide-for-manut" data-nav-page="chamados">
             <div class="quick-icon green-bg">
               <svg viewBox="0 0 24 24" fill="none">
@@ -106,6 +116,17 @@
             </div>
             <h3 id="tituloCardChamadosRapido">Minhas OS</h3>
             <p id="textoCardChamadosRapido">Acompanhar</p>
+          </div>
+
+          <div class="quick-card manut-only" data-nav-page="comunicados">
+            <div class="quick-icon orange-bg">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 14h3l8 4V6L7 10H4v4Z" stroke="currentColor" stroke-linejoin="round" />
+                <path d="M18 9a4 4 0 0 1 0 6M21 7a7 7 0 0 1 0 10" stroke="currentColor" stroke-linecap="round" />
+              </svg>
+            </div>
+            <h3>Comunicados</h3>
+            <p>Ver avisos</p>
           </div>
 
           <div class="quick-card hide-for-manut" data-nav-page="areas">
@@ -152,17 +173,6 @@
             <h3 class="manut-only-title">Diagnóstico inicial</h3>
             <p>Inspeção da unidade</p>
           </div>
-        </div>
-      </section>
-
-      <section class="manut-only" id="secaoChamadosNovosInicio">
-        <div class="section-header spacing">
-          <h2>Novos chamados <span id="contadorChamadosNovosInicio" class="inicio-count-badge">0</span></h2>
-          <a href="#" data-nav-page="painel">Ver fila</a>
-        </div>
-
-        <div class="tickets-card" id="listaChamadosNovosInicio">
-          <!-- Apenas OS com status ABERTO serão carregadas pelo JavaScript -->
         </div>
       </section>
 
@@ -637,96 +647,44 @@
     </section>
 
     <!-- ABA NOVO -->
-    <section class="page" id="novo">
-      <header class="page-header">
-        <h1>Nova OS</h1>
-        <p>Registre uma Ordem de Serviço para a equipe de manutenção avaliar, executar e encerrar com rastreabilidade.</p>
+    <section class="page nova-os-chat-page" id="novo">
+      <header class="nova-os-chat-header">
+        <div class="nova-os-chat-heading">
+          <span class="nova-os-chat-heading-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-linecap="round"/></svg>
+          </span>
+          <div>
+            <h1>Novo chamado</h1>
+            <p>Assistente de Manutenção • responda passo a passo</p>
+          </div>
+        </div>
+        <button type="button" class="nova-os-chat-reset" data-dynamic-action="reiniciarChatNovaOS">Recomeçar</button>
       </header>
 
-     <form class="form-card" data-form-action="bloquear-submit">
+      <div class="nova-os-chat-shell" id="novaOSChat">
+        <div class="nova-os-chat-toolbar">
+          <button type="button" class="nova-os-chat-back" id="novaOSChatVoltar" data-dynamic-action="voltarChatNovaOS" hidden aria-label="Voltar uma etapa">← Voltar</button>
+          <span class="nova-os-chat-progress" id="novaOSChatProgresso">Etapa 1 de 7</span>
+          <small>Dados organizados automaticamente</small>
+        </div>
 
-     <label>
-        Escolher o andar
-        <select id="andarChamado" data-change-action="atualizar-locais-andar-manutencao">
-          <option value="">Selecione o andar</option>
-          <option value="1º ANDAR">1º ANDAR</option>
-          <option value="SL ANDAR">SL ANDAR</option>
-          <option value="0º ANDAR">0º ANDAR</option>
-          <option value="-1º ANDAR">-1º ANDAR</option>
-          <option value="Telhado">Telhado</option>
-        </select>
-        <small class="form-help">Depois de escolher o andar, o campo abaixo mostra somente os locais daquele andar.</small>
-     </label>
+        <div class="nova-os-chat-content">
+          <div class="nova-os-chat-messages" id="novaOSChatMensagens" aria-live="polite"></div>
+          <div class="nova-os-chat-interaction" id="novaOSChatInteracao"></div>
+        </div>
+      </div>
 
-     <label>
-        Local do andar
-        <select id="localChamado" disabled>
-          <option value="">Selecione um andar primeiro</option>
-        </select>
-     </label>
-
-     <label>
-        Tipo de manutenção
-        <select id="tipoManutencaoChamado">
-          <option value="Corretiva">Corretiva</option>
-          <option value="Preventiva">Preventiva</option>
-          <option value="Inspeção">Inspeção</option>
-          <option value="Melhoria">Melhoria</option>
-        </select>
-        <small class="form-help">Use Corretiva para falhas, Preventiva para rotina programada, Inspeção para vistoria e Melhoria para evolução da estrutura.</small>
-     </label>
-
-     <label>
-        Categoria da OS
-        <select id="categoriaChamado" data-change-action="atualizar-subcategorias-chamado">
-          <option value="">Selecione</option>
-          <option value="Elétrica">Elétrica</option>
-          <option value="Hidráulica">Hidráulica</option>
-          <option value="Alvenaria">Alvenaria</option>
-          <option value="Pintura">Pintura</option>
-          <option value="Eletrônica">Eletrônica</option>
-          <option value="Outros">Outros</option>
-        </select>
-     </label>
-
-     <label>
-        Subcategoria
-        <select id="subcategoriaChamado">
-          <option value="">Selecione uma categoria primeiro</option>
-        </select>
-        <small class="form-help">As subcategorias mudam conforme a categoria escolhida.</small>
-     </label>
-
-
-        <label>
-          Prioridade
-          <select id="prioridadeChamado">
-            <option value="">Selecione</option>
-            <option value="Baixa">Baixa</option>
-            <option value="Média">Média</option>
-            <option value="Alta">Alta</option>
-            <option value="Urgente">Urgente</option>
-          </select>
-        </label>
-
-        <label>
-          Descrição da solicitação
-          <textarea id="descricaoChamado" placeholder="Descreva a ocorrência com detalhes..."></textarea>
-        </label>
-
-        <label>
-          Fotos de abertura / antes
-          <input id="fotoChamado" type="file" accept="image/*" multiple />
-          <small class="form-help">Você pode selecionar até 3 imagens de abertura por OS.</small>
-        </label>
-
-        <button 
-        type="button" 
-        class="primary-button" 
-        data-action="criar-chamado"
-       >
-        Abrir OS
-       </button>
+      <!-- Campos de compatibilidade: mantêm o mesmo objeto/fluxo de gravação Firebase existente. -->
+      <form class="nova-os-chat-legacy-fields" data-form-action="bloquear-submit" aria-hidden="true">
+        <select id="andarChamado" tabindex="-1"><option value=""></option></select>
+        <select id="localChamado" tabindex="-1"><option value=""></option></select>
+        <select id="tipoManutencaoChamado" tabindex="-1"><option value="Corretiva">Corretiva</option></select>
+        <select id="categoriaChamado" tabindex="-1"><option value=""></option></select>
+        <select id="subcategoriaChamado" tabindex="-1"><option value=""></option></select>
+        <select id="prioridadeChamado" tabindex="-1"><option value=""></option></select>
+        <textarea id="descricaoChamado" tabindex="-1"></textarea>
+        <input id="equipamentoNomeChamado" type="hidden" value="" />
+        <input id="fotoChamado" class="nova-os-file-input" type="file" accept="image/*" multiple data-change-action="processar-fotos-chat-nova-os" tabindex="-1" />
       </form>
     </section>
 
@@ -1056,41 +1014,6 @@
         <strong id="perfilEmailValor">usuario@senac.com</strong>
       </div>
     </div>
-
-    <section class="push-alert-card manut-only" id="areaAlertasPush" hidden aria-labelledby="tituloAlertasPush">
-      <div class="push-alert-card-header">
-        <div class="push-alert-icon" aria-hidden="true">🔔</div>
-        <div>
-          <h3 id="tituloAlertasPush">Alertas no celular</h3>
-          <strong id="statusAlertasPush">Desativado</strong>
-        </div>
-      </div>
-
-      <p id="detalheAlertasPush">
-        Ative para receber alertas de novos chamados mesmo com o PWA em segundo plano.
-      </p>
-
-      <div class="push-alert-actions">
-        <button
-          type="button"
-          class="primary-button"
-          id="botaoAtivarAlertasPush"
-          data-action="ativar-alertas-push"
-        >
-          Ativar alertas neste aparelho
-        </button>
-
-        <button
-          type="button"
-          class="secondary-button push-disable-button"
-          id="botaoDesativarAlertasPush"
-          data-action="desativar-alertas-push"
-          hidden
-        >
-          Desativar neste aparelho
-        </button>
-      </div>
-    </section>
 
     <button 
       id="botaoPainelManutencao" 
@@ -1539,7 +1462,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js"></script>
 
   <!-- Constantes globais do projeto -->
   <script src="src/constants/andares.js"></script>
@@ -1552,7 +1474,6 @@
   <script src="src/constants/perfis.js"></script>
   <script src="src/constants/permissoes.js"></script>
   <script src="src/constants/firebase.js"></script>
-  <script src="src/constants/push.js"></script>
   <script src="src/constants/exportacoes.js"></script>
   <script src="src/constants/index.js"></script>
 
@@ -1564,12 +1485,12 @@
   <script src="js/utils.js"></script>
   <script src="js/navigation.js"></script>
   <script src="js/notificacoes.js"></script>
-  <script src="js/push-notifications.js"></script>
   <script src="js/categorias.js"></script>
   <script src="js/logs-tecnicos.js"></script>
   <script src="js/chamados-form.js"></script>
   <script src="js/chamados-render.js"></script>
   <script src="js/chamados.js"></script>
+  <script src="js/nova-os-chat.js"></script>
   <script src="js/exportacoes.js"></script>
   <script src="js/modal-chamado.js"></script>
   <script src="js/painel-indicadores.js"></script>

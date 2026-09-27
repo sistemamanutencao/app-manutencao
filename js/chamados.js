@@ -17,12 +17,13 @@
 
 async function criarChamado() {
   const botaoEnvio = document.querySelector('button[data-action="criar-chamado"]');
+  const chatAtivo = typeof novaOSChatAtivo === "function" && novaOSChatAtivo();
 
   if (botaoEnvio && botaoEnvio.disabled) {
-    return;
+    return false;
   }
 
-  if (typeof inicializarFormularioOS === "function") {
+  if (!chatAtivo && typeof inicializarFormularioOS === "function") {
     inicializarFormularioOS();
   }
 
@@ -31,14 +32,14 @@ async function criarChamado() {
   if (!campos.formularioValido) {
     await appFeedback("Alguns campos do formulário da OS não foram encontrados.\nAtualize a página e tente novamente.", { tipo: "erro", titulo: "Formulário incompleto" });
     console.error("Campos ausentes na OS:", campos.ausentes);
-    return;
+    return false;
   }
 
-  if (typeof atualizarLocaisPorAndarManutencao === "function") {
+  if (!chatAtivo && typeof atualizarLocaisPorAndarManutencao === "function") {
     atualizarLocaisPorAndarManutencao(campos.local.value);
   }
 
-  if (typeof atualizarSubcategoriasChamado === "function") {
+  if (!chatAtivo && typeof atualizarSubcategoriasChamado === "function") {
     atualizarSubcategoriasChamado(campos.categoria.value, campos.subcategoria.value);
   }
 
@@ -49,12 +50,12 @@ async function criarChamado() {
 
   if (camposPendentes.length > 0) {
     await appFeedback(`Preencha os campos obrigatórios da OS:\n- ${camposPendentes.join("\n- ")}`, { tipo: "aviso" });
-    return;
+    return false;
   }
 
   if (valores.arquivosFotos.length > LIMITE_FOTOS_CHAMADO) {
     await appFeedback(`Selecione no máximo ${LIMITE_FOTOS_CHAMADO} imagens por chamado.\nRemova imagens excedentes e tente novamente.`, { tipo: "aviso", titulo: "Limite de imagens" });
-    return;
+    return false;
   }
 
   if (botaoEnvio) {
@@ -90,20 +91,22 @@ async function criarChamado() {
       await registrarNotificacaoNovoChamado(chamadoId, novoChamado);
     }
 
-    if (typeof enviarAlertaPushNovoChamado === "function") {
-      enviarAlertaPushNovoChamado(chamadoId).catch(erro => {
-        console.warn("OS criada; alerta push não enviado:", erro);
-      });
+    limparFormularioChamado();
+
+    if (chatAtivo && typeof finalizarEnvioChatNovaOS === "function") {
+      finalizarEnvioChatNovaOS(chamadoId, novoChamado);
+      return true;
     }
 
     await appFeedback(`OS ${numeroOS} aberta com sucesso.\nA solicitação já está disponível para acompanhamento.`, { tipo: "sucesso", titulo: "OS registrada" });
-    limparFormularioChamado();
     prepararAbaChamadosAposEnvio();
     openPage("chamados");
+    return true;
   } catch (erro) {
     console.error("Erro ao enviar OS:", erro);
     const detalheErro = erro && (erro.code || erro.message) ? `\nDetalhe técnico: ${erro.code || erro.message}` : "";
     await appFeedback(`Não foi possível enviar a OS.\nVerifique sua conexão, login e permissões.${detalheErro}`, { tipo: "erro", titulo: "Falha ao abrir OS" });
+    return false;
   } finally {
     if (botaoEnvio) {
       botaoEnvio.disabled = false;
